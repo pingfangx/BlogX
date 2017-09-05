@@ -1,0 +1,415 @@
+# 让OmegaT支持百度翻译和谷歌翻译
+# 0x00 前言
+OmegaT自带的谷歌翻译一直用不了，而且好像还是收费的。  
+自己在使用的时候总是要复制到浏览器翻译，很是麻烦。   
+而OmetaT是开源的，于是想自己修改一下。
+# 0x01 下载并能运行OmegaT的源码
+## 1.1 导入Eclipse
+OmegaT的官网是[https://omegat.org/](https://omegat.org/)  
+源码在[https://github.com/omegat-org/omegat](https://github.com/omegat-org/omegat)  
+文档在\omegat\docs_devel\README.txt  
+下载完后，用Eclipse打开，不可用。  
+readme 中说
+>OmegaT is built with Gradle. Run `gradlew tasks` from the top level to
+see the available tasks.
+
+我一开始应该是直接作为Java项目打开的.  
+于是在窗口→显示视图→其他里，找到Gradle→Gradle Tasks
+打开后提示
+> There are no Gradle projects in the current workspace.*Import a Gradle project* to see its tasks in the Gradle Tasks View.
+
+于是导入，文件→导入→Gradle→Existing Gradle Project
+
+导入后卡半天，想了下可能又是下载gradle卡住了。于是下载gradle,参考[[1]]。
+
+还是卡。
+所以这时一定要打开进度窗口，看它在干什么，好像是有下载的进度,最后却还是卡住了.  
+最后换了阿里云的才终于下载完成了.
+
+## 1.2 处理引用的库
+加载完成之后，有一些类还是找不到。
+然后看到OmegaT中用到的一些第三方库，都放在了lib/sources/中，但都是zip的，而且文件结构也不一样。  
+我只好在zip中把src或jar复制出来，然后手动将复制出来的src添加为代码目录，jar添加到构建路径。  
+最后还缺少org.openide.awt.jar，
+在[http://www.java2s.com/Code/Jar/o/Downloadorgopenideawtjar.htm](http://www.java2s.com/Code/Jar/o/Downloadorgopenideawtjar.htm)下载添加。  
+
+找不到com.sun.tools.javac.main，手动添加jdk路径的C:\Program Files\Java\jdk1.8.0_121\lib\tools.jar
+
+至此,可以运行起OmegaT了.
+
+# 0x02 寻找翻译的方式
+
+## 2.1 调用翻译的代码
+找了一下,看到谷歌翻译的方法为
+```
+org.omegat.core.machinetranslators.Google2Translate.translate(Language, Language, String)
+```
+## 2.2 直接调取翻译api
+在稍微尝试之后，发现直接调取谷歌的翻译api是行不通的。  
+在它的网页简单抓了一下，重新调取也有错，应该是一个类似随机数的那个参数,或是别的什么参数的校验。
+## 2.3 选择WebView
+不能直接请求,那我们用webView打开好了  
+在kimmking的《swing和java里嵌入浏览器》[[2]]中列出了很多方案，于是开始了漫长的下载、试用。
+### jxbrowser
+[http://www.teamdev.com/jxbrowser](http://www.teamdev.com/jxbrowser)  
+这个看着很酷，但是好像要收费的，虽然有破解什么的,但这可没法用啊。
+
+### swt/Jface
+greatwqs《[swt/Jface模拟ie浏览器](http://greatwqs.iteye.com/blog/1213801)》  
+这一个，是可以打开，但是好像没有办法进行交互啊，我也不能设置每次翻译时打开不同的网址，好像一打开就类似一个应用固定了。
+
+### MozSwing
+[https://sourceforge.net/projects/mozswing/](https://sourceforge.net/projects/mozswing/)  
+这个……怎么用啊，怎么连文档都找不到，我也是醉了。
+
+### HtmlUnit
+[http://htmlunit.sourceforge.net/](http://htmlunit.sourceforge.net/)  
+最后发现这个应该挺好的。 
+ 
+# 0x03 完成翻译集成
+## 3.1 解决使用HtmlUnit的问题
+使用HtmlUnit运行之后提示：
+`NoSuchMethodError: org.apache.http.conn.ssl.SSLConnectionSocketFactory`  
+后来发现是httpclient.jar版本有问题。  
+HtmlUnit使用的是4.5.3，而OmegaT中使用的是4.3.6，而且OmegaT的好像是某个库引用的。  
+一开始我想，能不能存在两个库呢，或是将HtmlUnit独立出去，让它单独使用4.5.3，后来发现不行，应该是因为在同一个项目中会编译到一起的。
+
+折腾一天没成功，后来晚上想到，可以让HtmlUnit使用源码，这样应该就可以了。  
+于是下载了HtmlUnit的源码，放到一个项目中。  
+然后又下载了4.5.3的源码，供HtmlUnit使用。  
+接下来，将4.5.3的源码修改，修改包名为org.apache.http453。  
+最后再将HtmlUnit引用到omegat项目中。  
+运行，
+
+然后发现，需要httpmime，httpcore，httpclient 3个包都下载源码修改，而且源码中java-deprecated中的代码也需要复制。
+
+## 3.2 使用HtmlUnit解析数据
+在上一步中，我们终于完成了在java中打开一个网页，接下来我们就要打开翻译并解析数据。
+经过一番努力，我们得到了以下代码
+```
+    /**
+     * 百度翻译
+     */
+    public static String translateByBaidu(String sLang, String tLang, String text) {
+        return translateByHtmlUnit(sLang, tLang, text, "http://fanyi.baidu.com/#%s/%s/%s",
+                "p.ordinary-output.target-output.clearfix");
+    }
+
+    /**
+     * 调用谷歌翻译， 但是实际测试时，速度非常慢，难道是因为要把所有资源加载完才行
+     * 
+     */
+    public static String translateByGoogle(String sLang, String tLang, String text) {
+        // 这里要用https，使用http读取不到翻译结果
+        return translateByHtmlUnit(sLang, tLang, text, "https://translate.google.cn/#%s/%s/%s", "span#result_box");
+    }
+
+    /**
+     * 使用HtmlUnit抓取翻译结果
+     * 
+     * @param sLang source语言
+     * @param tLang target语言
+     * @param text 要翻译的文本
+     * @param url 抓取的网址
+     * @param selector 选择器
+     * @return
+     */
+    public static String translateByHtmlUnit(String sLang, String tLang, String text, String url, String selector) {
+        String formatted_url = String.format(url, sLang, tLang, text);
+        System.out.println("get result from  " + formatted_url);
+        String result = null;
+        WebClient webClient = null;
+        try {
+            webClient = new WebClient(BrowserVersion.CHROME);
+            HtmlPage page = webClient.getPage(formatted_url);
+            result = parseResult(page, selector);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (webClient != null) {
+                try {
+                    webClient.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        System.out.println(String.format("%s translate to  %s", text, result));
+        return result;
+    }
+
+    /**
+     * 从加载的页面中解析出翻译结果
+     * 
+     * @param page 加载出的页面
+     * @param selector 选择器
+     * @return
+     */
+    private static String parseResult(HtmlPage page, String selector) {
+        String result = null;
+        if (page == null) {
+            return result;
+        }
+        try {
+            // 延时了下面的querySelector才有结果，难道是异步加载的？
+            System.out.println("sleep...");
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        // ordinary-output target-output clearfix
+        DomNode div = page.querySelector(selector);
+        if (div != null) {
+            // result=div.getFirstChild().getTextContent();
+            result = div.getTextContent();
+        } else {
+            result = "not found";
+        }
+
+        return result;
+    }
+
+```
+## 3.3 用Java打开浏览器
+**这个方案最终弃用了**  
+
+百度翻译还好，但是谷歌翻译异常的慢，而我打开网页明明是很快的呀。   
+于是再次整理思路：
+* 用java打开其他程序，打开后再返回
+* 用java打开浏览器，直接在浏览器，直接在浏览器中打开翻译界面。
+
+分析了一下，其实我并没有特别需要返回的结果，只是需要谷歌翻译作为参考，不然我每次都要复制到浏览器很是麻烦。  
+于是选择用Java打开浏览器。
+可是问题来了，当我们打开chrome的时候，它要么会新建一个窗口，要么会新建一个tab，但不能在当前tab打开。  
+查找了一下是否有解决方案,看到了这个反馈，好几年了，没人改这个……笑哭。
+https://bugs.chromium.org/p/chromium/issues/detail?id=141942
+### 3.3.1 使用firefox
+在搜索过程中，有人提到firefox是可以的，但是设置后可能正常的网页也只会在当前tab打开，不过我只用firefox来翻译的话影响不大。  
+[Open link in the same tab for Firefox](https://superuser.com/questions/260129/open-link-in-the-same-tab-for-firefox)
+>* In about:config page (confirm that you'll be careful)
+>* Enter browser.link.open_newwindow in the search field
+>* Double click browser.link.open_newwindow.restriction and set value to 0
+>* Double click browser.link.open_newwindow and set value to 1
+
+要注意，第一次运行只能打开firefox浏览器，第二次再运行才打开了指定的网页。  
+也就是说要先打开，再运行程序打开指定网页
+```
+    private void openByBrowser() {
+        String browserPath = "D:\\xx\\software\\browser\\firfox\\firefox.exe";
+        String url = "http://www.baidu.com";
+        try {
+            Runtime runtime = Runtime.getRuntime();
+            runtime.exec(String.format("\"%s\" %s", browserPath, url));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+```
+## 3.5 添加翻译菜单
+**这个方案最终弃用了**  
+```
+    #org.omegat.gui.main.MainWindowMenu.getMachineTranslationMenu()
+    public JMenu getMachineTranslationMenu() {
+        return optionsMachineTranslateMenu;
+    }
+```
+org.omegat.core.machinetranslators.BaseTranslate.BaseTranslate()
+org.omegat.gui.exttrans.MachineTranslateTextArea.FindThread.getTranslation(Language, Language)
+于是找到了类org.omegat.core.machinetranslators.MachineTranslators
+通过方法org.omegat.core.machinetranslators.MachineTranslators.add(IMachineTranslation)
+发现在org.omegat.gui.exttrans.MachineTranslateTextArea.MachineTranslateTextArea(IMainWindow)
+中完成了添加。  
+在这个时候,我发现其实可以不在OmegaT的项目中修改,可以直接导出为插件就好了.
+
+
+# 0x04 插件化
+本来想直接在菜单中设置，追踪过程中发现直接可以使用插件添加的。  
+>A class for aggregating machine translation connectors. Old-style plugins ("OmegaT-Plugin: machinetranslator") are added here by the MachineTranslateTextArea and so should not add themselves manually. New-style plugins ("OmegaT-Plugins: <classname>") should add themselves with add(IMachineTranslation) in the loadPlugins() method.
+
+插件的文档在
+\omegat\docs_devel\OmegaT developer's guide.odt中有介绍
+
+## 4.1 导出jar及清单文件
+右键→导出→Java→JAR文件→下一步  
+选择导出目标→下一步  
+下一步  
+生成清单文件→将清单保存在工作空间中→完成  
+这样就可以生成一个清单文件，
+
+然后修改清单文件，下一次导出的时候就可以选择这个清单文件。
+
+它说的
+> New-style plugins ("OmegaT-Plugins: <classname>") 
+
+实际要在清单文件中写
+>OmegaT-Plugins: com.pingfangx.omegat.plugin.translator.BaiduTranslator
+
+注意“:”后面的空格。
+代码：
+```
+    public class BaiduTranslator {
+
+        public static void loadPlugins() {
+            MachineTranslators.add(new BaiduTranslator2());
+        }
+
+        public static void unloadPlugins() {
+        }
+
+    }
+
+
+```
+但是这样写还是报错。
+```
+InvocationTargetException:null
+```
+查了一下是反射运行有错误，没有头绪。
+## 4.2 清单文件照葫芦画瓢
+从网上下载了一个`OmegaT-plugins-YandexTranslate.jar`  
+发现这个插件是可以正常加载的，查看其清单文件发现用的是旧版本的，于是改为
+```
+    Manifest-Version: 1.0
+    OmegaT-Plugin: true
+    (这里是个空行,这个空行还不能删除，前一行也不能删除)
+    Name: com.pingfangx.omegat.plugin.translator.BaiduTranslator2
+    OmegaT-Plugin: MachineTranslator
+
+```
+这里后来自己新建了一个manifest.mf,然后粘帖上面的内容,结果还是不行,后来发现生的manifest.mf中没有全部写进去,不知是否是格式的文题.
+于是勾选生成manifest,生成后再修改使用.
+
+## 4.3 调试插件
+### 4.3.1 插件路径不正确
+因为插件有问题，运行不了，调试的时候发现路径不对。  
+在
+```
+    //org.omegat.filters2.master.PluginUtils.loadPlugins(Map<String, String>)
+    public static void loadPlugins(final Map<String, String> params) {
+        File pluginsDir = new File(StaticUtils.installDir(), "plugins");
+        ...
+    }
+```
+处打断点，发现其加载的路径是代码路径\.\plugins
+这个目录进不去，于是修改org.omegat.util.StaticUtils.installDir()
+让它返回\1\plugins，可正常加载。
+
+### 4.3.2 插件未加载
+加载过程中,如果有一个插件有问题,就会停止加载.
+打断点看mu的file
+```
+
+    public static void loadPlugins(final Map<String, String> params) {
+        ...
+                URL mu = mlist.nextElement();
+        ...
+    }
+```
+找到有问题的插件,是我导出的mf文件不正确,删除后正常.
+
+### 4.3.3 翻译插件未正常翻译
+发现是报错了没有输出错误信息.  
+后来一步一步步入,只有选择了源码,调试进去才有错误信息.
+
+### 4.3.4 缺少部分类
+导出的jar并没有包含HtmlUnit的所有依赖库,于是将其所有jar复制到plugins文件夹中,也可以再新建一个文件夹保存,可以正常加载.
+
+### 4.3.5 加载谷歌翻译慢
+调试时看到控制台
+```
+
+八月 14, 2017 11:31:49 上午 com.gargoylesoftware.htmlunit.javascript.DefaultJavaScriptErrorListener loadScriptError
+    严重: Error loading JavaScript from [https://apis.google.com/_/scs/abc-static/_/js/k=gapi.gapi.en.iXl4BleY64I.O/m=gapi_iframes,googleapis_client,plusone/rt=j/sv=1/d=1/ed=1/am=AAg/rs=AHpOoo-ACNR5BzMFKxicVpbq2gaX5KLKcg/cb=gapi.loaded_0].
+    org.apache.http453.conn.HttpHostConnectException: Connect to apis.google.com:443 [apis.google.com/74.125.203.102, apis.google.com/74.125.203.100, apis.google.com/74.125.203.101, apis.google.com/74.125.203.138, apis.google.com/74.125.203.113, apis.google.com/74.125.203.139] failed: Connection timed out: connect
+        at org.apache.http453.impl.conn.DefaultHttpClientConnectionOperator.connect(DefaultHttpClientConnectionOperator.java:159)
+        at org.apache.http453.impl.conn.PoolingHttpClientConnectionManager.connect(PoolingHttpClientConnectionManager.java:359)
+        at org.apache.http453.impl.execchain.MainClientExec.establishRoute(MainClientExec.java:381)
+        at org.apache.http453.impl.execchain.MainClientExec.execute(MainClientExec.java:237)
+        at org.apache.http453.impl.execchain.ProtocolExec.execute(ProtocolExec.java:185)
+        at org.apache.http453.impl.execchain.RetryExec.execute(RetryExec.java:89)
+        at org.apache.http453.impl.execchain.RedirectExec.execute(RedirectExec.java:111)
+        at org.apache.http453.impl.client.InternalHttpClient.doExecute(InternalHttpClient.java:185)
+        at org.apache.http453.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:72)
+        at com.gargoylesoftware.htmlunit.HttpWebConnection.getResponse(HttpWebConnection.java:194)
+        at com.gargoylesoftware.htmlunit.WebClient.loadWebResponseFromWebConnection(WebClient.java:1379)
+        at com.gargoylesoftware.htmlunit.WebClient.loadWebResponse(WebClient.java:1298)
+        at com.gargoylesoftware.htmlunit.html.HtmlPage.loadJavaScriptFromUrl(HtmlPage.java:1024)
+        at com.gargoylesoftware.htmlunit.html.HtmlPage.loadExternalJavaScriptFile(HtmlPage.java:974)
+        at com.gargoylesoftware.htmlunit.html.HtmlScript.executeScriptIfNeeded(HtmlScript.java:366)
+        at com.gargoylesoftware.htmlunit.html.HtmlScript$2.execute(HtmlScript.java:247)
+        at com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine.doProcessPostponedActions(JavaScriptEngine.java:945)
+        at com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine.access$4(JavaScriptEngine.java:915)
+        at com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine$HtmlUnitContextAction.run(JavaScriptEngine.java:889)
+        at net.sourceforge.htmlunit.corejs.javascript.Context.call(Context.java:637)
+        at net.sourceforge.htmlunit.corejs.javascript.ContextFactory.call(ContextFactory.java:518)
+        at com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine.execute(JavaScriptEngine.java:774)
+        at com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine.execute(JavaScriptEngine.java:750)
+        at com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine.execute(JavaScriptEngine.java:1)
+        at com.gargoylesoftware.htmlunit.html.HtmlPage.loadExternalJavaScriptFile(HtmlPage.java:991)
+        at com.gargoylesoftware.htmlunit.html.HtmlScript.executeScriptIfNeeded(HtmlScript.java:366)
+        at com.gargoylesoftware.htmlunit.html.HtmlScript$2.execute(HtmlScript.java:247)
+        at com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine.doProcessPostponedActions(JavaScriptEngine.java:945)
+        at com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine.access$4(JavaScriptEngine.java:915)
+        at com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine$HtmlUnitContextAction.run(JavaScriptEngine.java:889)
+        at net.sourceforge.htmlunit.corejs.javascript.Context.call(Context.java:637)
+        at net.sourceforge.htmlunit.corejs.javascript.ContextFactory.call(ContextFactory.java:518)
+        at com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine.execute(JavaScriptEngine.java:774)
+        at com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine.execute(JavaScriptEngine.java:750)
+        at com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine.execute(JavaScriptEngine.java:741)
+        at com.gargoylesoftware.htmlunit.html.HtmlPage.executeJavaScript(HtmlPage.java:918)
+        at com.gargoylesoftware.htmlunit.html.HtmlScript.executeInlineScriptIfNeeded(HtmlScript.java:317)
+        at com.gargoylesoftware.htmlunit.html.HtmlScript.executeScriptIfNeeded(HtmlScript.java:382)
+        at com.gargoylesoftware.htmlunit.html.HtmlScript$2.execute(HtmlScript.java:247)
+        at com.gargoylesoftware.htmlunit.html.HtmlScript.onAllChildrenAddedToPage(HtmlScript.java:268)
+        at com.gargoylesoftware.htmlunit.html.HTMLParser$HtmlUnitDOMBuilder.endElement(HTMLParser.java:800)
+        at org.apache.xerces.parsers.AbstractSAXParser.endElement(Unknown Source)
+        at com.gargoylesoftware.htmlunit.html.HTMLParser$HtmlUnitDOMBuilder.endElement(HTMLParser.java:756)
+        at net.sourceforge.htmlunit.cyberneko.HTMLTagBalancer.callEndElement(HTMLTagBalancer.java:1236)
+        at net.sourceforge.htmlunit.cyberneko.HTMLTagBalancer.endElement(HTMLTagBalancer.java:1136)
+        at net.sourceforge.htmlunit.cyberneko.filters.DefaultFilter.endElement(DefaultFilter.java:226)
+        at net.sourceforge.htmlunit.cyberneko.filters.NamespaceBinder.endElement(NamespaceBinder.java:345)
+        at net.sourceforge.htmlunit.cyberneko.HTMLScanner$ContentScanner.scanEndElement(HTMLScanner.java:3178)
+        at net.sourceforge.htmlunit.cyberneko.HTMLScanner$ContentScanner.scan(HTMLScanner.java:2141)
+        at net.sourceforge.htmlunit.cyberneko.HTMLScanner.scanDocument(HTMLScanner.java:945)
+        at net.sourceforge.htmlunit.cyberneko.HTMLConfiguration.parse(HTMLConfiguration.java:521)
+        at net.sourceforge.htmlunit.cyberneko.HTMLConfiguration.parse(HTMLConfiguration.java:472)
+        at org.apache.xerces.parsers.XMLParser.parse(Unknown Source)
+        at com.gargoylesoftware.htmlunit.html.HTMLParser$HtmlUnitDOMBuilder.parse(HTMLParser.java:999)
+        at com.gargoylesoftware.htmlunit.html.HTMLParser.parse(HTMLParser.java:250)
+        at com.gargoylesoftware.htmlunit.html.HTMLParser.parseHtml(HTMLParser.java:192)
+        at com.gargoylesoftware.htmlunit.DefaultPageCreator.createHtmlPage(DefaultPageCreator.java:272)
+        at com.gargoylesoftware.htmlunit.DefaultPageCreator.createPage(DefaultPageCreator.java:160)
+        at com.gargoylesoftware.htmlunit.WebClient.loadWebResponseInto(WebClient.java:522)
+        at com.gargoylesoftware.htmlunit.WebClient.getPage(WebClient.java:396)
+        at com.gargoylesoftware.htmlunit.WebClient.getPage(WebClient.java:313)
+        at com.gargoylesoftware.htmlunit.WebClient.getPage(WebClient.java:461)
+        at com.gargoylesoftware.htmlunit.WebClient.getPage(WebClient.java:446)
+        at com.pingfangx.omegat.plugin.HtmlUnitUtils.translateByHtmlUnit(HtmlUnitUtils.java:71)
+        at com.pingfangx.omegat.plugin.HtmlUnitUtils.translateByGoogle(HtmlUnitUtils.java:45)
+        at com.pingfangx.omegat.plugin.HtmlUnitUtils.main(HtmlUnitUtils.java:121)
+```
+看到是加载某一js的时候超时了.
+在com.gargoylesoftware.htmlunit.html.HtmlPage.loadJavaScriptFromUrl(URL, Charset)
+中加上print,发现只有加载某一js时会超时,于是在此处直接将其return null不加载.
+```
+    // https://apis.google.com/_/scs/abc-static/_/js/k=gapi.gapi.en.iXl4BleY64I.O/m=gapi_iframes,googleapis_client,plusone/rt=j/sv=1/d=1/ed=1/am=AAg/rs=AHpOoo-ACNR5BzMFKxicVpbq2gaX5KLKcg/cb=gapi.loaded_0
+    if (url.toString().startsWith("https://apis.google.com")) {
+        // 连接总是超时，直接返回null
+        return null;
+    }
+```
+
+# 0x05总结
+* 可以通过添加一个插件来完成翻译
+* 使用HtmlUnit抓取翻译结果
+* HtmlUnit使用的HttpClient都使用源码,修改并导出为jar包
+
+
+
+
+# 参考文献
+[[1]].[gradle下载缓慢的解决方案整理](http://blog.pingfangx.com/2361.html)  
+[[2]]:[kimmking.swing和java里嵌入浏览器](http://blog.csdn.net/kimmking/article/details/43805797)  
+
+[1]:http://blog.pingfangx.com/2361.html "gradle下载缓慢的解决方案整理"
+[2]:http://blog.csdn.net/kimmking/article/details/43805797 "kimmking.swing和java里嵌入浏览器"

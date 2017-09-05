@@ -1,0 +1,52 @@
+# 手动生成OmegaT的记忆文件
+>本文由平方X发表于平方X网，转载请注明出处。[http://blog.pingfangx.com/2360.html](http://blog.pingfangx.com/2360.html)
+
+使用的OmegaT为4.1.2.01Beta  
+# 0x01 格式  
+项目的翻译记忆文件为/omegat/project_save.tmx，只要按此生成文件即可。
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tmx SYSTEM "tmx11.dtd">
+<tmx version="1.1">
+  <header creationtool="OmegaT" o-tmf="OmegaT TMX" adminlang="EN-US" datatype="plaintext" creationtoolversion="OmegaT-4.1.2" segtype="sentence" srclang="EN-US"/>
+  <body>
+<!-- Default translations -->
+    <tu>
+      <tuv lang="EN-US">
+        <seg>Capture Memory Snapshot</seg>
+      </tuv>
+      <tuv lang="ZH-CN" changeid="Admin" changedate="20170816T073236Z" creationid="Admin" creationdate="20170816T073236Z">
+        <seg>捕获内存快照</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="EN-US">
+        <seg>Start CPU Usage Profiling</seg>
+      </tuv>
+      <tuv lang="ZH-CN" changeid="Admin" changedate="20170816T073446Z" creationid="Admin" creationdate="20170816T073446Z">
+        <seg>启动CPU使用情况分析</seg>
+      </tuv>
+    </tu>
+    
+<!-- Alternative translations -->
+  </body>
+</tmx>
+
+```
+
+
+# 0x02 导出前准备
+* 1. unicode转中文
+* 2. 截断句子
+>极少数的英文有两个句子，在omegaT中会被划分为两个片段，所以把中文的也划分为两个句子。  在导入OmegaT时分开导入。  
+>“. ”替换为“。 ”，注意都带一个空格。
+* 3. 处理快捷键
+* 4. 处理省略号
+# 0x03 导出后处理
+* 导出
+* 格式化
+> 格式化一下,格式不影响解析,只要结构正确就行  
+> 格式化的时候为了匹配原格式，可以选上缩进2空格，text不换行  
+> 中文tuv中不是所有属性都必须,只要有lang就够了.
+* 在\<body\>后双击选中并复制
+* 粘贴到/omegat/project_save.tmx
