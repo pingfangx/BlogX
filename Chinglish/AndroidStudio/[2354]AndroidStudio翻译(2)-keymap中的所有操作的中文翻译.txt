@@ -1,0 +1,112 @@
+# AndroidStudio keymap中的所有操作中文翻译
+>本文由平方X发表于平方X网，转载请注明出处。[http://blog.pingfangx.com/2354.html](http://blog.pingfangx.com/2354.html)
+
+# 0x00 前言
+之前用习惯了Eclipse，切换为AndroidStudio的时候，就选了Eclipse风格的快捷键，并且结合自己的风格自定义了一些快捷键。  
+但是后来发现有两个问题，一是当需要使用别人的电脑时，相当不方便。二是JetBrains有太多软件啊，自己使用的就有AndroidStudio、PHPStorm、PyCharm、WebStorm等，还不如统一快捷键比较方便。
+
+# 0x01 准备工作
+## 1.1 了解结构
+在{install_dir}\lib\resources.jar中有\idea\PlatformActions.xml，文件中有各操作，用id标识。  
+在{install_dir}\lib\resources_en.jar中有\messages\ActionsBundle.properties，有各id对应的内容。  
+id.text 为文字  
+id.description 为描述  
+
+## 1.2 准备词库
+### 1.2.1 选择汉化包
+在[[1]]中有中文汉化包，它应该来自是[Adven.AndroidStudio 中文汉化包](https://github.com/ACXNX/AndroidStudio-ChineseLanguagePackage)  
+网上能搜到的应该多是这个版本，但是是基于2.0的。  
+后来又找到了《Android Studio汉化包 2.3.3.0 官方最新版》[[2]]，作者就写了他们的网址，不知原作者是谁。  
+比较了一下，觉得后者版本更新、内容更全一些，于是决定基于后者。  
+而英文原版的包就选择当前最新的pre版。AndroidStudio 3.0 Beta 2
+### 1.2.2 导出OmegaT的记忆文件
+[手动生成OmegaT的记忆文件](http://blog.pingfangx.com/2360.html)
+
+# 0x02 使用OCR抓取keymap
+
+读取了一下发现，PlatformActions.xml里面并没有所有的操作，但ActionsBundle.properties里面却有所有的操作信息，毕竟所有文字需要完全显示出来。  
+但在keymaps的设置里是按字母顺序来的。
+将ActionsBundle.properties中的所有内容输出出来，发现还不是所有的keymap，于是最后使用了强大的OCR持术
+
+PS：这里后来知道，不是所有的操作都在ActionsBundle应该是在别的文件、插件中还有一些操作。
+
+
+## 2.1 截屏
+一开始觉得很简单，截个屏嘛。
+
+### 2.1.1 长截屏
+因为实在太长，于是想着增大屏幕的显示就好了。  
+于是在桌面→右键→屏幕分辨率→设为竖向  
+然后自己有2个屏，在跨屏的情况下，如果截取的是窗口，跨屏幕的整个窗口都被截取了下来。
+但是内容依然很多，截一次就累够呛，后面想要设置字体的时候，不可能再截一次。
+
+### 2.1.2 软件截滚动屏
+后来我想了下，应该有截屏软件可以直接截下来的。
+百度找到了[屏幕截图软件(FastStone Capture)v8.4绿色中文版](http://www.pc6.com/softview/SoftView_14254.html)  
+下载后使用滚动截屏，点击可以滚动的区域，鼠标不要移出,截屏成功。
+
+## 2.2 png转jpg
+用ps的录制动作，包含关闭动作。  
+然后文件→自动→批处理即可。
+
+## 2.3 图片分割
+可能是因为截的图太大了，汉王无法识别，网上重新下了一个OCR直接卡死，于是想分割图片。
+
+### 2.3.1 PS分割
+快捷键C，切换至切片工具。  
+文件→存储为 Web 所有格式，但是该命令是灰色的，查了一下可能还是因为图片太大了。
+
+### 2.3.2 软件切片
+[图片拆分器 V0.2.0 绿色免费版](http://www.downxia.com/downinfo/23831.html)
+
+## 2.4 设置字体
+识别了一下发现效果不好，于是设置。  
+Setting→Appearance & Behavior→Appearance  
+Override default fonts by (not recommended):  
+Name: Fira Code Size: 24
+
+## 2.5 识别
+
+# 0x03 修改抓取后的结果
+## 3.1 识别后的结果保存到一个文件中
+## 3.2 sync误拼为syne，误写为小写开头，其他误拼
+结果整理为keymap.txt
+## 3.3 删除末尾的省略号
+结尾是...的，有可能有2个点，或是带有空格  
+结果为keymap_delete_ellipsis.txt
+## 3.4 增加描述、注释并导出为要翻译的文件
+结果为keymap_delete_ellipsis_add_desc_and_comment.properties  
+描述从ActionsBundle_en.properties中读取  
+注释从之前翻译的文件中读取  
+
+# 0x04 翻译
+## 词典
+* caret 翻译为“插入符号”，cursor 翻译为“光标”
+* tab 翻译为“选项卡”，不使用“标签(页)”，label、tag 翻译为“标签”
+* live template 翻译为“代码模板”
+* selected 翻译为“选中”，selection 翻译为“选择”
+* change 翻译为“更改”，不使用“变更”
+* watch 翻译为“观察点”
+## 导出
+翻译后导出为一个markdown的可读文本。
+# 参考文献
+[[1]].[Android Studio 2.0 汉化包](http://www.android-studio.org/index.php/chinese)  
+[[2]].[Android Studio汉化包 2.3.3.0 官方最新版](https://www.7down.com/soft/40545.html)  
+
+[1]:http://www.android-studio.org/index.php/chinese "Android Studio 2.0 汉化包"
+[2]:https://www.7down.com/soft/40545.html "Android Studio汉化包 2.3.3.0 官方最新版"
+
+# 相关
+## 相关源码
+[keymap_list.py](https://github.com/pingfangx/PythonX/blob/feature-android_studio_translator/ToolsX/android_studio_translator/keymap_list/keymap_list.py)
+
+## 结果文件
+[keymap_list.md](https://github.com/pingfangx/PythonX/blob/feature-android_studio_translator/ToolsX/android_studio_translator/keymap_list/data/keymap_list.md)
+
+## 序列文章
+* [AndroidStudio翻译(1)-总述](http://blog.pingfangx.com/2353.html)
+* [AndroidStudio翻译(2)-keymap中的所有操作的中文翻译](http://blog.pingfangx.com/2354.html)  
+* [AndroidStudio翻译(3)-ActionsBundle中文翻译](http://blog.pingfangx.com/2355.html)
+* [AndroidStudio翻译(4)-所有默认快捷键整理及翻译](http://blog.pingfangx.com/2356.html)  
+* [AndroidStudio翻译(5)-Keymap Refrence快捷键参考中文翻译](http://blog.pingfangx.com/2357.html)
+* [AndroidStudio翻译(6)-Tip of the Day每日提示中文翻译](http://blog.pingfangx.com/2358.html)

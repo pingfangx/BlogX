@@ -1,0 +1,59 @@
+# AndroidStudio翻译(4)-所有默认快捷键整理及翻译
+>本文由平方X发表于平方X网，转载请注明出处。[http://blog.pingfangx.com/2356.html](http://blog.pingfangx.com/2356.html)
+
+为了解所有的快捷键，将默认的快捷键全部导出来。
+# 0x01 准备要处理的文件
+快捷键文件，位于/lib/resources.jar，之前的版本为idea/Keymap_Default.xml，pre版改为keymaps/$default.xml  
+除此之外，在以下目录的文件中，也会申明一些快捷键
+* idea.jar,\META-INF\
+* resources.jar,\idea\
+* resources.jar,\META-INF\
+
+在文件中记录了每个操作的id和快捷键，解析时要注意
+* 每个操作可能用多组快捷键
+* 每组快捷键可能要按多次
+* 每组快捷键可能有多个键
+* 每个键的名称需要替换
+* use-shortcut-of指明使用某个操作的快捷键
+* 属性中的keymap指明了使用哪一个快键类型
+>有类似Period、Multiply等的单词，将其翻译一下。
+
+# 0x02 整理
+根据操作id，使用ActionBundle文件及翻译结果，整理出快捷键的名字和翻译。
+
+# 0x03 快捷键排序
+按快捷名称排序可以方便查看，只是F9和和F10这里要处理一下，把一位数字替换为09样式的2位数字。  
+需求很明确F1变为F01，F10不变。
+
+## 要区分一位与两位
+* result = re.sub(r'(\d)', r'0\1', str)
+* result = re.sub(r'(\d)(\D*)', r'0\1', str)
+>都不行，F10会变为F0100，因为后面的数字满足1位就满足2位。
+
+## 前后不为数字
+* result = re.sub(r'(\D)(\d)\D', r'\1[zero]\2', str)
+>不可行，因为后面有可能有别的内容，也可能没有了，只能匹配"F1其他"，不能匹配单独的"F1"  
+>而且因为要取第1组，后面要跟0就变成10了。
+
+## 负向零宽断言
+要让后面不是数字可以
+* result = re.sub(r'(\d)(?!\d)', r'0\1', str)
+>但是结果为F100，因为最后一位的0满足
+* result = re.sub(r'(?<!\d)(\d)(?!\d)', r'0\1', str)
+> ## *成功*
+
+
+# 相关
+## 相关源码
+[keymap_default.py](https://github.com/pingfangx/PythonX/blob/feature-android_studio_translator/ToolsX/android_studio_translator/keymap_default/keymap_default.py)
+
+## 结果文件
+[keymap_default_parsed_sorted.md](https://github.com/pingfangx/PythonX/blob/feature-android_studio_translator/ToolsX/android_studio_translator/keymap_default/data/keymap_default_parsed_sorted.md)
+
+## 序列文章
+* [AndroidStudio翻译(1)-总述](http://blog.pingfangx.com/2353.html)
+* [AndroidStudio翻译(2)-keymap中的所有操作的中文翻译](http://blog.pingfangx.com/2354.html)  
+* [AndroidStudio翻译(3)-ActionsBundle中文翻译](http://blog.pingfangx.com/2355.html)
+* [AndroidStudio翻译(4)-所有默认快捷键整理及翻译](http://blog.pingfangx.com/2356.html)  
+* [AndroidStudio翻译(5)-Keymap Refrence快捷键参考中文翻译](http://blog.pingfangx.com/2357.html)
+* [AndroidStudio翻译(6)-Tip of the Day每日提示中文翻译](http://blog.pingfangx.com/2358.html)

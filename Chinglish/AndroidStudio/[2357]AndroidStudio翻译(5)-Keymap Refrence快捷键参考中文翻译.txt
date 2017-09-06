@@ -1,0 +1,42 @@
+# AndroidStudio翻译(5)-Keymap Refrence快捷键参考中文翻译
+>本文由平方X发表于平方X网，转载请注明出处。[http://blog.pingfangx.com/2357.html](http://blog.pingfangx.com/2357.html)
+
+# 0x01 准备要翻译的文件
+点Help→Keymap Reference  
+可以看到本地的快捷键参考文件，或是在线的。  
+[IntelliJIDEA_ReferenceCard.pdf](https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf)
+
+# 0x02 选择翻译方案
+* 转为word
+>因为是pdf的，首先想到能不能转为word。  
+>找了一下，相关的软件转换效果都不好。  
+* pdf编辑软件
+>于是找pdf编辑软件，最后选择了Adobe Acrobat Pro DC
+>它可以很方便的导出为word
+* 修改word
+>要想翻译word，就要读写，试了一下，发现python写入word后，格式丢失了，不可用。  
+>想换别的语言试试。
+* 翻译文本
+>最后只好暂时选择了翻译为纯文本。
+
+# 0x03 处理为要翻译的文件
+导出后，标题用“#”标识，快捷键用“【”分隔。  
+执行处理，标题用“[#] ”开头，内容用“* ”开头，注意有空格，保存为.properties，方便OmegaT解析并后期转为markdown。
+
+# 0x04 处理翻译后的文件
+
+
+# 相关
+## 相关源码
+[keymap_reference.py](https://github.com/pingfangx/PythonX/blob/feature-android_studio_translator/ToolsX/android_studio_translator/keymap_reference/keymap_reference.py)
+
+## 结果文件
+[IntelliJIDEA_ReferenceCard_result.md](https://github.com/pingfangx/PythonX/blob/feature-android_studio_translator/ToolsX/android_studio_translator/keymap_reference/data/IntelliJIDEA_ReferenceCard_result.md)
+
+## 序列文章
+* [AndroidStudio翻译(1)-总述](http://blog.pingfangx.com/2353.html)
+* [AndroidStudio翻译(2)-keymap中的所有操作的中文翻译](http://blog.pingfangx.com/2354.html)  
+* [AndroidStudio翻译(3)-ActionsBundle中文翻译](http://blog.pingfangx.com/2355.html)
+* [AndroidStudio翻译(4)-所有默认快捷键整理及翻译](http://blog.pingfangx.com/2356.html)  
+* [AndroidStudio翻译(5)-Keymap Refrence快捷键参考中文翻译](http://blog.pingfangx.com/2357.html)
+* [AndroidStudio翻译(6)-Tip of the Day每日提示中文翻译](http://blog.pingfangx.com/2358.html)
