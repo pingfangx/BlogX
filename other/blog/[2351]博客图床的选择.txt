@@ -1,0 +1,46 @@
+
+因为博客要保存图片。想到可不可以直接把图片放到Github上。
+
+
+最后还是回到了问题的开始,我只是想用在博客上而已,还是直接发到博客好了.  
+* 简书可以直接拖图片就上传.  
+* csdn的图片要一张一张上传,有水印.  
+
+最后选**简书**,因为用手机写也方便.  
+再最后选择了**GitHub Pages**，因为本来它就是提供用于展示网页的，地址也方便获取。
+
+
+
+参考[非我Nonego.《迁移博客图片者的福音：使用GitHub做免费不限流量图床》](http://www.cnblogs.com/Nonego/archive/2013/05/06/3062060.htm)
+
+然后又想到，会不会因为违反协议帐号被封停呢。  
+于是查阅了GitHub注册时的用户协议:  
+[GitHub Terms of Service](https://help.github.com/articles/github-terms-of-service/)  
+有关内容如下,可以看到
+* C.2 github没有限制用户的上传内容,但要符合相关要求
+* C.7 如果流量使用过多,GitHub有权停止用户的使用
+* D.2 GitHub有权删除内容
+* M.3 GitHub有封停帐号
+
+># C. Acceptable Use
+>## 2. Content Restrictions
+>You agree that you will not under any circumstances upload, post, host, or transmit any content that:
+>* is unlawful or promotes unlawful activities;
+>* is or contains sexually obscene content;
+>* is libelous, defamatory, or fraudulent;
+>* is discriminatory or abusive toward any individual or group;
+>* contains or installs any active malware or exploits, or uses our platform for exploit delivery (such as part of a command and control system); or
+>* infringes on any proprietary right of any party, including patent, trademark, trade secret, copyright, right of publicity, or other rights.
+>## 7. Excessive Bandwidth Use
+>If we determine your bandwidth usage to be significantly excessive in relation to other GitHub customers, we reserve the right to suspend your account or throttle your file hosting until you can reduce your bandwidth consumption.
+
+># D. User-Generated Content
+>## 2. GitHub May Remove Content
+>We do not pre-screen User-Generated Content, but we have the right (though not the obligation) to refuse or remove any User-Generated Content that, in our sole discretion, violates any GitHub terms or policies.
+
+># M. Cancellation and Termination
+>## 3. GitHub May Terminate
+>GitHub has the right to suspend or terminate your access to all or any part of the Website at any time, with or without cause, with or without notice, effective immediately. GitHub reserves the right to refuse service to anyone for any reason at any time.
+
+
+
