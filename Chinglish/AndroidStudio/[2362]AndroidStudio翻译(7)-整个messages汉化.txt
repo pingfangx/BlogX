@@ -1,0 +1,96 @@
+>本文由平方X发表于平方X网，转载请注明出处。[http://blog.pingfangx.com/2362.html](http://blog.pingfangx.com/2362.html)
+
+# 0x01 准备词库
+## 1.1 选择汉化包
+感谢前人的辛勤工作,此次汉化参考了以下的汉化包,一并表示诚挚感谢.  
+* [[1]].[ewen0930.《PhpStorm Chinese Language Pack（中文语言包）》](https://github.com/ewen0930)  
+* [[2]].[ACXNX.《AndroidStudio 中文汉化包》](https://github.com/ACXNX/AndroidStudio-ChineseLanguagePackage)  
+* [[3]].[韩梦飞沙 韩亚飞.《安卓工作室 韩梦飞沙 汉化 使用 教程》](http://www.cnblogs.com/yue31313/p/7464727.html)  
+* [[4]].[第七下载.《Android Studio汉化包 2.3.3.0 官方最新版》](https://www.7down.com/soft/40545.html)  
+
+下文将以1、2、3、4表示这4个汉化结果。
+
+## 1.2 比较翻译信息
+将不同包中的翻译抓取出来，看翻译质量及翻译结果是否统一。
+* 1中共包含翻译6327条
+* 2中共包含翻译2581条
+* 3中共包含翻译7903条
+* 4中共包含翻译6994条
+
+有一些机器翻译很不理想，如
+![](https://pingfangx.github.io/resource/blogx/2362.1.jpg)
+
+然后发现4中的翻译与3中几乎完全一致，之前找不到4的出处，应该就是出自3.  
+2中针对实际的使用情况进行了一些调整，而不是纯翻译，挺不错的。  
+3中不仅全，翻译的也非常不错，在下面的时间中，3甚至连日期格式都修改了，赞。
+```
+license.panel.expirable.license.description=The license will expire on {0,date,MMMM dd, yyyy}
+license.panel.expirable.license.description=\u8bb8\u53ef\u8bc1\u5c06\u4e8e {0,date,yyyy-MM-dd} \u5230\u671f
+```
+
+## 1.3 选择不同的翻译
+词典中相同的英文，不同的汉化包给出了不同的翻译，我们要选择较好的一个或再修改。  
+python的UI不好弄，用C#写了一个简单的小程序手动整理翻译。  
+[C#项目](https://github.com/pingfangx/CSharpX/tree/develop-android_studio_translator)  
+![](https://pingfangx.github.io/resource/blogx/2362.2.jpg)
+
+为了方便在车上也进行整理，还简单写了安卓版本的，用的kotlin，就当练手了。  
+[安卓项目](https://github.com/pingfangx/AndroidX/tree/feature-android_studio_translator)  
+![](https://pingfangx.github.io/resource/blogx/2362.3.jpg)
+
+## 1.4 导出OmegaT的词库
+最终整理了约9000多条数据，作为参考译文，放到tm文件夹。关于tm和tm/auto的说明可查看OmegaT的说明。
+
+
+# 0x02 翻译前预处理
+因为标点符号、快捷方式会影响翻译，在翻译前将其处理掉，在翻译后再处理回来。  
+以后翻译版本，最后的标点符号（.:;!等）应该都处理掉，方便翻译。  
+
+# 0x03 翻译
+翻译过程中总共有9861个片断，其中8844个独立片断，感觉很多，但因为有机器翻译和词库参考，难度还好，花了约一个周的时间。  
+其中有一些功能自己没有使用过，也没有每个功能都去官网查，以后使用过程中再慢慢优化。  
+一些通用翻译见：
+[AndroidStudio汉化中的一些统一](http://blog.pingfangx.com/2363.html)
+
+# 0x04 翻译后处理
+## 4.1 生成伪翻译记忆
+在chapter.translation.memories.html中看到
+>通过下列命令行参数可生成伪翻译记忆：  
+>```java -jar omegat.jar --pseudotranslatetmx=<filename> [pseudotranslatetype=[equal|empty]]```
+
+试了一下没有用，后来找到chapter.installing.and.running.html  
+需要完整的命令
+```
+java -jar OmegaT.jar <project-dir> --mode=console-createpseudotranslatetmx --pseudotranslatetmx=<filename> --pseudotranslatetype=[equal|empty]
+```
+
+## 4.2 补全快捷键和标点符号
+根据4.1中伪翻译记忆，补全快捷方式和标点符号。  
+要注意生成的记忆文件不要使用PyCharm格式化，因为文件中的换行后是不需要缩进的，格式化后加上的缩进导致原文或译文有换行时，不能正常识别。  
+打开OmegaT让它自己格式化就好了。
+
+
+# 参考与感谢
+[[1]].[ewen0930.《PhpStorm Chinese Language Pack（中文语言包）》](https://github.com/ewen0930)  
+[[2]].[ACXNX.《AndroidStudio 中文汉化包》](https://github.com/ACXNX/AndroidStudio-ChineseLanguagePackage)  
+[[3]].[韩梦飞沙 韩亚飞.《安卓工作室 韩梦飞沙 汉化 使用 教程》](http://www.cnblogs.com/yue31313/p/7464727.html)  
+[[4]].[第七下载.《Android Studio汉化包 2.3.3.0 官方最新版》](https://www.7down.com/soft/40545.html)  
+
+[1]:https://github.com/ewen0930 (ewen0930.《PhpStorm Chinese Language Pack（中文语言包）》)
+[2]:https://github.com/ACXNX/AndroidStudio-ChineseLanguagePackage (ACXNX.《AndroidStudio 中文汉化包》)
+[3]:http://www.cnblogs.com/yue31313/p/7464727.html (韩梦飞沙 韩亚飞.《安卓工作室 韩梦飞沙 汉化 使用 教程》)
+[4]:https://www.7down.com/soft/40545.html (第七下载.《Android Studio汉化包 2.3.3.0 官方最新版》)
+
+
+# 相关
+## 相关源码
+[翻译文件](https://github.com/pingfangx/TranslatorX/tree/develop-android_studio_2.3.3)  
+[python工具](https://github.com/pingfangx/PythonX/tree/feature-android_studio_translator/ToolsX/android_studio_translator)  
+[C#小工具](https://github.com/pingfangx/CSharpX/tree/develop-android_studio_translator)  
+[安卓小工具](https://github.com/pingfangx/AndroidX/tree/feature-android_studio_translator) 
+
+## 结果文件
+[release](https://github.com/pingfangx/TranslatorX/releases)
+
+## 系列文章
+* [AndroidStudio翻译(1)-总述](http://blog.pingfangx.com/2353.html)

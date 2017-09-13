@@ -33,10 +33,5 @@
 ## 结果文件
 [IntelliJIDEA_ReferenceCard_result.md](https://github.com/pingfangx/PythonX/blob/feature-android_studio_translator/ToolsX/android_studio_translator/keymap_reference/data/IntelliJIDEA_ReferenceCard_result.md)
 
-## 序列文章
+## 系列文章
 * [AndroidStudio翻译(1)-总述](http://blog.pingfangx.com/2353.html)
-* [AndroidStudio翻译(2)-keymap中的所有操作的中文翻译](http://blog.pingfangx.com/2354.html)  
-* [AndroidStudio翻译(3)-ActionsBundle中文翻译](http://blog.pingfangx.com/2355.html)
-* [AndroidStudio翻译(4)-所有默认快捷键整理及翻译](http://blog.pingfangx.com/2356.html)  
-* [AndroidStudio翻译(5)-Keymap Refrence快捷键参考中文翻译](http://blog.pingfangx.com/2357.html)
-* [AndroidStudio翻译(6)-Tip of the Day每日提示中文翻译](http://blog.pingfangx.com/2358.html)

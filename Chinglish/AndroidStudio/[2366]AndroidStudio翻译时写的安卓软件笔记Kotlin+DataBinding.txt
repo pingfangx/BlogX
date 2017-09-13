@@ -1,0 +1,79 @@
+[md]
+
+>本文由平方X发表于平方X网，转载请注明出处。[http://blog.pingfangx.com/2366.html](http://blog.pingfangx.com/2366.html)
+
+
+# 选择配色
+[https://www.materialpalette.com/](https://www.materialpalette.com/)
+
+# 添加图标
+[https://github.com/google/material-design-icons](https://github.com/google/material-design-icons)
+
+# 启用DataBinding
+## gradle配置
+```
+android {
+    ...
+    dataBinding {
+        enabled = true
+    }
+}
+```
+## 布局文件
+```
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="com.pingfangx.tools.androidstudiotranslator.MainActivity" />
+    </data>
+
+    <RelativeLayout
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="15dp"
+        android:orientation="vertical"
+        tools:context="com.pingfangx.tools.androidstudiotranslator.MainActivity">
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="50dp"
+            android:layout_marginRight="50dp"
+            android:onClick="@{vm.onClickBtnAdd}"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_add_white_48dp" />
+
+    </RelativeLayout>
+
+</layout>
+
+```
+* visibility需要的是整型，要用VISIBLE
+## 代码绑定
+```
+    val mHasProject = ObservableBoolean()
+
+        val binding: ActivityMainBinding = DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
+        binding.setVm(this)
+```
+* java中的public final，在kotlin中只要val就够了
+* DataBinding的类是根据布局文件命名的
+
+# 在kotling中启用DataBinding
+```
+apply plugin: 'kotlin-kapt'
+dependencies {
+    kapt "com.android.databinding:compiler:$android_plugin_version"
+}  
+```
+
+[/md]

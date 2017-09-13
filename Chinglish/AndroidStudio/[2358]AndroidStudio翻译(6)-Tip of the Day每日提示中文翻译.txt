@@ -50,10 +50,5 @@ result = re.sub('[A-Z][a-z]+', lambda m: m.group().lower() + ' ', word).rstrip()
 ## 结果文件
 [AndroidStudio翻译(6)-Tip of the Day每日提示中文翻译](https://pingfangx.github.io/android_studio/tips/index.html)
 
-## 序列文章
+## 系列文章
 * [AndroidStudio翻译(1)-总述](http://blog.pingfangx.com/2353.html)
-* [AndroidStudio翻译(2)-keymap中的所有操作的中文翻译](http://blog.pingfangx.com/2354.html)  
-* [AndroidStudio翻译(3)-ActionsBundle中文翻译](http://blog.pingfangx.com/2355.html)
-* [AndroidStudio翻译(4)-所有默认快捷键整理及翻译](http://blog.pingfangx.com/2356.html)  
-* [AndroidStudio翻译(5)-Keymap Refrence快捷键参考中文翻译](http://blog.pingfangx.com/2357.html)
-* [AndroidStudio翻译(6)-Tip of the Day每日提示中文翻译](http://blog.pingfangx.com/2358.html)

@@ -1,0 +1,19 @@
+>本文由平方X发表于平方X网，转载请注明出处。[http://blog.pingfangx.com/2364.html](http://blog.pingfangx.com/2364.html)
+
+# OmegaT
+开源，免费，喜欢。  
+[https://omegat.org/](https://omegat.org/)  
+
+# TRADOS
+收费.  
+TRADOS 名称来源于Translation Documentation Software  
+被SDL收购.  
+[SDL官网](http://www.sdl.com/cn/)  
+[TRADOS中文网](http://www.trados.com.cn/)  
+[TRADOS百度百科](https://baike.baidu.com/item/TRADOS/10916594)
+
+# PASSOLO
+[SDL PASSOLO](http://www.sdltrados.com/cn/products/passolo/)  
+[passolo百度百科](https://baike.baidu.com/item/passolo/6351037)  
+分不清TRADOS和PASSOLO,于是查了一下,它们都是SDL的,TRADOS用于翻译,PASSOLO应该是专门用于翻译软件的.
+PASSOLO是一个组件，可以集成于TRADOS,也可以单独运行.

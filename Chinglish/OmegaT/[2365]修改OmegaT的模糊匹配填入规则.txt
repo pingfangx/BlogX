@@ -1,0 +1,24 @@
+[md]
+
+>本文由平方X发表于平方X网，转载请注明出处。[http://blog.pingfangx.com/2365.html](http://blog.pingfangx.com/2365.html)
+
+# 0x00 前言
+OmegaT支持模糊匹配，并且可以设置自动插入匹配的项。  
+但是有一个问题，就是在有数字符号的时候，它会忽略，仍计算为匹配。  
+在[官方帮助文档中]我们知道
+>实际上还有三个可用的匹配估计（在上面第4个匹配中为66/66/30）。它们的含义如下：
+>* 使用解析器插件后的匹配百分率
+>* 缺省的OmegaT匹配度，即忽略数字和标签后匹配词汇数除以总的词汇数
+>* 包含数字、标签的OmegaT匹配度
+```
+org.omegat.Main.main(String[])
+org.omegat.Main.runGUI()
+org.omegat.core.Core.initializeGUI(Map<String, String>)
+org.omegat.gui.matches.MatchesTextArea.checkForReplaceTranslation()
+
+将
+            if (thebest.scores[0].score >= percentage) {
+改为
+            if (thebest.scores[0].adjustedScore >= percentage) {
+```
+[/md]

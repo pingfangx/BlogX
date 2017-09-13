@@ -1,7 +1,23 @@
-# AndroidStudio翻译（一）
+[md]
+>本文由平方X发表于平方X网，转载请注明出处。[http://blog.pingfangx.com/2353.html](http://blog.pingfangx.com/2353.html)
+
 >**工欲善其事，必先利其器**
 
->本文由平方X发表于平方X网，转载请注明出处。[http://blog.pingfangx.com/2353.html](http://blog.pingfangx.com/2353.html)
+# 系列文章
+* [AndroidStudio翻译(1)-总述](http://blog.pingfangx.com/2353.html)  
+>就是这一篇文章
+* [AndroidStudio翻译(2)-keymap中的所有操作的中文翻译](http://blog.pingfangx.com/2354.html)    
+>基本上所有的操作都可以在keymap中设置快捷键，因此将设置中的keymap完全翻译，就可以了解AndroidStudio中几乎所有的操作。
+* [AndroidStudio翻译(3)-ActionsBundle中文翻译](http://blog.pingfangx.com/2355.html)  
+>我们对所有操作进行了翻译后，就可以用于ActionsBundle_en_modified.properties中，然后就可以汉化一部分AndroidStudio中的操作了。
+* [AndroidStudio翻译(4)-所有默认快捷键整理及翻译](http://blog.pingfangx.com/2356.html)  
+>翻译了所有的操作，而有一部分操作是有默认快捷键的，对其进行翻译和整理。
+* [AndroidStudio翻译(5)-Keymap Refrence快捷键参考中文翻译](http://blog.pingfangx.com/2357.html)  
+>官方提供的快捷键参考，进行翻译方便快速查看。
+* [AndroidStudio翻译(6)-Tip of the Day每日提示中文翻译](http://blog.pingfangx.com/2358.html)  
+>每天一个小技巧，以前总是英文的懒得看，将其翻译为中文，一天可以看好几条。
+* [AndroidStudio翻译(7)-整个messages汉化](http://blog.pingfangx.com/2362.html)  
+>翻译了上面的之后意犹未尽，一口气将整个messages汉化了
 
 一直使用AndroidStudio，但是有一些功能、快捷键却并不熟悉。  
 为了防止以后会对某功能有相见恨晚的感觉，决定将AndroidStudio中的所有操作进行翻译。  
@@ -11,8 +27,12 @@
 
 ## 1.1 准备翻译工具
 以前使用过OmegaT进行翻译，很是方便，这一次也依然使用OmegaT。  
+[翻译软件的选择](http://blog.pingfangx.com/2364.html)  
 因为OmegaT不支持谷歌翻译（内置的谷歌翻译v2不可用），也不支持百度翻译，于是自己进行了修改。  
-[让OmegaT支持百度翻译和谷歌翻译](http://blog.pingfangx.com/2359.html)
+[让OmegaT支持百度翻译和谷歌翻译](http://blog.pingfangx.com/2359.html)  
+模糊匹配有问题，进行修改  
+[修改OmegaT的模糊匹配填入规则](http://blog.pingfangx.com/2365.html)
+
 
 ## 1.2 了解AndroidStudio的汉化方法
 AndroidStudio在lib目录中有2个jar文件，在其中的一些文件中保存了需要翻译的内容，翻译后替换即可。  
@@ -21,26 +41,13 @@ AndroidStudio在lib目录中有2个jar文件，在其中的一些文件中保存
 {install_dir}\lib\resources.jar
 {install_dir}\lib\resources_en.jar
 ```
+[AndroidStudio汉化中的一些统一](http://blog.pingfangx.com/2363.html)
 
 ## 1.3 供鉴其他汉化包
 已经有了一些汉化包，本人也不喜欢重复造轮子，但是翻译效果我不是很喜欢，而且也不便于自己了解，于是决定自己翻译。  
 但还是有一些借鉴，因此决定在汉化包的基础上进行修改。  
 [手动生成OmegaT的记忆文件](http://blog.pingfangx.com/2360.html)
 
-# 0x02 翻译相关文件
-* [AndroidStudio翻译(2)-keymap中的所有操作的中文翻译](http://blog.pingfangx.com/2354.html)  
->基本上所有的操作都可以在keymap中设置快捷键，因此将设置中的keymap完全翻译，就可以了解AndroidStudio中几乎所有的操作。
-* [AndroidStudio翻译(3)-ActionsBundle中文翻译](http://blog.pingfangx.com/2355.html)
->在0x02中我们对所有操作进行了翻译，就可以用于ActionsBundle_en_modified.properties中，然后就可以汉化一部分AndroidStudio中的操作了。
-
-* [AndroidStudio翻译(4)-所有默认快捷键整理及翻译](http://blog.pingfangx.com/2356.html)  
->在0x02中翻译了所有的操作，而有一部分操作是有默认快捷键的，对其进行翻译和整理。
-
-* [AndroidStudio翻译(5)-Keymap Refrence快捷键参考中文翻译](http://blog.pingfangx.com/2357.html)
->官方提供的快捷键参考，进行翻译方便快速查看。
-
-* [AndroidStudio翻译(6)-Tip of the Day每日提示中文翻译](http://blog.pingfangx.com/2358.html)
->每天一个小技巧，以前总是英文的懒得看，将其翻译为中文，一天可以看好几条。
-
 # 相关源码
 [tools.py](https://github.com/pingfangx/PythonX/blob/feature-android_studio_translator/ToolsX/android_studio_translator/tools.py)
+[/md]
