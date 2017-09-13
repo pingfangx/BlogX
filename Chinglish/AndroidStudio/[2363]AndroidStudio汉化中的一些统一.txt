@@ -1,10 +1,13 @@
 >本文由平方X发表于平方X网，转载请注明出处。[http://blog.pingfangx.com/2363.html](http://blog.pingfangx.com/2363.html)
+# 0x01 文件结构
+在翻译tip的时候，发现AndroidStudio并不会判为哪一个resource包，而是直接按顺序读取，resources_zh_CN位于resources_en之后，因此优先读了resources_en的tips。  
+但是汉化文件却是读取的resources_zh_CN，不明所以。
 
-# 0x01 中英混排
+# 0x02 中英混排
 理论上会在中英文之前添加空格,如果忘了加就不加了,因为没有找到相关规范.  
 如果有一些单词不用翻译,不会翻译,则会保留英文原文
 
-# 0x02 可选内容的翻译
+# 0x03 可选内容的翻译
 以RefactoringBundle.properties中的下列语句为例，可以在安全删除时的提示中测试
 ```
 {0} has {1,choice,1#1 usage that is|2#{1,number} usages that are} not safe to delete  
@@ -29,7 +32,7 @@ choice,表示选择
 * {2,number} 个使用（第1个参数，不是第2个）
 * {number} 个使用（要指定参数序号，number不表示该数字）
 
-# 0x03 一些单词的统一翻译
+# 0x04 一些单词的统一翻译
 如果有一些单词不用翻译,不会翻译,则会保留英文原文  
 英文|翻译|备注  
 -|-|-
@@ -71,7 +74,7 @@ Emmet|
 Schema|
 
 
-# 0x04 翻译文件的介绍
+# 0x05 翻译文件的介绍
 ## lib/resource_en/messages
 文件|说明|备注
 -|-|-
