@@ -1,0 +1,19 @@
+[md]
+>本文由平方X发表于平方X网，转载请注明出处。[http://blog.pingfangx.com/2370.html](http://blog.pingfangx.com/2370.html)
+
+在上一篇中备份微信的聊天记录比较复杂，还好有前人指路。  
+这一次备份手机的QQ聊天记录，
+
+adb pull /data/data/com.tencent.mobileqq/databases/252114284.db D:/adb
+
+能查到的资料不多，不知为啥。  
+知道是按位异或，但是要注意一点。  
+在Groups中的group_name是text的格式，在聊天记录中是BLOB的格式。  
+而且聊天记录的表情、分享等不能正常显示。
+
+参考了：  
+[piece of the past.《用Python解密手机QQ聊天记录》](http://www.freebuf.com/articles/terminal/68224.html)  
+[blackfeather.《QQ和微信聊天内容读取解密》](http://www.fenlog.com/post/75.html)  
+[guduzhe.《手机QQ聊天记录查看器》](http://bbs.pediy.com/thread-215245.htm)  
+
+[/md]

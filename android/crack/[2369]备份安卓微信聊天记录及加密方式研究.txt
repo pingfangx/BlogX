@@ -1,0 +1,166 @@
+[md]
+>本文由平方X发表于平方X网，转载请注明出处。[http://blog.pingfangx.com/2369.html](http://blog.pingfangx.com/2369.html)
+
+# 0x00 需求
+我有一个小米手机MI2s，还有一个米5。好像在某一次迁移还是刷机过程中，数据丢失了，想要恢复到一起。
+
+# 0x01 官方的备分与恢复
+官方用电脑与手机wifi连接，进行备份，备份速度约2M/S。
+
+# 0x02 静态方式破解
+很久以前在csdn看到的一篇文章，一直留着看，今天在收藏夹里一搜，居然没找到，吓我一跳，还好又在网止搜了回来。  
+[尼古拉斯_赵四.《 Android逆向之旅---静态方式破解微信获取聊天记录和通讯录信息》](http://blog.csdn.net/jiangwei0910410003/article/details/52238891)  
+
+## 2.1 导出数据库
+adb pull /data/data/com.tencent.mm/MicroMsg/847c648f740954a4a7c6023b2305e874/EnMicroMsg.db D:/adb  
+后面那一串是MD5("mm"+uin)  
+来源于[y788iiiiii](http://blog.csdn.net/y788iiiiii) 回复于 [博文6楼](http://blog.csdn.net/yuanbohx/article/details/41674949)  
+
+## 2.2 读取源码
+在博客中已经有了步骤，只是有些类变化了，自已跟着学习了一遍。
+```
+com.tencent.wcdb.database.SQLiteDatabase
+   
+    public static SQLiteDatabase openDatabase(String str, byte[] bArr, SQLiteCipherSpec sQLiteCipherSpec, CursorFactory cursorFactory, int i, DatabaseErrorHandler databaseErrorHandler, int i2) {
+        SQLiteDatabase sQLiteDatabase = new SQLiteDatabase(str, i, cursorFactory, databaseErrorHandler);
+        sQLiteDatabase.open(bArr, sQLiteCipherSpec, i2);
+        return sQLiteDatabase;
+    }
+    private void openInner(byte[] bArr, SQLiteCipherSpec sQLiteCipherSpec, int i)
+
+    public static SQLiteConnectionPool open(SQLiteDatabase sQLiteDatabase, SQLiteDatabaseConfiguration sQLiteDatabaseConfiguration, byte[] bArr, SQLiteCipherSpec sQLiteCipherSpec, int i) {
+        if (sQLiteDatabaseConfiguration == null) {
+            throw new IllegalArgumentException("configuration must not be null.");
+        }
+        SQLiteConnectionPool sQLiteConnectionPool = new SQLiteConnectionPool(sQLiteDatabase, sQLiteDatabaseConfiguration, i);
+        sQLiteConnectionPool.mPassword = bArr;
+        sQLiteConnectionPool.mCipher = sQLiteCipherSpec == null ? null : new SQLiteCipherSpec(sQLiteCipherSpec);
+        sQLiteConnectionPool.open();
+        return sQLiteConnectionPool;
+    }
+ 
+带密码打开数据库的方法搜索
+Lcom/tencent/wcdb/database/SQLiteDatabase;->openDatabase(Ljava/lang/String;[BL
+
+定位到com\tencent\mm\bj\e.smali
+public static e r(String str, String str2, boolean z)
+
+str2是密码
+搜索该方法得
+                    this.uJJ = e.r(str, this.arH, z);
+
+arH是密码，看赋值
+    private boolean a(String str, long j, String str2, boolean z, String str3) {
+        ...
+        this.arH = g.n((str2 + j).getBytes()).substring(0, 7);
+        ...
+    }
+g.n()方法是md5，看a方法
+
+public final boolean a(String str, String str2, String str3, long j, String str4, HashMap<Integer, g.c> hashMap, boolean z) {
+    ...
+        this.uJL = a(str2, j, str4, e.bNC(), str3);
+    ...
+}
+需要的是str4和j
+
+    public final boolean a(String str, String str2, String str3, long j, String str4, HashMap<Integer, c> hashMap, boolean z) {
+        ...
+        if (!this.uKi.a(str, str2, str3, j, str4, hashMap, z) || this.uKi.uJJ == null) {
+        ...
+    }
+需要的是str4和j
+
+            if (vI.gXW.a(str, str2, str3, (long) uH, p.rA(), vI.uh(), true)) {
+需要的是p.rA()和uH
+
+先看p.rA()
+    public static String rA() {
+        GMTrace.i(13801340534784L, 102828);
+        String str = (String) k.rj().get(258);
+        if (str != null) {
+            GMTrace.o(13801340534784L, 102828);
+        } else {
+            str = getDeviceID(aa.getContext());
+            if (str == null) {
+                str = "1234567890ABCDEF";
+            }
+            k.rj().set(258, str);
+            GMTrace.o(13801340534784L, 102828);
+        }
+        return str;
+    }
+    
+再看uH
+        int uH = gWW.uH();
+
+        public final int uH() {
+            int i;
+            synchronized (this) {
+                GMTrace.i(13525388886016L, 100772);
+                if (!this.gXo) {
+                    va();
+                    this.gXo = true;
+                }
+                i = this.uin;
+                GMTrace.o(13525388886016L, 100772);
+            }
+            return i;
+        }
+
+uin的赋值
+这个是默认值，可以看到获取的是default_uin
+private void va() {
+    ...
+    
+                if (sVar == null) {
+                    com.tencent.mm.sdk.platformtools.v.w("MMKernel.CoreAccount", "summer read detault uin exception sysCfg is null!");
+                } else {
+                    Integer num = (Integer) sVar.get(1);
+                    if (num == null) {
+                        if (sVar.uxm) {
+                            com.tencent.mm.plugin.report.c.oRz.a(148, 40, 1, false);
+                        }
+                        Integer valueOf = Integer.valueOf(aa.getContext().getSharedPreferences("system_config_prefs", 4).getInt("default_uin", 0));
+                        if (valueOf != null) {
+                            com.tencent.mm.sdk.platformtools.v.i("MMKernel.CoreAccount", "summer read detault uin[%d], bakUin[%d] sysCfg.isOpenException[%b]", num, valueOf, Boolean.valueOf(sVar.uxm));
+                            if (gXq) {
+                                com.tencent.mm.sdk.platformtools.v.w("MMKernel.CoreAccount", "summer read detault uin exception backup uin[%d], stack[%s]", valueOf, bf.bJP());
+                                com.tencent.mm.plugin.report.c.oRz.i(11911, Integer.valueOf(bf.f(valueOf)));
+                                gXq = false;
+                            }
+                            a(sVar, valueOf.intValue());
+                            num = valueOf;
+                        }
+                    }
+                    com.tencent.mm.sdk.platformtools.v.i("MMKernel.CoreAccount", "summer getDefaultUin uin[%d]", Integer.valueOf(bf.f(num)));
+                    i = bf.f(num);
+                }
+                this.uin = i;
+
+    ...
+}
+但是追_auth_uin的时候，怎么也追不到，好复杂的样子。最后就放弃了。
+        
+
+```
+结论：
+并没有发生变化，和原博文的一致。
+>概要：微信的核心数据库是EnMicroMsg.db，但是是加密操作的，而加密的密码是设备的IMEI+用户的UIN值(在SP中保存了)，计算MD5(字符是小写)，取出前7位字符即可。
+
+## 2.3 工具选择
+jdgui、jeb、jadx
+
+
+# 0x03 查看
+获取到了密码，在读取数据库的时候，却还是失败的。  
+难道是我密码计算错了，写安卓代码算了一下，没错呀。  
+看到有人回复  
+http://blog.csdn.net/yuanbohx/article/details/41674949，32楼  
+八只爪
+>（IMEI+UIN）计算出的MD5值的前7位，和我在手机里安装的“微信加密聊天记录导出"软件不一致。。。手机安装的软件计算出来的数据库密码才是正确的，原因不太清楚……至于sqlite怎么导出查找到的数据，在研究中……
+
+于是我就网上找他所说的“微信加密聊天记录导出”，结果下了一个电脑版，要收费，只能看7条，又下了一个查看器，要2个csdn积分……  
+这个技术……是自己的吗……居然要收费，唉。  
+好在兑换了2积分，下载后，那个sqlcipher.exe是可以使用的，原来是我的软件不正确。
+[/md]
