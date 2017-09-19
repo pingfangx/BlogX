@@ -1,0 +1,23 @@
+[md]
+>本文由平方X发表于平方X网，转载请注明出处。[http://blog.pingfangx.com/2376.html](http://blog.pingfangx.com/2376.html)
+
+# 修改新建文本文档的默认编码为utf-8
+# 0x01 创建模板文件
+在C:\Windows\ShellNew下新建template.txt，将其编码设为utf-8无bom，写入一个空格
+## 注意:
+* 如果用记事本，则将编码设为utf-8，不用写任何内容。
+* 如果用Notepad++，把编码设置为utf-8无bom，这里候如果没有内容，保存后编码又变回ANSI，所以要写一个空格
+# 0x02 配置注册表
+在注册表HKEY_CLASSES_ROOT\.txt\ShellNew下，新建字符串值，
+FileName，值为C:\Windows\ShellNew\template.txt
+## 注意
+* 注册表是.txt，一开始我居然找的.text
+* FileName的值不包括双引号，一开始我直接复制为路径，带着双引号结果无效。
+
+# [相关源码](https://github.com/pingfangx/BlogX/blob/develop/CodeFarmer/windows/%5B2376%5D.%E8%AE%BE%E7%BD%AE.bat)
+
+# 参考文献：
+[[1]].denson.如何将新建文本文档的编码默认设为UTF-8格式.https://segmentfault.com/a/1190000004567813
+
+[1]:https://segmentfault.com/a/1190000004567813 (denson.如何将新建文本文档的编码默认设为UTF-8格式)
+[/md]
