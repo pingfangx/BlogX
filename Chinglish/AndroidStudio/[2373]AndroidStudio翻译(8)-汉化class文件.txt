@@ -1,0 +1,37 @@
+[md]
+>本文由平方X发表于平方X网，转载请注明出处。[http://blog.pingfangx.com/2373.html](http://blog.pingfangx.com/2373.html)
+
+# 0x01 寻找目标
+当编辑器中没有打开文件时，会显示空页面，这也是经常看到的页面，想把它汉化一下。  
+搜索“Search Everywhere”，找到lib/idea.jar  
+解包后再搜索，定位到“com\intellij\openapi\fileEditor\impl\EditorEmptyTextPainter.class”  
+可以看到是在类中用代码设置的。
+
+# 0x02 反编译.class
+一开始想阅读代码，手动修改后重新编译或是直接修改，  
+但是使用jd-gui打开，失败。想搜索有没有好的反编译工具。  
+找到了[evangel_z.《Java 反编译工具几枚(class转java)》](http://blog.csdn.net/evangel_z/article/details/17713709)  
+其中提到JODE，下载后还是反编译失败。
+
+# 0x03 jclasslib
+后来找到这一篇文章  
+[本人纯属虚构.《直接修改别人jar包里面的class文件 工具:jclasslib》](http://blog.csdn.net/hexin373/article/details/6669813)  
+
+下载[jclasslib](https://bintray.com/ingokegel/generic/jclasslib)，是一个安装包，安装后在安装目录有/lib/jclasslib-library.jar  
+这个jar后面要用。  
+安装后查看代码，在
+```
+Methods
+[05]appendSearchEverywhere
+[0] Code
+16 ldc #40 <Searh Everywhere>
+[040]CONSTANT_String_info
+[196]CONSTANT_Utf8_info
+```
+
+# 0x04 修改
+能找到字符串常量，我们就可以修改了  
+新建java类，把上面说的jclasslib-library.jar添加进去。
+[相关源码](https://github.com/pingfangx/JavaX/tree/develop-tools/ClassFileEditor)
+
+[/md]

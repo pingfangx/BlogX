@@ -1,0 +1,19 @@
+# 翻译步骤
+* 预处理翻译文件  
+删降快捷方式、句尾标点符号等
+* 使用谷歌进行翻译
+* 将谷歌翻译结果转为记忆文件
+* 利用记忆文件手动过一遍翻译
+
+# 检查翻译
+[相关源码](https://github.com/pingfangx/PythonX/blob/feature-android_studio_translator/ToolsX/android_studio_translator/translation_inspection/translation_inspection.py)
+* 检查翻译是否准确，是否使用[统一的翻译](http://blog.pingfangx.com/2375.html)
+* 检查""，不使用“”，删去中间的空格
+* 检查单引号
+* 检查''(2个')也按原来的保持''，去除中间的空格，同时前后如果是字母加上空格
+* 检查()不翻译为（），同时如果是方法后的()后面加上空格
+* 检查结尾的符号
+* 检查快捷键
+* 检查汉字与英文（或{\d}）之间是否添加了空格
+
+# 使用检查过的翻译重新翻译
