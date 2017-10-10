@@ -1,13 +1,45 @@
 >本文由平方X发表于平方X网，转载请注明出处。[http://blog.pingfangx.com/2363.html](http://blog.pingfangx.com/2363.html)
+
+# 0x00 汉化中要留意的问题
+* properties 资源文件汉化后要将中文转为 unicode (如果使用 OmegaT 生成时会自动转换)
+* 翻译 tips 时生成的文件会自动添加一个 meta 指明编码，需将其删除
+* 统一单词的翻译  
+翻译完才发现 [用户指南](https://developer.android.google.cn/studio/intro/index.html) 中已经完全汉化，早知道就可以借鉴很多了。  
+其他的遵守 [AndroidStudio汉化中使用的统一翻译](http://blog.pingfangx.com/2375.html)
+
 # 0x01 文件结构
+## 1.1 jar 包
+在安装目录有一些 jar 包，其中包括消息文本文件或类文件。  
+主要有2个目录 lib 和 plugins  
+* lib/resources.jar
+* lib/resources_en.jar
+
+## 1.2 资源包的读取
 在翻译tip的时候，发现AndroidStudio并不会判为哪一个resource包，而是直接按顺序读取，resources_zh_CN位于resources_en之后，因此优先读了resources_en的tips。  
-但是汉化文件却是读取的resources_zh_CN，不明所以。
+但是汉化文件却是读取的resources_zh_CN，可能处理资源文件，会优先读 _zh_CN 包，读普通文件就按顺序读。
 
-# 0x02 中英混排
-理论上会在中英文之前添加空格,如果忘了加就不加了,因为没有找到相关规范.  
-如果有一些单词不用翻译,不会翻译,则会保留英文原文
 
-# 0x03 可选内容的翻译
+# 0x02 操作注册
+操作会继承 com.intellij.openapi.actionSystem 包中的 AnAction 或其他 Action  
+openapi 的定义位于lib/openapi.jar
+
+操作可以在 jar 包中的 xml 文件中注册，如\lib\resources.jar,\idea\PlatformActions.xml  
+分为 group, action等，有一个属性是 popup ，如果是添加的，会有标签 add-to-group ，带有 group-id , anchor , relative-to-action 等属性。  
+有时也会有 **text** 属性，注意有些操作的文字就是用 text 写在 xml 文件中的，这时要汉化就要将其修改，  
+如 New
+```
+    <group id="OpenProjectGroup">
+      <group id="NewElementInMenuGroup" class="com.intellij.ide.actions.NewActionGroup" text="New" popup="true"/>
+      <add-to-group group-id="FileOpenGroup" anchor="first"/>
+    </group>
+```
+
+
+# 0x03 中英混排
+理论上会在中英文之间添加空格,虽然没有找到相关规范，但有人说可以方便阅读。  
+如果有一些单词不用翻译、不会翻译,则会保留英文原文
+
+# 0x04 可选内容的翻译
 以RefactoringBundle.properties中的下列语句为例，可以在安全删除时的提示中测试
 ```
 {0} has {1,choice,1#1 usage that is|2#{1,number} usages that are} not safe to delete  
@@ -32,46 +64,6 @@ choice,表示选择
 * {2,number} 个使用（第1个参数，不是第2个）
 * {number} 个使用（要指定参数序号，number不表示该数字）
 
-# 0x04 一些单词的统一翻译
-如果有一些单词不用翻译,不会翻译,则会保留英文原文  
-英文|翻译|备注  
--|-|-
-remove|移除
-delete|删除|两者好像没有区别，但还是根据不同的单词进行不同的翻译
-cursor|光标
-caret|插入符|与光标区分开
-change|更改|如果名词性不强，就使用“变更”
-all|全部|不使用“所有”
-live template|代码模板|统一翻译
-complete|补全|统一翻译为补全
-code complete|代码补全|
-Popup Menu|弹出菜单
-action|操作
-parentheses|小括号
-brackets，square brackets|中括号,方括号
-braces，curly braces|括号，大括号，花括号
-angle brackets|尖括号
-period|句号
-comma|逗号
-semicolon|分号
-asterisk|星号
-i18n，internationalization|国际化
-L10n，localization|本地化
-Soft Wraps|自动换行
-super|超
-parent|父|超类父类其实一样吧
-evaluated|计算，解析|常用于调试部分，如计算表达式，无法解析字段
-expected|预期，期望|如期望一个布尔值
-Productivity Features Guide|生产力功能指南|就是统计你使用了哪些功能有助于提高你工作效率
-occurrence|匹配项|有时也被翻译为出现，表示查找结果的匹配项
-pattern|模式|就是正则、字符串模式，不好翻译
-root|根|如git的根目录，项目根目录
-argument|参数，实参
-parameter|参数，形参|应该是混用的，只是在代码样式→换行和括号中补区分
-formal and actual parameters|形参和实参
-reference|引用，参考
-Emmet|
-Schema|
 
 
 # 0x05 翻译文件的介绍
