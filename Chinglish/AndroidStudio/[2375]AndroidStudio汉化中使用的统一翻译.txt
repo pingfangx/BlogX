@@ -43,4 +43,5 @@ Instant Run|即时运行
 variant|变体
 Emmet|
 Schema|
+repository|仓库|存储库|git 中统一翻译
 [/md]
