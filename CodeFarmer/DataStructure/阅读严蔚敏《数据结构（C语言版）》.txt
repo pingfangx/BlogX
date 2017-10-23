@@ -1,0 +1,27 @@
+
+# 第1章 绪论
+## 1.2 基本概念和术语
+* 数据 data
+* 数据元素 data element
+* 数据对象 data object
+* 数据结构 data structure  
+1,集合  
+2,线性结构  
+3,树形结构  
+4,图状结构或网状结构
+* 元素 element
+* 节点 node
+* 数据域 data field
+* 数据类型 data type
+* 抽象数据类型  abstract data type ADT
+
+## 1.4 算法与算法分析
+* 算法 algorithm
+### 1.4.3 渐近时间复杂度
+asymptotic time complexity
+T(n)=O(f(n))
+
+### 1.4.4 时间复杂度
+space complexity
+S(n)=O(f(n))
+
