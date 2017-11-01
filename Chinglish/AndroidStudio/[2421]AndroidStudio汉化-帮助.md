@@ -22,8 +22,12 @@
 [csdn 下载](http://download.csdn.net/download/pingfangx/10046862)  
 比②中更增加了一些 class 文件的汉化，汉化更多了一点点。
 
+
+![预览图](https://pingfangx.github.io/resource/blogx/2421.1.png)
+
 # 0x02 如何反馈
 请提至 [https://github.com/pingfangx/TranslatorX/issues](https://github.com/pingfangx/TranslatorX/issues)
+
 
 # 0x03 关于
 汉化是个出力不讨好的活。  
