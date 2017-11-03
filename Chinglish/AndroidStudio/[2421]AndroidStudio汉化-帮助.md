@@ -4,6 +4,8 @@
 平方X原创汉化，转载请注明出处。  
 [http://www.pingfangx.com/xx/translation/android_studio](http://www.pingfangx.com/xx/translation/android_studio)  
 
+![预览图](https://pingfangx.github.io/resource/blogx/2421.1.png)
+
 # 0x01 如何使用
 有以下 4 种汉化方式：  
 方法一、二比较简单，直接放入 /lib/ 中即可，要取消汉化直接删除即可；  
