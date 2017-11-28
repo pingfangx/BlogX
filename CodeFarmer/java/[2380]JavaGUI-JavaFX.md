@@ -17,6 +17,7 @@
 # 安装 JavaFX Scene Builder
 [JavaFX Scene Builder Archive](http://www.oracle.com/technetwork/java/javase/downloads/javafxscenebuilder-1x-archive-2199384.html)  
 安装后在窗口→首选项→ JavaFX 中配置 SceneBuilder executable
+补充：换为 IntelliJ IEDA 后，不用预先配置，右键 Open In SceneBuilder 后，选择就可以了。
 
 # HelloWorld
 根据[初生不惑.《JavaFX快速入门》](http://www.yiibai.com/javafx/javafx-tutorial-for-beginners.html#)
