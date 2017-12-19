@@ -64,9 +64,18 @@ choice,表示选择
 * {2,number} 个使用（第1个参数，不是第2个）
 * {number} 个使用（要指定参数序号，number不表示该数字）
 
+# 0x05 不应翻译的地方
+* Licensed to {0}  
+启动时显示的许可到，但是汉化为会显示为框框
+* build  
+设置中的 gradle 消失  
+其使用的是 configurable.group.build.tools.settings.parent=build  
+错误地将值 build 进行了汉化，导致出错
+* Application
+用于运行配置中的分组  
+application.configuration.name=Application
 
-
-# 0x05 翻译文件的介绍
+# 0x06 翻译文件的介绍
 ## lib/resource_en/messages
 文件|说明|备注
 -|-|-
