@@ -1,94 +1,99 @@
-# ÈÃOmegaTÖ§³Ö°Ù¶È·­ÒëºÍ¹È¸è·­Òë
-# 0x00 Ç°ÑÔ
-OmegaT×Ô´øµÄ¹È¸è·­ÒëÒ»Ö±ÓÃ²»ÁË£¬¶øÇÒºÃÏñ»¹ÊÇÊÕ·ÑµÄ¡£  
-×Ô¼ºÔÚÊ¹ÓÃµÄÊ±ºò×ÜÊÇÒª¸´ÖÆµ½ä¯ÀÀÆ÷·­Òë£¬ºÜÊÇÂé·³¡£   
-¶øOmetaTÊÇ¿ªÔ´µÄ£¬ÓÚÊÇÏë×Ô¼ºĞŞ¸ÄÒ»ÏÂ¡£
-# 0x01 ÏÂÔØ²¢ÄÜÔËĞĞOmegaTµÄÔ´Âë
-## 1.1 µ¼ÈëEclipse
-OmegaTµÄ¹ÙÍøÊÇ[https://omegat.org/](https://omegat.org/)  
-Ô´ÂëÔÚ[https://github.com/omegat-org/omegat](https://github.com/omegat-org/omegat)  
-ÎÄµµÔÚ\omegat\docs_devel\README.txt  
-ÏÂÔØÍêºó£¬ÓÃEclipse´ò¿ª£¬²»¿ÉÓÃ¡£  
-readme ÖĞËµ
+# è®©OmegaTæ”¯æŒç™¾åº¦ç¿»è¯‘å’Œè°·æ­Œç¿»è¯‘
+
+è¯¥æ–¹æ³•å·²å¼ƒç”¨ï¼Œæ–°æ–¹æ³•è§  
+[[2487]OmegaT è°·æ­Œç¿»è¯‘æ’ä»¶å¼€å‘è®°å½•](http://blog.pingfangx.com/2487.html)  
+[[2488]OmegaT ç™¾åº¦ç¿»è¯‘æ’ä»¶å¼€å‘è®°å½•](http://blog.pingfangx.com/2488.html)  
+
+# 0x00 å‰è¨€
+OmegaTè‡ªå¸¦çš„è°·æ­Œç¿»è¯‘ä¸€ç›´ç”¨ä¸äº†ï¼Œè€Œä¸”å¥½åƒè¿˜æ˜¯æ”¶è´¹çš„ã€‚  
+è‡ªå·±åœ¨ä½¿ç”¨çš„æ—¶å€™æ€»æ˜¯è¦å¤åˆ¶åˆ°æµè§ˆå™¨ç¿»è¯‘ï¼Œå¾ˆæ˜¯éº»çƒ¦ã€‚   
+è€ŒOmetaTæ˜¯å¼€æºçš„ï¼Œäºæ˜¯æƒ³è‡ªå·±ä¿®æ”¹ä¸€ä¸‹ã€‚
+# 0x01 ä¸‹è½½å¹¶èƒ½è¿è¡ŒOmegaTçš„æºç 
+## 1.1 å¯¼å…¥Eclipse
+OmegaTçš„å®˜ç½‘æ˜¯[https://omegat.org/](https://omegat.org/)  
+æºç åœ¨[https://github.com/omegat-org/omegat](https://github.com/omegat-org/omegat)  
+æ–‡æ¡£åœ¨\omegat\docs_devel\README.txt  
+ä¸‹è½½å®Œåï¼Œç”¨Eclipseæ‰“å¼€ï¼Œä¸å¯ç”¨ã€‚  
+readme ä¸­è¯´
 >OmegaT is built with Gradle. Run `gradlew tasks` from the top level to
 see the available tasks.
 
-ÎÒÒ»¿ªÊ¼Ó¦¸ÃÊÇÖ±½Ó×÷ÎªJavaÏîÄ¿´ò¿ªµÄ.  
-ÓÚÊÇÔÚ´°¿Ú¡úÏÔÊ¾ÊÓÍ¼¡úÆäËûÀï£¬ÕÒµ½Gradle¡úGradle Tasks
-´ò¿ªºóÌáÊ¾
+æˆ‘ä¸€å¼€å§‹åº”è¯¥æ˜¯ç›´æ¥ä½œä¸ºJavaé¡¹ç›®æ‰“å¼€çš„.  
+äºæ˜¯åœ¨çª—å£â†’æ˜¾ç¤ºè§†å›¾â†’å…¶ä»–é‡Œï¼Œæ‰¾åˆ°Gradleâ†’Gradle Tasks
+æ‰“å¼€åæç¤º
 > There are no Gradle projects in the current workspace.*Import a Gradle project* to see its tasks in the Gradle Tasks View.
 
-ÓÚÊÇµ¼Èë£¬ÎÄ¼ş¡úµ¼Èë¡úGradle¡úExisting Gradle Project
+äºæ˜¯å¯¼å…¥ï¼Œæ–‡ä»¶â†’å¯¼å…¥â†’Gradleâ†’Existing Gradle Project
 
-µ¼Èëºó¿¨°ëÌì£¬ÏëÁËÏÂ¿ÉÄÜÓÖÊÇÏÂÔØgradle¿¨×¡ÁË¡£ÓÚÊÇÏÂÔØgradle,²Î¿¼[[1]]¡£
+å¯¼å…¥åå¡åŠå¤©ï¼Œæƒ³äº†ä¸‹å¯èƒ½åˆæ˜¯ä¸‹è½½gradleå¡ä½äº†ã€‚äºæ˜¯ä¸‹è½½gradle,å‚è€ƒ[[1]]ã€‚
 
-»¹ÊÇ¿¨¡£
-ËùÒÔÕâÊ±Ò»¶¨Òª´ò¿ª½ø¶È´°¿Ú£¬¿´ËüÔÚ¸ÉÊ²Ã´£¬ºÃÏñÊÇÓĞÏÂÔØµÄ½ø¶È,×îºóÈ´»¹ÊÇ¿¨×¡ÁË.  
-×îºó»»ÁË°¢ÀïÔÆµÄ²ÅÖÕÓÚÏÂÔØÍê³ÉÁË.
+è¿˜æ˜¯å¡ã€‚
+æ‰€ä»¥è¿™æ—¶ä¸€å®šè¦æ‰“å¼€è¿›åº¦çª—å£ï¼Œçœ‹å®ƒåœ¨å¹²ä»€ä¹ˆï¼Œå¥½åƒæ˜¯æœ‰ä¸‹è½½çš„è¿›åº¦,æœ€åå´è¿˜æ˜¯å¡ä½äº†.  
+æœ€åæ¢äº†é˜¿é‡Œäº‘çš„æ‰ç»ˆäºä¸‹è½½å®Œæˆäº†.
 
-## 1.2 ´¦ÀíÒıÓÃµÄ¿â
-¼ÓÔØÍê³ÉÖ®ºó£¬ÓĞÒ»Ğ©Àà»¹ÊÇÕÒ²»µ½¡£
-È»ºó¿´µ½OmegaTÖĞÓÃµ½µÄÒ»Ğ©µÚÈı·½¿â£¬¶¼·ÅÔÚÁËlib/sources/ÖĞ£¬µ«¶¼ÊÇzipµÄ£¬¶øÇÒÎÄ¼ş½á¹¹Ò²²»Ò»Ñù¡£  
-ÎÒÖ»ºÃÔÚzipÖĞ°Ñsrc»òjar¸´ÖÆ³öÀ´£¬È»ºóÊÖ¶¯½«¸´ÖÆ³öÀ´µÄsrcÌí¼ÓÎª´úÂëÄ¿Â¼£¬jarÌí¼Óµ½¹¹½¨Â·¾¶¡£  
-×îºó»¹È±ÉÙorg.openide.awt.jar£¬
-ÔÚ[http://www.java2s.com/Code/Jar/o/Downloadorgopenideawtjar.htm](http://www.java2s.com/Code/Jar/o/Downloadorgopenideawtjar.htm)ÏÂÔØÌí¼Ó¡£  
+## 1.2 å¤„ç†å¼•ç”¨çš„åº“
+åŠ è½½å®Œæˆä¹‹åï¼Œæœ‰ä¸€äº›ç±»è¿˜æ˜¯æ‰¾ä¸åˆ°ã€‚
+ç„¶åçœ‹åˆ°OmegaTä¸­ç”¨åˆ°çš„ä¸€äº›ç¬¬ä¸‰æ–¹åº“ï¼Œéƒ½æ”¾åœ¨äº†lib/sources/ä¸­ï¼Œä½†éƒ½æ˜¯zipçš„ï¼Œè€Œä¸”æ–‡ä»¶ç»“æ„ä¹Ÿä¸ä¸€æ ·ã€‚  
+æˆ‘åªå¥½åœ¨zipä¸­æŠŠsrcæˆ–jarå¤åˆ¶å‡ºæ¥ï¼Œç„¶åæ‰‹åŠ¨å°†å¤åˆ¶å‡ºæ¥çš„srcæ·»åŠ ä¸ºä»£ç ç›®å½•ï¼Œjaræ·»åŠ åˆ°æ„å»ºè·¯å¾„ã€‚  
+æœ€åè¿˜ç¼ºå°‘org.openide.awt.jarï¼Œ
+åœ¨[http://www.java2s.com/Code/Jar/o/Downloadorgopenideawtjar.htm](http://www.java2s.com/Code/Jar/o/Downloadorgopenideawtjar.htm)ä¸‹è½½æ·»åŠ ã€‚  
 
-ÕÒ²»µ½com.sun.tools.javac.main£¬ÊÖ¶¯Ìí¼ÓjdkÂ·¾¶µÄC:\Program Files\Java\jdk1.8.0_121\lib\tools.jar
+æ‰¾ä¸åˆ°com.sun.tools.javac.mainï¼Œæ‰‹åŠ¨æ·»åŠ jdkè·¯å¾„çš„C:\Program Files\Java\jdk1.8.0_121\lib\tools.jar
 
-ÖÁ´Ë,¿ÉÒÔÔËĞĞÆğOmegaTÁË.
+è‡³æ­¤,å¯ä»¥è¿è¡Œèµ·OmegaTäº†.
 
-# 0x02 Ñ°ÕÒ·­ÒëµÄ·½Ê½
+# 0x02 å¯»æ‰¾ç¿»è¯‘çš„æ–¹å¼
 
-## 2.1 µ÷ÓÃ·­ÒëµÄ´úÂë
-ÕÒÁËÒ»ÏÂ,¿´µ½¹È¸è·­ÒëµÄ·½·¨Îª
+## 2.1 è°ƒç”¨ç¿»è¯‘çš„ä»£ç 
+æ‰¾äº†ä¸€ä¸‹,çœ‹åˆ°è°·æ­Œç¿»è¯‘çš„æ–¹æ³•ä¸º
 ```
 org.omegat.core.machinetranslators.Google2Translate.translate(Language, Language, String)
 ```
-## 2.2 Ö±½Óµ÷È¡·­Òëapi
-ÔÚÉÔÎ¢³¢ÊÔÖ®ºó£¬·¢ÏÖÖ±½Óµ÷È¡¹È¸èµÄ·­ÒëapiÊÇĞĞ²»Í¨µÄ¡£  
-ÔÚËüµÄÍøÒ³¼òµ¥×¥ÁËÒ»ÏÂ£¬ÖØĞÂµ÷È¡Ò²ÓĞ´í£¬Ó¦¸ÃÊÇÒ»¸öÀàËÆËæ»úÊıµÄÄÇ¸ö²ÎÊı,»òÊÇ±ğµÄÊ²Ã´²ÎÊıµÄĞ£Ñé¡£
-## 2.3 Ñ¡ÔñWebView
-²»ÄÜÖ±½ÓÇëÇó,ÄÇÎÒÃÇÓÃwebView´ò¿ªºÃÁË  
-ÔÚkimmkingµÄ¡¶swingºÍjavaÀïÇ¶Èëä¯ÀÀÆ÷¡·[[2]]ÖĞÁĞ³öÁËºÜ¶à·½°¸£¬ÓÚÊÇ¿ªÊ¼ÁËÂş³¤µÄÏÂÔØ¡¢ÊÔÓÃ¡£
+## 2.2 ç›´æ¥è°ƒå–ç¿»è¯‘api
+åœ¨ç¨å¾®å°è¯•ä¹‹åï¼Œå‘ç°ç›´æ¥è°ƒå–è°·æ­Œçš„ç¿»è¯‘apiæ˜¯è¡Œä¸é€šçš„ã€‚  
+åœ¨å®ƒçš„ç½‘é¡µç®€å•æŠ“äº†ä¸€ä¸‹ï¼Œé‡æ–°è°ƒå–ä¹Ÿæœ‰é”™ï¼Œåº”è¯¥æ˜¯ä¸€ä¸ªç±»ä¼¼éšæœºæ•°çš„é‚£ä¸ªå‚æ•°,æˆ–æ˜¯åˆ«çš„ä»€ä¹ˆå‚æ•°çš„æ ¡éªŒã€‚
+## 2.3 é€‰æ‹©WebView
+ä¸èƒ½ç›´æ¥è¯·æ±‚,é‚£æˆ‘ä»¬ç”¨webViewæ‰“å¼€å¥½äº†  
+åœ¨kimmkingçš„ã€Šswingå’Œjavaé‡ŒåµŒå…¥æµè§ˆå™¨ã€‹[[2]]ä¸­åˆ—å‡ºäº†å¾ˆå¤šæ–¹æ¡ˆï¼Œäºæ˜¯å¼€å§‹äº†æ¼«é•¿çš„ä¸‹è½½ã€è¯•ç”¨ã€‚
 ### jxbrowser
 [http://www.teamdev.com/jxbrowser](http://www.teamdev.com/jxbrowser)  
-Õâ¸ö¿´×ÅºÜ¿á£¬µ«ÊÇºÃÏñÒªÊÕ·ÑµÄ£¬ËäÈ»ÓĞÆÆ½âÊ²Ã´µÄ,µ«Õâ¿ÉÃ»·¨ÓÃ°¡¡£
+è¿™ä¸ªçœ‹ç€å¾ˆé…·ï¼Œä½†æ˜¯å¥½åƒè¦æ”¶è´¹çš„ï¼Œè™½ç„¶æœ‰ç ´è§£ä»€ä¹ˆçš„,ä½†è¿™å¯æ²¡æ³•ç”¨å•Šã€‚
 
 ### swt/Jface
-greatwqs¡¶[swt/JfaceÄ£Äâieä¯ÀÀÆ÷](http://greatwqs.iteye.com/blog/1213801)¡·  
-ÕâÒ»¸ö£¬ÊÇ¿ÉÒÔ´ò¿ª£¬µ«ÊÇºÃÏñÃ»ÓĞ°ì·¨½øĞĞ½»»¥°¡£¬ÎÒÒ²²»ÄÜÉèÖÃÃ¿´Î·­ÒëÊ±´ò¿ª²»Í¬µÄÍøÖ·£¬ºÃÏñÒ»´ò¿ª¾ÍÀàËÆÒ»¸öÓ¦ÓÃ¹Ì¶¨ÁË¡£
+greatwqsã€Š[swt/Jfaceæ¨¡æ‹Ÿieæµè§ˆå™¨](http://greatwqs.iteye.com/blog/1213801)ã€‹  
+è¿™ä¸€ä¸ªï¼Œæ˜¯å¯ä»¥æ‰“å¼€ï¼Œä½†æ˜¯å¥½åƒæ²¡æœ‰åŠæ³•è¿›è¡Œäº¤äº’å•Šï¼Œæˆ‘ä¹Ÿä¸èƒ½è®¾ç½®æ¯æ¬¡ç¿»è¯‘æ—¶æ‰“å¼€ä¸åŒçš„ç½‘å€ï¼Œå¥½åƒä¸€æ‰“å¼€å°±ç±»ä¼¼ä¸€ä¸ªåº”ç”¨å›ºå®šäº†ã€‚
 
 ### MozSwing
 [https://sourceforge.net/projects/mozswing/](https://sourceforge.net/projects/mozswing/)  
-Õâ¸ö¡­¡­ÔõÃ´ÓÃ°¡£¬ÔõÃ´Á¬ÎÄµµ¶¼ÕÒ²»µ½£¬ÎÒÒ²ÊÇ×íÁË¡£
+è¿™ä¸ªâ€¦â€¦æ€ä¹ˆç”¨å•Šï¼Œæ€ä¹ˆè¿æ–‡æ¡£éƒ½æ‰¾ä¸åˆ°ï¼Œæˆ‘ä¹Ÿæ˜¯é†‰äº†ã€‚
 
 ### HtmlUnit
 [http://htmlunit.sourceforge.net/](http://htmlunit.sourceforge.net/)  
-×îºó·¢ÏÖÕâ¸öÓ¦¸ÃÍ¦ºÃµÄ¡£ 
+æœ€åå‘ç°è¿™ä¸ªåº”è¯¥æŒºå¥½çš„ã€‚ 
  
-# 0x03 Íê³É·­Òë¼¯³É
-## 3.1 ½â¾öÊ¹ÓÃHtmlUnitµÄÎÊÌâ
-Ê¹ÓÃHtmlUnitÔËĞĞÖ®ºóÌáÊ¾£º
+# 0x03 å®Œæˆç¿»è¯‘é›†æˆ
+## 3.1 è§£å†³ä½¿ç”¨HtmlUnitçš„é—®é¢˜
+ä½¿ç”¨HtmlUnitè¿è¡Œä¹‹åæç¤ºï¼š
 `NoSuchMethodError: org.apache.http.conn.ssl.SSLConnectionSocketFactory`  
-ºóÀ´·¢ÏÖÊÇhttpclient.jar°æ±¾ÓĞÎÊÌâ¡£  
-HtmlUnitÊ¹ÓÃµÄÊÇ4.5.3£¬¶øOmegaTÖĞÊ¹ÓÃµÄÊÇ4.3.6£¬¶øÇÒOmegaTµÄºÃÏñÊÇÄ³¸ö¿âÒıÓÃµÄ¡£  
-Ò»¿ªÊ¼ÎÒÏë£¬ÄÜ²»ÄÜ´æÔÚÁ½¸ö¿âÄØ£¬»òÊÇ½«HtmlUnit¶ÀÁ¢³öÈ¥£¬ÈÃËüµ¥¶ÀÊ¹ÓÃ4.5.3£¬ºóÀ´·¢ÏÖ²»ĞĞ£¬Ó¦¸ÃÊÇÒòÎªÔÚÍ¬Ò»¸öÏîÄ¿ÖĞ»á±àÒëµ½Ò»ÆğµÄ¡£
+åæ¥å‘ç°æ˜¯httpclient.jarç‰ˆæœ¬æœ‰é—®é¢˜ã€‚  
+HtmlUnitä½¿ç”¨çš„æ˜¯4.5.3ï¼Œè€ŒOmegaTä¸­ä½¿ç”¨çš„æ˜¯4.3.6ï¼Œè€Œä¸”OmegaTçš„å¥½åƒæ˜¯æŸä¸ªåº“å¼•ç”¨çš„ã€‚  
+ä¸€å¼€å§‹æˆ‘æƒ³ï¼Œèƒ½ä¸èƒ½å­˜åœ¨ä¸¤ä¸ªåº“å‘¢ï¼Œæˆ–æ˜¯å°†HtmlUnitç‹¬ç«‹å‡ºå»ï¼Œè®©å®ƒå•ç‹¬ä½¿ç”¨4.5.3ï¼Œåæ¥å‘ç°ä¸è¡Œï¼Œåº”è¯¥æ˜¯å› ä¸ºåœ¨åŒä¸€ä¸ªé¡¹ç›®ä¸­ä¼šç¼–è¯‘åˆ°ä¸€èµ·çš„ã€‚
 
-ÕÛÌÚÒ»ÌìÃ»³É¹¦£¬ºóÀ´ÍíÉÏÏëµ½£¬¿ÉÒÔÈÃHtmlUnitÊ¹ÓÃÔ´Âë£¬ÕâÑùÓ¦¸Ã¾Í¿ÉÒÔÁË¡£  
-ÓÚÊÇÏÂÔØÁËHtmlUnitµÄÔ´Âë£¬·Åµ½Ò»¸öÏîÄ¿ÖĞ¡£  
-È»ºóÓÖÏÂÔØÁË4.5.3µÄÔ´Âë£¬¹©HtmlUnitÊ¹ÓÃ¡£  
-½ÓÏÂÀ´£¬½«4.5.3µÄÔ´ÂëĞŞ¸Ä£¬ĞŞ¸Ä°üÃûÎªorg.apache.http453¡£  
-×îºóÔÙ½«HtmlUnitÒıÓÃµ½omegatÏîÄ¿ÖĞ¡£  
-ÔËĞĞ£¬
+æŠ˜è…¾ä¸€å¤©æ²¡æˆåŠŸï¼Œåæ¥æ™šä¸Šæƒ³åˆ°ï¼Œå¯ä»¥è®©HtmlUnitä½¿ç”¨æºç ï¼Œè¿™æ ·åº”è¯¥å°±å¯ä»¥äº†ã€‚  
+äºæ˜¯ä¸‹è½½äº†HtmlUnitçš„æºç ï¼Œæ”¾åˆ°ä¸€ä¸ªé¡¹ç›®ä¸­ã€‚  
+ç„¶ååˆä¸‹è½½äº†4.5.3çš„æºç ï¼Œä¾›HtmlUnitä½¿ç”¨ã€‚  
+æ¥ä¸‹æ¥ï¼Œå°†4.5.3çš„æºç ä¿®æ”¹ï¼Œä¿®æ”¹åŒ…åä¸ºorg.apache.http453ã€‚  
+æœ€åå†å°†HtmlUnitå¼•ç”¨åˆ°omegaté¡¹ç›®ä¸­ã€‚  
+è¿è¡Œï¼Œ
 
-È»ºó·¢ÏÖ£¬ĞèÒªhttpmime£¬httpcore£¬httpclient 3¸ö°ü¶¼ÏÂÔØÔ´ÂëĞŞ¸Ä£¬¶øÇÒÔ´ÂëÖĞjava-deprecatedÖĞµÄ´úÂëÒ²ĞèÒª¸´ÖÆ¡£
+ç„¶åå‘ç°ï¼Œéœ€è¦httpmimeï¼Œhttpcoreï¼Œhttpclient 3ä¸ªåŒ…éƒ½ä¸‹è½½æºç ä¿®æ”¹ï¼Œè€Œä¸”æºç ä¸­java-deprecatedä¸­çš„ä»£ç ä¹Ÿéœ€è¦å¤åˆ¶ã€‚
 
-## 3.2 Ê¹ÓÃHtmlUnit½âÎöÊı¾İ
-ÔÚÉÏÒ»²½ÖĞ£¬ÎÒÃÇÖÕÓÚÍê³ÉÁËÔÚjavaÖĞ´ò¿ªÒ»¸öÍøÒ³£¬½ÓÏÂÀ´ÎÒÃÇ¾ÍÒª´ò¿ª·­Òë²¢½âÎöÊı¾İ¡£
-¾­¹ıÒ»·¬Å¬Á¦£¬ÎÒÃÇµÃµ½ÁËÒÔÏÂ´úÂë
+## 3.2 ä½¿ç”¨HtmlUnitè§£ææ•°æ®
+åœ¨ä¸Šä¸€æ­¥ä¸­ï¼Œæˆ‘ä»¬ç»ˆäºå®Œæˆäº†åœ¨javaä¸­æ‰“å¼€ä¸€ä¸ªç½‘é¡µï¼Œæ¥ä¸‹æ¥æˆ‘ä»¬å°±è¦æ‰“å¼€ç¿»è¯‘å¹¶è§£ææ•°æ®ã€‚
+ç»è¿‡ä¸€ç•ªåŠªåŠ›ï¼Œæˆ‘ä»¬å¾—åˆ°äº†ä»¥ä¸‹ä»£ç 
 ```
     /**
-     * °Ù¶È·­Òë
+     * ç™¾åº¦ç¿»è¯‘
      */
     public static String translateByBaidu(String sLang, String tLang, String text) {
         return translateByHtmlUnit(sLang, tLang, text, "http://fanyi.baidu.com/#%s/%s/%s",
@@ -96,22 +101,22 @@ HtmlUnitÊ¹ÓÃµÄÊÇ4.5.3£¬¶øOmegaTÖĞÊ¹ÓÃµÄÊÇ4.3.6£¬¶øÇÒOmegaTµÄºÃÏñÊÇÄ³¸ö¿âÒıÓÃµÄ¡£
     }
 
     /**
-     * µ÷ÓÃ¹È¸è·­Òë£¬ µ«ÊÇÊµ¼Ê²âÊÔÊ±£¬ËÙ¶È·Ç³£Âı£¬ÄÑµÀÊÇÒòÎªÒª°ÑËùÓĞ×ÊÔ´¼ÓÔØÍê²ÅĞĞ
+     * è°ƒç”¨è°·æ­Œç¿»è¯‘ï¼Œ ä½†æ˜¯å®é™…æµ‹è¯•æ—¶ï¼Œé€Ÿåº¦éå¸¸æ…¢ï¼Œéš¾é“æ˜¯å› ä¸ºè¦æŠŠæ‰€æœ‰èµ„æºåŠ è½½å®Œæ‰è¡Œ
      * 
      */
     public static String translateByGoogle(String sLang, String tLang, String text) {
-        // ÕâÀïÒªÓÃhttps£¬Ê¹ÓÃhttp¶ÁÈ¡²»µ½·­Òë½á¹û
+        // è¿™é‡Œè¦ç”¨httpsï¼Œä½¿ç”¨httpè¯»å–ä¸åˆ°ç¿»è¯‘ç»“æœ
         return translateByHtmlUnit(sLang, tLang, text, "https://translate.google.cn/#%s/%s/%s", "span#result_box");
     }
 
     /**
-     * Ê¹ÓÃHtmlUnit×¥È¡·­Òë½á¹û
+     * ä½¿ç”¨HtmlUnitæŠ“å–ç¿»è¯‘ç»“æœ
      * 
-     * @param sLang sourceÓïÑÔ
-     * @param tLang targetÓïÑÔ
-     * @param text Òª·­ÒëµÄÎÄ±¾
-     * @param url ×¥È¡µÄÍøÖ·
-     * @param selector Ñ¡ÔñÆ÷
+     * @param sLang sourceè¯­è¨€
+     * @param tLang targetè¯­è¨€
+     * @param text è¦ç¿»è¯‘çš„æ–‡æœ¬
+     * @param url æŠ“å–çš„ç½‘å€
+     * @param selector é€‰æ‹©å™¨
      * @return
      */
     public static String translateByHtmlUnit(String sLang, String tLang, String text, String url, String selector) {
@@ -139,10 +144,10 @@ HtmlUnitÊ¹ÓÃµÄÊÇ4.5.3£¬¶øOmegaTÖĞÊ¹ÓÃµÄÊÇ4.3.6£¬¶øÇÒOmegaTµÄºÃÏñÊÇÄ³¸ö¿âÒıÓÃµÄ¡£
     }
 
     /**
-     * ´Ó¼ÓÔØµÄÒ³ÃæÖĞ½âÎö³ö·­Òë½á¹û
+     * ä»åŠ è½½çš„é¡µé¢ä¸­è§£æå‡ºç¿»è¯‘ç»“æœ
      * 
-     * @param page ¼ÓÔØ³öµÄÒ³Ãæ
-     * @param selector Ñ¡ÔñÆ÷
+     * @param page åŠ è½½å‡ºçš„é¡µé¢
+     * @param selector é€‰æ‹©å™¨
      * @return
      */
     private static String parseResult(HtmlPage page, String selector) {
@@ -151,7 +156,7 @@ HtmlUnitÊ¹ÓÃµÄÊÇ4.5.3£¬¶øOmegaTÖĞÊ¹ÓÃµÄÊÇ4.3.6£¬¶øÇÒOmegaTµÄºÃÏñÊÇÄ³¸ö¿âÒıÓÃµÄ¡£
             return result;
         }
         try {
-            // ÑÓÊ±ÁËÏÂÃæµÄquerySelector²ÅÓĞ½á¹û£¬ÄÑµÀÊÇÒì²½¼ÓÔØµÄ£¿
+            // å»¶æ—¶äº†ä¸‹é¢çš„querySelectoræ‰æœ‰ç»“æœï¼Œéš¾é“æ˜¯å¼‚æ­¥åŠ è½½çš„ï¼Ÿ
             System.out.println("sleep...");
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -170,29 +175,29 @@ HtmlUnitÊ¹ÓÃµÄÊÇ4.5.3£¬¶øOmegaTÖĞÊ¹ÓÃµÄÊÇ4.3.6£¬¶øÇÒOmegaTµÄºÃÏñÊÇÄ³¸ö¿âÒıÓÃµÄ¡£
     }
 
 ```
-## 3.3 ÓÃJava´ò¿ªä¯ÀÀÆ÷
-**Õâ¸ö·½°¸×îÖÕÆúÓÃÁË**  
+## 3.3 ç”¨Javaæ‰“å¼€æµè§ˆå™¨
+**è¿™ä¸ªæ–¹æ¡ˆæœ€ç»ˆå¼ƒç”¨äº†**  
 
-°Ù¶È·­Òë»¹ºÃ£¬µ«ÊÇ¹È¸è·­ÒëÒì³£µÄÂı£¬¶øÎÒ´ò¿ªÍøÒ³Ã÷Ã÷ÊÇºÜ¿ìµÄÑ½¡£   
-ÓÚÊÇÔÙ´ÎÕûÀíË¼Â·£º
-* ÓÃjava´ò¿ªÆäËû³ÌĞò£¬´ò¿ªºóÔÙ·µ»Ø
-* ÓÃjava´ò¿ªä¯ÀÀÆ÷£¬Ö±½ÓÔÚä¯ÀÀÆ÷£¬Ö±½ÓÔÚä¯ÀÀÆ÷ÖĞ´ò¿ª·­Òë½çÃæ¡£
+ç™¾åº¦ç¿»è¯‘è¿˜å¥½ï¼Œä½†æ˜¯è°·æ­Œç¿»è¯‘å¼‚å¸¸çš„æ…¢ï¼Œè€Œæˆ‘æ‰“å¼€ç½‘é¡µæ˜æ˜æ˜¯å¾ˆå¿«çš„å‘€ã€‚   
+äºæ˜¯å†æ¬¡æ•´ç†æ€è·¯ï¼š
+* ç”¨javaæ‰“å¼€å…¶ä»–ç¨‹åºï¼Œæ‰“å¼€åå†è¿”å›
+* ç”¨javaæ‰“å¼€æµè§ˆå™¨ï¼Œç›´æ¥åœ¨æµè§ˆå™¨ï¼Œç›´æ¥åœ¨æµè§ˆå™¨ä¸­æ‰“å¼€ç¿»è¯‘ç•Œé¢ã€‚
 
-·ÖÎöÁËÒ»ÏÂ£¬ÆäÊµÎÒ²¢Ã»ÓĞÌØ±ğĞèÒª·µ»ØµÄ½á¹û£¬Ö»ÊÇĞèÒª¹È¸è·­Òë×÷Îª²Î¿¼£¬²»È»ÎÒÃ¿´Î¶¼Òª¸´ÖÆµ½ä¯ÀÀÆ÷ºÜÊÇÂé·³¡£  
-ÓÚÊÇÑ¡ÔñÓÃJava´ò¿ªä¯ÀÀÆ÷¡£
-¿ÉÊÇÎÊÌâÀ´ÁË£¬µ±ÎÒÃÇ´ò¿ªchromeµÄÊ±ºò£¬ËüÒªÃ´»áĞÂ½¨Ò»¸ö´°¿Ú£¬ÒªÃ´»áĞÂ½¨Ò»¸ötab£¬µ«²»ÄÜÔÚµ±Ç°tab´ò¿ª¡£  
-²éÕÒÁËÒ»ÏÂÊÇ·ñÓĞ½â¾ö·½°¸,¿´µ½ÁËÕâ¸ö·´À¡£¬ºÃ¼¸ÄêÁË£¬Ã»ÈË¸ÄÕâ¸ö¡­¡­Ğ¦¿Ş¡£
+åˆ†æäº†ä¸€ä¸‹ï¼Œå…¶å®æˆ‘å¹¶æ²¡æœ‰ç‰¹åˆ«éœ€è¦è¿”å›çš„ç»“æœï¼Œåªæ˜¯éœ€è¦è°·æ­Œç¿»è¯‘ä½œä¸ºå‚è€ƒï¼Œä¸ç„¶æˆ‘æ¯æ¬¡éƒ½è¦å¤åˆ¶åˆ°æµè§ˆå™¨å¾ˆæ˜¯éº»çƒ¦ã€‚  
+äºæ˜¯é€‰æ‹©ç”¨Javaæ‰“å¼€æµè§ˆå™¨ã€‚
+å¯æ˜¯é—®é¢˜æ¥äº†ï¼Œå½“æˆ‘ä»¬æ‰“å¼€chromeçš„æ—¶å€™ï¼Œå®ƒè¦ä¹ˆä¼šæ–°å»ºä¸€ä¸ªçª—å£ï¼Œè¦ä¹ˆä¼šæ–°å»ºä¸€ä¸ªtabï¼Œä½†ä¸èƒ½åœ¨å½“å‰tabæ‰“å¼€ã€‚  
+æŸ¥æ‰¾äº†ä¸€ä¸‹æ˜¯å¦æœ‰è§£å†³æ–¹æ¡ˆ,çœ‹åˆ°äº†è¿™ä¸ªåé¦ˆï¼Œå¥½å‡ å¹´äº†ï¼Œæ²¡äººæ”¹è¿™ä¸ªâ€¦â€¦ç¬‘å“­ã€‚
 https://bugs.chromium.org/p/chromium/issues/detail?id=141942
-### 3.3.1 Ê¹ÓÃfirefox
-ÔÚËÑË÷¹ı³ÌÖĞ£¬ÓĞÈËÌáµ½firefoxÊÇ¿ÉÒÔµÄ£¬µ«ÊÇÉèÖÃºó¿ÉÄÜÕı³£µÄÍøÒ³Ò²Ö»»áÔÚµ±Ç°tab´ò¿ª£¬²»¹ıÎÒÖ»ÓÃfirefoxÀ´·­ÒëµÄ»°Ó°Ïì²»´ó¡£  
+### 3.3.1 ä½¿ç”¨firefox
+åœ¨æœç´¢è¿‡ç¨‹ä¸­ï¼Œæœ‰äººæåˆ°firefoxæ˜¯å¯ä»¥çš„ï¼Œä½†æ˜¯è®¾ç½®åå¯èƒ½æ­£å¸¸çš„ç½‘é¡µä¹Ÿåªä¼šåœ¨å½“å‰tabæ‰“å¼€ï¼Œä¸è¿‡æˆ‘åªç”¨firefoxæ¥ç¿»è¯‘çš„è¯å½±å“ä¸å¤§ã€‚  
 [Open link in the same tab for Firefox](https://superuser.com/questions/260129/open-link-in-the-same-tab-for-firefox)
 >* In about:config page (confirm that you'll be careful)
 >* Enter browser.link.open_newwindow in the search field
 >* Double click browser.link.open_newwindow.restriction and set value to 0
 >* Double click browser.link.open_newwindow and set value to 1
 
-Òª×¢Òâ£¬µÚÒ»´ÎÔËĞĞÖ»ÄÜ´ò¿ªfirefoxä¯ÀÀÆ÷£¬µÚ¶ş´ÎÔÙÔËĞĞ²Å´ò¿ªÁËÖ¸¶¨µÄÍøÒ³¡£  
-Ò²¾ÍÊÇËµÒªÏÈ´ò¿ª£¬ÔÙÔËĞĞ³ÌĞò´ò¿ªÖ¸¶¨ÍøÒ³
+è¦æ³¨æ„ï¼Œç¬¬ä¸€æ¬¡è¿è¡Œåªèƒ½æ‰“å¼€firefoxæµè§ˆå™¨ï¼Œç¬¬äºŒæ¬¡å†è¿è¡Œæ‰æ‰“å¼€äº†æŒ‡å®šçš„ç½‘é¡µã€‚  
+ä¹Ÿå°±æ˜¯è¯´è¦å…ˆæ‰“å¼€ï¼Œå†è¿è¡Œç¨‹åºæ‰“å¼€æŒ‡å®šç½‘é¡µ
 ```
     private void openByBrowser() {
         String browserPath = "D:\\xx\\software\\browser\\firfox\\firefox.exe";
@@ -205,8 +210,8 @@ https://bugs.chromium.org/p/chromium/issues/detail?id=141942
         }
     }
 ```
-## 3.5 Ìí¼Ó·­Òë²Ëµ¥
-**Õâ¸ö·½°¸×îÖÕÆúÓÃÁË**  
+## 3.5 æ·»åŠ ç¿»è¯‘èœå•
+**è¿™ä¸ªæ–¹æ¡ˆæœ€ç»ˆå¼ƒç”¨äº†**  
 ```
     #org.omegat.gui.main.MainWindowMenu.getMachineTranslationMenu()
     public JMenu getMachineTranslationMenu() {
@@ -215,37 +220,37 @@ https://bugs.chromium.org/p/chromium/issues/detail?id=141942
 ```
 org.omegat.core.machinetranslators.BaseTranslate.BaseTranslate()
 org.omegat.gui.exttrans.MachineTranslateTextArea.FindThread.getTranslation(Language, Language)
-ÓÚÊÇÕÒµ½ÁËÀàorg.omegat.core.machinetranslators.MachineTranslators
-Í¨¹ı·½·¨org.omegat.core.machinetranslators.MachineTranslators.add(IMachineTranslation)
-·¢ÏÖÔÚorg.omegat.gui.exttrans.MachineTranslateTextArea.MachineTranslateTextArea(IMainWindow)
-ÖĞÍê³ÉÁËÌí¼Ó¡£  
-ÔÚÕâ¸öÊ±ºò,ÎÒ·¢ÏÖÆäÊµ¿ÉÒÔ²»ÔÚOmegaTµÄÏîÄ¿ÖĞĞŞ¸Ä,¿ÉÒÔÖ±½Óµ¼³öÎª²å¼ş¾ÍºÃÁË.
+äºæ˜¯æ‰¾åˆ°äº†ç±»org.omegat.core.machinetranslators.MachineTranslators
+é€šè¿‡æ–¹æ³•org.omegat.core.machinetranslators.MachineTranslators.add(IMachineTranslation)
+å‘ç°åœ¨org.omegat.gui.exttrans.MachineTranslateTextArea.MachineTranslateTextArea(IMainWindow)
+ä¸­å®Œæˆäº†æ·»åŠ ã€‚  
+åœ¨è¿™ä¸ªæ—¶å€™,æˆ‘å‘ç°å…¶å®å¯ä»¥ä¸åœ¨OmegaTçš„é¡¹ç›®ä¸­ä¿®æ”¹,å¯ä»¥ç›´æ¥å¯¼å‡ºä¸ºæ’ä»¶å°±å¥½äº†.
 
 
-# 0x04 ²å¼ş»¯
-±¾À´ÏëÖ±½ÓÔÚ²Ëµ¥ÖĞÉèÖÃ£¬×·×Ù¹ı³ÌÖĞ·¢ÏÖÖ±½Ó¿ÉÒÔÊ¹ÓÃ²å¼şÌí¼ÓµÄ¡£  
+# 0x04 æ’ä»¶åŒ–
+æœ¬æ¥æƒ³ç›´æ¥åœ¨èœå•ä¸­è®¾ç½®ï¼Œè¿½è¸ªè¿‡ç¨‹ä¸­å‘ç°ç›´æ¥å¯ä»¥ä½¿ç”¨æ’ä»¶æ·»åŠ çš„ã€‚  
 >A class for aggregating machine translation connectors. Old-style plugins ("OmegaT-Plugin: machinetranslator") are added here by the MachineTranslateTextArea and so should not add themselves manually. New-style plugins ("OmegaT-Plugins: <classname>") should add themselves with add(IMachineTranslation) in the loadPlugins() method.
 
-²å¼şµÄÎÄµµÔÚ
-\omegat\docs_devel\OmegaT developer's guide.odtÖĞÓĞ½éÉÜ
+æ’ä»¶çš„æ–‡æ¡£åœ¨
+\omegat\docs_devel\OmegaT developer's guide.odtä¸­æœ‰ä»‹ç»
 
-## 4.1 µ¼³öjar¼°Çåµ¥ÎÄ¼ş
-ÓÒ¼ü¡úµ¼³ö¡úJava¡úJARÎÄ¼ş¡úÏÂÒ»²½  
-Ñ¡Ôñµ¼³öÄ¿±ê¡úÏÂÒ»²½  
-ÏÂÒ»²½  
-Éú³ÉÇåµ¥ÎÄ¼ş¡ú½«Çåµ¥±£´æÔÚ¹¤×÷¿Õ¼äÖĞ¡úÍê³É  
-ÕâÑù¾Í¿ÉÒÔÉú³ÉÒ»¸öÇåµ¥ÎÄ¼ş£¬
+## 4.1 å¯¼å‡ºjaråŠæ¸…å•æ–‡ä»¶
+å³é”®â†’å¯¼å‡ºâ†’Javaâ†’JARæ–‡ä»¶â†’ä¸‹ä¸€æ­¥  
+é€‰æ‹©å¯¼å‡ºç›®æ ‡â†’ä¸‹ä¸€æ­¥  
+ä¸‹ä¸€æ­¥  
+ç”Ÿæˆæ¸…å•æ–‡ä»¶â†’å°†æ¸…å•ä¿å­˜åœ¨å·¥ä½œç©ºé—´ä¸­â†’å®Œæˆ  
+è¿™æ ·å°±å¯ä»¥ç”Ÿæˆä¸€ä¸ªæ¸…å•æ–‡ä»¶ï¼Œ
 
-È»ºóĞŞ¸ÄÇåµ¥ÎÄ¼ş£¬ÏÂÒ»´Îµ¼³öµÄÊ±ºò¾Í¿ÉÒÔÑ¡ÔñÕâ¸öÇåµ¥ÎÄ¼ş¡£
+ç„¶åä¿®æ”¹æ¸…å•æ–‡ä»¶ï¼Œä¸‹ä¸€æ¬¡å¯¼å‡ºçš„æ—¶å€™å°±å¯ä»¥é€‰æ‹©è¿™ä¸ªæ¸…å•æ–‡ä»¶ã€‚
 
-ËüËµµÄ
+å®ƒè¯´çš„
 > New-style plugins ("OmegaT-Plugins: <classname>") 
 
-Êµ¼ÊÒªÔÚÇåµ¥ÎÄ¼şÖĞĞ´
+å®é™…è¦åœ¨æ¸…å•æ–‡ä»¶ä¸­å†™
 >OmegaT-Plugins: com.pingfangx.omegat.plugin.translator.BaiduTranslator
 
-×¢Òâ¡°:¡±ºóÃæµÄ¿Õ¸ñ¡£
-´úÂë£º
+æ³¨æ„â€œ:â€åé¢çš„ç©ºæ ¼ã€‚
+ä»£ç ï¼š
 ```
     public class BaiduTranslator {
 
@@ -260,29 +265,29 @@ org.omegat.gui.exttrans.MachineTranslateTextArea.FindThread.getTranslation(Langu
 
 
 ```
-µ«ÊÇÕâÑùĞ´»¹ÊÇ±¨´í¡£
+ä½†æ˜¯è¿™æ ·å†™è¿˜æ˜¯æŠ¥é”™ã€‚
 ```
 InvocationTargetException:null
 ```
-²éÁËÒ»ÏÂÊÇ·´ÉäÔËĞĞÓĞ´íÎó£¬Ã»ÓĞÍ·Ğ÷¡£
-## 4.2 Çåµ¥ÎÄ¼şÕÕºùÂ«»­Æ°
-´ÓÍøÉÏÏÂÔØÁËÒ»¸ö`OmegaT-plugins-YandexTranslate.jar`  
-·¢ÏÖÕâ¸ö²å¼şÊÇ¿ÉÒÔÕı³£¼ÓÔØµÄ£¬²é¿´ÆäÇåµ¥ÎÄ¼ş·¢ÏÖÓÃµÄÊÇ¾É°æ±¾µÄ£¬ÓÚÊÇ¸ÄÎª
+æŸ¥äº†ä¸€ä¸‹æ˜¯åå°„è¿è¡Œæœ‰é”™è¯¯ï¼Œæ²¡æœ‰å¤´ç»ªã€‚
+## 4.2 æ¸…å•æ–‡ä»¶ç…§è‘«èŠ¦ç”»ç“¢
+ä»ç½‘ä¸Šä¸‹è½½äº†ä¸€ä¸ª`OmegaT-plugins-YandexTranslate.jar`  
+å‘ç°è¿™ä¸ªæ’ä»¶æ˜¯å¯ä»¥æ­£å¸¸åŠ è½½çš„ï¼ŒæŸ¥çœ‹å…¶æ¸…å•æ–‡ä»¶å‘ç°ç”¨çš„æ˜¯æ—§ç‰ˆæœ¬çš„ï¼Œäºæ˜¯æ”¹ä¸º
 ```
     Manifest-Version: 1.0
     OmegaT-Plugin: true
-    (ÕâÀïÊÇ¸ö¿ÕĞĞ,Õâ¸ö¿ÕĞĞ»¹²»ÄÜÉ¾³ı£¬Ç°Ò»ĞĞÒ²²»ÄÜÉ¾³ı)
+    (è¿™é‡Œæ˜¯ä¸ªç©ºè¡Œ,è¿™ä¸ªç©ºè¡Œè¿˜ä¸èƒ½åˆ é™¤ï¼Œå‰ä¸€è¡Œä¹Ÿä¸èƒ½åˆ é™¤)
     Name: com.pingfangx.omegat.plugin.translator.BaiduTranslator2
     OmegaT-Plugin: MachineTranslator
 
 ```
-ÕâÀïºóÀ´×Ô¼ºĞÂ½¨ÁËÒ»¸ömanifest.mf,È»ºóÕ³ÌûÉÏÃæµÄÄÚÈİ,½á¹û»¹ÊÇ²»ĞĞ,ºóÀ´·¢ÏÖÉúµÄmanifest.mfÖĞÃ»ÓĞÈ«²¿Ğ´½øÈ¥,²»ÖªÊÇ·ñÊÇ¸ñÊ½µÄÎÄÌâ.
-ÓÚÊÇ¹´Ñ¡Éú³Émanifest,Éú³ÉºóÔÙĞŞ¸ÄÊ¹ÓÃ.
+è¿™é‡Œåæ¥è‡ªå·±æ–°å»ºäº†ä¸€ä¸ªmanifest.mf,ç„¶åç²˜å¸–ä¸Šé¢çš„å†…å®¹,ç»“æœè¿˜æ˜¯ä¸è¡Œ,åæ¥å‘ç°ç”Ÿçš„manifest.mfä¸­æ²¡æœ‰å…¨éƒ¨å†™è¿›å»,ä¸çŸ¥æ˜¯å¦æ˜¯æ ¼å¼çš„æ–‡é¢˜.
+äºæ˜¯å‹¾é€‰ç”Ÿæˆmanifest,ç”Ÿæˆåå†ä¿®æ”¹ä½¿ç”¨.
 
-## 4.3 µ÷ÊÔ²å¼ş
-### 4.3.1 ²å¼şÂ·¾¶²»ÕıÈ·
-ÒòÎª²å¼şÓĞÎÊÌâ£¬ÔËĞĞ²»ÁË£¬µ÷ÊÔµÄÊ±ºò·¢ÏÖÂ·¾¶²»¶Ô¡£  
-ÔÚ
+## 4.3 è°ƒè¯•æ’ä»¶
+### 4.3.1 æ’ä»¶è·¯å¾„ä¸æ­£ç¡®
+å› ä¸ºæ’ä»¶æœ‰é—®é¢˜ï¼Œè¿è¡Œä¸äº†ï¼Œè°ƒè¯•çš„æ—¶å€™å‘ç°è·¯å¾„ä¸å¯¹ã€‚  
+åœ¨
 ```
     //org.omegat.filters2.master.PluginUtils.loadPlugins(Map<String, String>)
     public static void loadPlugins(final Map<String, String> params) {
@@ -290,13 +295,13 @@ InvocationTargetException:null
         ...
     }
 ```
-´¦´ò¶Ïµã£¬·¢ÏÖÆä¼ÓÔØµÄÂ·¾¶ÊÇ´úÂëÂ·¾¶\.\plugins
-Õâ¸öÄ¿Â¼½ø²»È¥£¬ÓÚÊÇĞŞ¸Äorg.omegat.util.StaticUtils.installDir()
-ÈÃËü·µ»Ø\1\plugins£¬¿ÉÕı³£¼ÓÔØ¡£
+å¤„æ‰“æ–­ç‚¹ï¼Œå‘ç°å…¶åŠ è½½çš„è·¯å¾„æ˜¯ä»£ç è·¯å¾„\.\plugins
+è¿™ä¸ªç›®å½•è¿›ä¸å»ï¼Œäºæ˜¯ä¿®æ”¹org.omegat.util.StaticUtils.installDir()
+è®©å®ƒè¿”å›\1\pluginsï¼Œå¯æ­£å¸¸åŠ è½½ã€‚
 
-### 4.3.2 ²å¼şÎ´¼ÓÔØ
-¼ÓÔØ¹ı³ÌÖĞ,Èç¹ûÓĞÒ»¸ö²å¼şÓĞÎÊÌâ,¾Í»áÍ£Ö¹¼ÓÔØ.
-´ò¶Ïµã¿´muµÄfile
+### 4.3.2 æ’ä»¶æœªåŠ è½½
+åŠ è½½è¿‡ç¨‹ä¸­,å¦‚æœæœ‰ä¸€ä¸ªæ’ä»¶æœ‰é—®é¢˜,å°±ä¼šåœæ­¢åŠ è½½.
+æ‰“æ–­ç‚¹çœ‹muçš„file
 ```
 
     public static void loadPlugins(final Map<String, String> params) {
@@ -305,21 +310,21 @@ InvocationTargetException:null
         ...
     }
 ```
-ÕÒµ½ÓĞÎÊÌâµÄ²å¼ş,ÊÇÎÒµ¼³öµÄmfÎÄ¼ş²»ÕıÈ·,É¾³ıºóÕı³£.
+æ‰¾åˆ°æœ‰é—®é¢˜çš„æ’ä»¶,æ˜¯æˆ‘å¯¼å‡ºçš„mfæ–‡ä»¶ä¸æ­£ç¡®,åˆ é™¤åæ­£å¸¸.
 
-### 4.3.3 ·­Òë²å¼şÎ´Õı³£·­Òë
-·¢ÏÖÊÇ±¨´íÁËÃ»ÓĞÊä³ö´íÎóĞÅÏ¢.  
-ºóÀ´Ò»²½Ò»²½²½Èë,Ö»ÓĞÑ¡ÔñÁËÔ´Âë,µ÷ÊÔ½øÈ¥²ÅÓĞ´íÎóĞÅÏ¢.
+### 4.3.3 ç¿»è¯‘æ’ä»¶æœªæ­£å¸¸ç¿»è¯‘
+å‘ç°æ˜¯æŠ¥é”™äº†æ²¡æœ‰è¾“å‡ºé”™è¯¯ä¿¡æ¯.  
+åæ¥ä¸€æ­¥ä¸€æ­¥æ­¥å…¥,åªæœ‰é€‰æ‹©äº†æºç ,è°ƒè¯•è¿›å»æ‰æœ‰é”™è¯¯ä¿¡æ¯.
 
-### 4.3.4 È±ÉÙ²¿·ÖÀà
-µ¼³öµÄjar²¢Ã»ÓĞ°üº¬HtmlUnitµÄËùÓĞÒÀÀµ¿â,ÓÚÊÇ½«ÆäËùÓĞjar¸´ÖÆµ½pluginsÎÄ¼ş¼ĞÖĞ,Ò²¿ÉÒÔÔÙĞÂ½¨Ò»¸öÎÄ¼ş¼Ğ±£´æ,¿ÉÒÔÕı³£¼ÓÔØ.
+### 4.3.4 ç¼ºå°‘éƒ¨åˆ†ç±»
+å¯¼å‡ºçš„jarå¹¶æ²¡æœ‰åŒ…å«HtmlUnitçš„æ‰€æœ‰ä¾èµ–åº“,äºæ˜¯å°†å…¶æ‰€æœ‰jarå¤åˆ¶åˆ°pluginsæ–‡ä»¶å¤¹ä¸­,ä¹Ÿå¯ä»¥å†æ–°å»ºä¸€ä¸ªæ–‡ä»¶å¤¹ä¿å­˜,å¯ä»¥æ­£å¸¸åŠ è½½.
 
-### 4.3.5 ¼ÓÔØ¹È¸è·­ÒëÂı
-µ÷ÊÔÊ±¿´µ½¿ØÖÆÌ¨
+### 4.3.5 åŠ è½½è°·æ­Œç¿»è¯‘æ…¢
+è°ƒè¯•æ—¶çœ‹åˆ°æ§åˆ¶å°
 ```
 
-°ËÔÂ 14, 2017 11:31:49 ÉÏÎç com.gargoylesoftware.htmlunit.javascript.DefaultJavaScriptErrorListener loadScriptError
-    ÑÏÖØ: Error loading JavaScript from [https://apis.google.com/_/scs/abc-static/_/js/k=gapi.gapi.en.iXl4BleY64I.O/m=gapi_iframes,googleapis_client,plusone/rt=j/sv=1/d=1/ed=1/am=AAg/rs=AHpOoo-ACNR5BzMFKxicVpbq2gaX5KLKcg/cb=gapi.loaded_0].
+å…«æœˆ 14, 2017 11:31:49 ä¸Šåˆ com.gargoylesoftware.htmlunit.javascript.DefaultJavaScriptErrorListener loadScriptError
+    ä¸¥é‡: Error loading JavaScript from [https://apis.google.com/_/scs/abc-static/_/js/k=gapi.gapi.en.iXl4BleY64I.O/m=gapi_iframes,googleapis_client,plusone/rt=j/sv=1/d=1/ed=1/am=AAg/rs=AHpOoo-ACNR5BzMFKxicVpbq2gaX5KLKcg/cb=gapi.loaded_0].
     org.apache.http453.conn.HttpHostConnectException: Connect to apis.google.com:443 [apis.google.com/74.125.203.102, apis.google.com/74.125.203.100, apis.google.com/74.125.203.101, apis.google.com/74.125.203.138, apis.google.com/74.125.203.113, apis.google.com/74.125.203.139] failed: Connection timed out: connect
         at org.apache.http453.impl.conn.DefaultHttpClientConnectionOperator.connect(DefaultHttpClientConnectionOperator.java:159)
         at org.apache.http453.impl.conn.PoolingHttpClientConnectionManager.connect(PoolingHttpClientConnectionManager.java:359)
@@ -388,28 +393,28 @@ InvocationTargetException:null
         at com.pingfangx.omegat.plugin.HtmlUnitUtils.translateByGoogle(HtmlUnitUtils.java:45)
         at com.pingfangx.omegat.plugin.HtmlUnitUtils.main(HtmlUnitUtils.java:121)
 ```
-¿´µ½ÊÇ¼ÓÔØÄ³Ò»jsµÄÊ±ºò³¬Ê±ÁË.
-ÔÚcom.gargoylesoftware.htmlunit.html.HtmlPage.loadJavaScriptFromUrl(URL, Charset)
-ÖĞ¼ÓÉÏprint,·¢ÏÖÖ»ÓĞ¼ÓÔØÄ³Ò»jsÊ±»á³¬Ê±,ÓÚÊÇÔÚ´Ë´¦Ö±½Ó½«Æäreturn null²»¼ÓÔØ.
+çœ‹åˆ°æ˜¯åŠ è½½æŸä¸€jsçš„æ—¶å€™è¶…æ—¶äº†.
+åœ¨com.gargoylesoftware.htmlunit.html.HtmlPage.loadJavaScriptFromUrl(URL, Charset)
+ä¸­åŠ ä¸Šprint,å‘ç°åªæœ‰åŠ è½½æŸä¸€jsæ—¶ä¼šè¶…æ—¶,äºæ˜¯åœ¨æ­¤å¤„ç›´æ¥å°†å…¶return nullä¸åŠ è½½.
 ```
     // https://apis.google.com/_/scs/abc-static/_/js/k=gapi.gapi.en.iXl4BleY64I.O/m=gapi_iframes,googleapis_client,plusone/rt=j/sv=1/d=1/ed=1/am=AAg/rs=AHpOoo-ACNR5BzMFKxicVpbq2gaX5KLKcg/cb=gapi.loaded_0
     if (url.toString().startsWith("https://apis.google.com")) {
-        // Á¬½Ó×ÜÊÇ³¬Ê±£¬Ö±½Ó·µ»Ønull
+        // è¿æ¥æ€»æ˜¯è¶…æ—¶ï¼Œç›´æ¥è¿”å›null
         return null;
     }
 ```
 
-# 0x05×Ü½á
-* ¿ÉÒÔÍ¨¹ıÌí¼ÓÒ»¸ö²å¼şÀ´Íê³É·­Òë
-* Ê¹ÓÃHtmlUnit×¥È¡·­Òë½á¹û
-* HtmlUnitÊ¹ÓÃµÄHttpClient¶¼Ê¹ÓÃÔ´Âë,ĞŞ¸Ä²¢µ¼³öÎªjar°ü
+# 0x05æ€»ç»“
+* å¯ä»¥é€šè¿‡æ·»åŠ ä¸€ä¸ªæ’ä»¶æ¥å®Œæˆç¿»è¯‘
+* ä½¿ç”¨HtmlUnitæŠ“å–ç¿»è¯‘ç»“æœ
+* HtmlUnitä½¿ç”¨çš„HttpClientéƒ½ä½¿ç”¨æºç ,ä¿®æ”¹å¹¶å¯¼å‡ºä¸ºjaråŒ…
 
 
 
 
-# ²Î¿¼ÎÄÏ×
-[[1]].[gradleÏÂÔØ»ºÂıµÄ½â¾ö·½°¸ÕûÀí](http://blog.pingfangx.com/2361.html)  
-[[2]]:[kimmking.swingºÍjavaÀïÇ¶Èëä¯ÀÀÆ÷](http://blog.csdn.net/kimmking/article/details/43805797)  
+# å‚è€ƒæ–‡çŒ®
+[[1]].[gradleä¸‹è½½ç¼“æ…¢çš„è§£å†³æ–¹æ¡ˆæ•´ç†](http://blog.pingfangx.com/2361.html)  
+[[2]]:[kimmking.swingå’Œjavaé‡ŒåµŒå…¥æµè§ˆå™¨](http://blog.csdn.net/kimmking/article/details/43805797)  
 
-[1]:http://blog.pingfangx.com/2361.html "gradleÏÂÔØ»ºÂıµÄ½â¾ö·½°¸ÕûÀí"
-[2]:http://blog.csdn.net/kimmking/article/details/43805797 "kimmking.swingºÍjavaÀïÇ¶Èëä¯ÀÀÆ÷"
+[1]:http://blog.pingfangx.com/2361.html "gradleä¸‹è½½ç¼“æ…¢çš„è§£å†³æ–¹æ¡ˆæ•´ç†"
+[2]:http://blog.csdn.net/kimmking/article/details/43805797 "kimmking.swingå’Œjavaé‡ŒåµŒå…¥æµè§ˆå™¨"
