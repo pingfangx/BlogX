@@ -7,6 +7,8 @@
 选中生成的 jar ，修改 Class Path 指向 jar 包移到文件夹
 4. Build → Build Artifacts
 
+另见 [[2502]编写 OmegaT 插件的经验整理](http://blog.pingfangx.com/2502.html)
+
 遇到的问题  
 1. 创建一个 Artifacts 后，又删除再创建，导致没刷新还是什么，一直执行的是第一次的。  
 将其删除、确认，或删除、应用，检查文件是否删掉，然后再重新创建。

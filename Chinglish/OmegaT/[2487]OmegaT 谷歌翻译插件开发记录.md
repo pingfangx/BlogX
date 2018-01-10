@@ -10,10 +10,11 @@ tk 的计算来自于
 [源码](https://github.com/pingfangx/omegat/blob/451bea6ade0bf62dc5bed7c771cf92ac08522a93/plugin/src/main/java/com/pingfangx/omegat/plugin/GoogleTranslatorX.java)
 
 # 0x01 新建 Module
-新建 Gradle module，名为 plugin 新建后相关文件夹不存在（后来发现是卡了？等弹出 git 添加提示就有了），但是在  
+新建 Gradle module，名为 plugin 新建后相关文件夹不存在，但是在  
 plugin_main.iml 和 plugin_test.iml 中已经有了，按标准新建文件夹
 src/man/java 和 src/test/java
 
+后来发现，是在 building ，等待就好了。
 # 0x02 java 加载 js 的方式。
 ```
         try {
