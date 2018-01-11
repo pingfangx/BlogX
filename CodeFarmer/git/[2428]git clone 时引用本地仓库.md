@@ -21,6 +21,8 @@ $ git clone --reference D:/workspace/github/test/1/test https://github.com/pingf
 引用，不复制对象。
 
 ## --dissociate
+再次更新，路径加上双引号，应不需要麻烦的转义了。
+$ git clone --dissociate --reference "D:/workspace/github/test/1/test" https://github.com/pingfangx/test.git
 ```
 $ git clone --dissociate --reference <repository> <repository>
 $ git clone --dissociate --reference D:/workspace/github/test/1/test https://github.com/pingfangx/test.git
