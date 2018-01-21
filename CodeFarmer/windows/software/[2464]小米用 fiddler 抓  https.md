@@ -1,0 +1,26 @@
+转自 [干净的句号.《fiddler 手机 https 抓包》](http://blog.csdn.net/wangjun5159/article/details/52202059)  
+# 设置 fiddler 抓包
+File → 勾选 capture traffic
+
+# 设置抓 https 和解密 https
+Tools → fiddler options → https
+* capture https traffic
+* decrypt https traffic
+* Ignore server certificate errors
+
+Tools → fiddler options → connections → allow remote computers to connect 
+
+# 给 fiddler 安装 certmaker 插件
+在 [Fiddler add-ons](https://www.telerik.com/fiddler/add-ons) 中找到并下载 CertMaker for iOS and Android
+
+# 设置手机代理
+ipconfig 查看 ip，手机连同一局域网，设置代理 服务器及端口号。  
+我使用手机软件 ProxyDroid 方便设置。
+
+# 手机安装根证书
+在浏览器中，输入 http://192.168.1.106:8888  
+点击最下边的 FiddlerRoot certificate，确定安装。
+
+# 小米手机安装
+直接下载装不上，可在 设置→更多设置→系统安全→从存储设置安装  
+选择 download 目录，安装时需要锁屏密码，安装成功后可在“信任的凭据”中查看。
