@@ -6,6 +6,15 @@
 找到
 > 第二步需要把phantomjs.exe拷贝放到python的安装目录下，才可以启动phantomjs。
 
+后来提示被弃用，于是改用 chromedriver  
+[chromedriver](https://sites.google.com/a/chromium.org/chromedriver/home)  
+一样需要将其复制到 python 安装目录下。环境变理无需设置。
+
+phantomjs 是打开无界面的浏览器，测试的时候实在太慢了。  
+chromedriver 打开 chrome ，速度正常。
+
+
+
 # 指定 Chrome 的位置
 chromedrive 会查找 chrome ，没找到报
 cannot find Chrome binary
