@@ -1,0 +1,167 @@
+* List 接口声明了哪些方法
+* AbstractList 实现和重写了哪些方法
+
+# List 接口声明了哪些方法
+List 继承 Collection ，然后添加了一些方法。
+```
+boolean addAll(int index, Collection<? extends E> c);
+default void replaceAll(UnaryOperator<E> operator)
+default void sort(Comparator<? super E> c)
+
+get(int index)
+set(int index, E element)
+add(int index, E element)
+remove(int index)
+
+indexOf(Object o)
+lastIndexOf(Object o)
+
+listIterator()
+listIterator(int index)
+subList(int fromIndex, int toIndex)
+```
+
+# 默认方法的实现
+```
+    default void replaceAll(UnaryOperator<E> operator) {
+        Objects.requireNonNull(operator);
+        final ListIterator<E> li = this.listIterator();
+        while (li.hasNext()) {
+            li.set(operator.apply(li.next()));
+        }
+    }
+    default void sort(Comparator<? super E> c) {
+        Object[] a = this.toArray();
+        Arrays.sort(a, (Comparator) c);
+        ListIterator<E> i = this.listIterator();
+        for (Object e : a) {
+            i.next();
+            i.set((E) e);
+        }
+    }
+```
+
+# 注意
+set 和 remove 返回的是以前在指定位置的元素。  
+list.subList(from, to).clear();
+
+# AbstractList 实现和重写了哪些方法
+继承于 AbstractCollection 重写的方法只有 clear
+```
+    public void clear() {
+        removeRange(0, size());
+    }
+```
+实现的方法有
+```
+    public boolean add(E e) {
+        add(size(), e);
+        return true;
+    }
+    public int indexOf(Object o) {
+        ListIterator<E> it = listIterator();
+        if (o==null) {
+            while (it.hasNext())
+                if (it.next()==null)
+                    return it.previousIndex();
+        } else {
+            while (it.hasNext())
+                if (o.equals(it.next()))
+                    return it.previousIndex();
+        }
+        return -1;
+    }
+    public int lastIndexOf(Object o) {
+        ListIterator<E> it = listIterator(size());
+        if (o==null) {
+            while (it.hasPrevious())
+                if (it.previous()==null)
+                    return it.nextIndex();
+        } else {
+            while (it.hasPrevious())
+                if (o.equals(it.previous()))
+                    return it.nextIndex();
+        }
+        return -1;
+    }
+    public boolean addAll(int index, Collection<? extends E> c) {
+        rangeCheckForAdd(index);
+        boolean modified = false;
+        for (E e : c) {
+            add(index++, e);
+            modified = true;
+        }
+        return modified;
+    }
+    public Iterator<E> iterator() {
+        return new Itr();
+    }
+    public ListIterator<E> listIterator() {
+        return listIterator(0);
+    }
+    public ListIterator<E> listIterator(final int index) {
+        rangeCheckForAdd(index);
+
+        return new ListItr(index);
+    }
+    public List<E> subList(int fromIndex, int toIndex) {
+        return (this instanceof RandomAccess ?
+                new RandomAccessSubList<>(this, fromIndex, toIndex) :
+                new SubList<>(this, fromIndex, toIndex));
+    }
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof List))
+            return false;
+
+        ListIterator<E> e1 = listIterator();
+        ListIterator<?> e2 = ((List<?>) o).listIterator();
+        while (e1.hasNext() && e2.hasNext()) {
+            E o1 = e1.next();
+            Object o2 = e2.next();
+            if (!(o1==null ? o2==null : o1.equals(o2)))
+                return false;
+        }
+        return !(e1.hasNext() || e2.hasNext());
+    }
+    public int hashCode() {
+        int hashCode = 1;
+        for (E e : this)
+            hashCode = 31*hashCode + (e==null ? 0 : e.hashCode());
+        return hashCode;
+    }
+```
+空实现的方法有
+```
+public E set(int index, E element)
+public void add(int index, E element)
+public E remove(int index)
+```
+抽象的方法有
+```
+abstract public E get(int index);
+```
+
+## 3 个 iterator 方法
+Iterator 定义了 hasNext() next() 和 remove() 方法（以及 forEachRemaining）。  
+ListIterator 添加了 previous() hasPrevious()，nextIndex() previousIndex()，set() add()  
+Itr 和 ListItr 分别是实现类。
+见 iterator 那篇文章的分析
+
+## subList 方法
+subList 判断 RandomAccess 返回了不同的子类。  
+而 RandomAccess 是一个标记接口   
+文档中说得很清楚了
+> 如果支持列表（即此列表）通过任何其他方式（而不是通过返回的列表）从结构上修改，则此方法返回的列表语义将变为未定义（从结构上修改是指更改列表的大小，或者以其他方式打乱列表，使正在进行的迭代产生错误的结果）。
+
+>此实现返回一个子类化 AbstractList 的列表。子类在 private 字段中存储底层实现列表中 subList 的偏移量、subList 的大小（随其生存期变化）以及底层实现列表的预期 modCount 值。子类有两个变体，其中一个实现 RandomAccess。如果此列表实现 RandomAccess，则返回的列表将是实现 RandomAccess 的子类实例。
+
+>子类的 set(int, E)、get(int)、add(int, E)、remove(int)、addAll(int, Collection) 和 removeRange(int, int) 方法在对索引进行边界检查和调整偏移量之后，都委托给底层实现抽象列表上的相应方法。addAll(Collection c) 方法返回 addAll(size, c)。
+
+>listIterator(int) 方法返回底层实现列表的列表迭代器上的“包装器对象”，使用底层实现列表上的相应方法可创建该迭代器。iterator 方法返回 listIterator()，size 方法返回子类的 size 字段。
+
+>所有方法都将首先检查底层实现列表的实际 modCount 是否与其预期的值相等，并且在不相等时将抛出 ConcurrentModificationException。
+
+## hashCode 方法
+需要另一篇文章来解析

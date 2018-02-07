@@ -1,0 +1,102 @@
+# Queue 和 Deque 定义的相关方法
+## Queue
+* add offer
+* remove poll
+* element peek
+
+## Deque
+文档很清楚了，值得注意的是
+LinkedList 也实现了 Deque 接口。
+
+# ArrayDeque
+## 相关方法
+参考文章：
+[ArrayDeque源代码分析](https://www.cnblogs.com/mthoutai/p/7371602.html)
+
+源码中有：
+> The array in which the elements of the deque are stored. The capacity of the deque is the length of this array, which is always a power of two. The array is never allowed to become full, except transiently within an addX method where it is resized (see doubleCapacity) immediately upon becoming full, thus avoiding head and tail wrapping around to equal each other. We also guarantee that all array cells not holding deque elements are always null.
+
+```
+    public void addFirst(E e) {
+        if (e == null)
+            throw new NullPointerException();
+        elements[head = (head - 1) & (elements.length - 1)] = e;
+        if (head == tail)
+            doubleCapacity();
+    }
+    public int size() {
+        return (tail - head) & (elements.length - 1);
+    }
+```
+```
+这个算法其实也很简单，用于求出一个大于 numElements 的二次幂。  
+原理就是第 1 位肯定为 1，按位或上（以下简称或上）无符号右移（以下简称右移）一位，那么前 2 位肯定都是 1；  
+然后再或上右移 2 位，那么前 4 位就都是 1 了。
+一直到最后或上右移 16 位，那么整个 31 位就都是 1 了。
+最后再加上 1 就得到了一个幂值，如果溢出，则再右移 1 位，即最大为 2^30
+    private static int calculateSize(int numElements) {
+        int initialCapacity = MIN_INITIAL_CAPACITY;
+        // Find the best power of two to hold elements.
+        // Tests "<=" because arrays aren't kept full.
+        if (numElements >= initialCapacity) {
+            initialCapacity = numElements;
+            initialCapacity |= (initialCapacity >>> 1);
+            initialCapacity |= (initialCapacity >>> 2);
+            initialCapacity |= (initialCapacity >>> 4);
+            initialCapacity |= (initialCapacity >>> 8);
+            initialCapacity |= (initialCapacity >>> 16);
+            initialCapacity++;
+
+            if (initialCapacity < 0)   // Too many elements, must back off
+                initialCapacity >>>= 1;// Good luck allocating 2 ^ 30 elements
+        }
+        return initialCapacity;
+    }
+```
+
+# AbstractQueue
+骨干实现了 add,remove,element，基于 offer,poll,peek
+实现了 clear,addAll,基于 poll,add
+
+# PriorityQueue
+数据结构为最小堆。
+```
+
+    private void siftUpComparable(int k, E x) {
+        Comparable<? super E> key = (Comparable<? super E>) x;
+        while (k > 0) {
+            //求 parent
+            int parent = (k - 1) >>> 1;
+            //取元素
+            Object e = queue[parent];
+            if (key.compareTo((E) e) >= 0)
+                break;
+            //父元素下移
+            queue[k] = e;
+            //记录 k
+            k = parent;
+        }
+        // 将 key 放到 k 处
+        queue[k] = key;
+    }
+    
+    private void siftDownComparable(int k, E x) {
+        Comparable<? super E> key = (Comparable<? super E>) x;
+        int half = size >>> 1;        // loop while a non-leaf
+        while (k < half) {
+            int child = (k << 1) + 1; // assume left child is least
+            Object c = queue[child];
+            int right = child + 1;
+            if (right < size &&
+                    ((Comparable<? super E>) c).compareTo((E) queue[right]) > 0)
+                //如果左边大于右边，则取右边，把小的移上去
+                c = queue[child = right];
+            if (key.compareTo((E) c) <= 0)
+                break;
+            //子元素上移
+            queue[k] = c;
+            k = child;
+        }
+        queue[k] = key;
+    }
+```

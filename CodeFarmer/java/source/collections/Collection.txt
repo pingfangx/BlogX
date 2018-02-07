@@ -1,0 +1,15 @@
+# 问题
+* Collection 有哪些方法
+* toArray 的使用
+* add 方法的作用及返回值
+
+
+
+`<T> T[] toArray(T[] a)`
+> a - 存储此 collection 元素的数组（如果其足够大）；否则，将为此分配一个具有相同运行时类型的新数组。
+
+boolean add(E e)
+> 如果 collection 由于某些原因（已经包含该元素的原因除外）拒绝添加特定的元素，那么它必须 抛出一个异常（而不是返回 false）。这确保了在此调用返回后，collection 总是包含指定的元素。
+
+int size()
+> 返回此 collection 中的元素数。如果此 collection 包含的元素大于 Integer.MAX_VALUE，则返回 Integer.MAX_VALUE。

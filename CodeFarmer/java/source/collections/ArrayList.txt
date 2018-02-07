@@ -1,0 +1,52 @@
+* 阅读所有方法
+
+http://blog.csdn.net/GuLu_GuLu_jp/article/details/51456969
+
+AbstractList 中未实现的 get，set，add，remove 都实现了；
+主要借助 System.arraycopy
+## retainAll
+该方法调用的是 batchRemove
+思路是 try 遍历数组，将符合条件的元素前移（不符合会被覆盖）
+try 遍历结束判断是否遍历完，如果没有，则先复制后面的内容
+如果符合条件的元素不是所有元素，将后面的元素置为 null
+```
+
+    public boolean retainAll(Collection<?> c) {
+        Objects.requireNonNull(c);
+        return batchRemove(c, true);
+    }
+
+    private boolean batchRemove(Collection<?> c, boolean complement) {
+        final Object[] elementData = this.elementData;
+        int r = 0, w = 0;
+        boolean modified = false;
+        try {
+            for (; r < size; r++)
+                if (c.contains(elementData[r]) == complement)
+                    //符合条件则赋值,不符合的会被覆盖
+                    elementData[w++] = elementData[r];
+        } finally {
+            // Preserve behavioral compatibility with AbstractCollection,
+            // even if c.contains() throws.
+            if (r != size) {
+                //如果有异常,需要复制后面的
+                System.arraycopy(elementData, r,
+                        elementData, w,
+                        size - r);
+                //修正 w
+                w += size - r;
+            }
+            if (w != size) {
+                // clear to let GC do its work
+                for (int i = w; i < size; i++)
+                    //多余的,置为 null
+                    elementData[i] = null;
+                //加了 size-w
+                modCount += size - w;
+                size = w;
+                modified = true;
+            }
+        }
+        return modified;
+    }
+```

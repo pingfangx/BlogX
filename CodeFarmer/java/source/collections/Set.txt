@@ -1,0 +1,14 @@
+# 3 个接口
+Set 好像都是 Collection 定义的方法  
+SortedSet 添加了 first,last,headSet,tailSet,subSet 等方法，注意其子集的半开范围。  
+NavigableSet lower,floor,ceiling,higher
+# 各实现类
+## AbstractSet
+仅实现了 equals,hashCode,removeAll
+
+## TreeSet
+使用  NavigableMap
+
+## EnumSet
+抽象方法 addAll,addRange,complement
+### 

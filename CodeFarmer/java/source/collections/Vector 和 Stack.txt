@@ -1,0 +1,42 @@
+* Vector 与 ArrayList
+* Vector 与 Stack
+
+# Vector 与 ArrayList
+
+[What are the differences between ArrayList and Vector?](https://stackoverflow.com/questions/2986296)
+
+[Difference between ArrayList and Vector](https://www.javatpoint.com/difference-between-arraylist-and-vector)
+## 线程同步
+synchronized
+
+## 扩容方法
+```
+java.util.Vector#grow
+    private void grow(int minCapacity) {
+        // overflow-conscious code
+        int oldCapacity = elementData.length;
+        int newCapacity = oldCapacity + ((capacityIncrement > 0) ?
+                                         capacityIncrement : oldCapacity);
+        if (newCapacity - minCapacity < 0)
+            newCapacity = minCapacity;
+        if (newCapacity - MAX_ARRAY_SIZE > 0)
+            newCapacity = hugeCapacity(minCapacity);
+        elementData = Arrays.copyOf(elementData, newCapacity);
+    }
+
+java2.util.ArrayList#grow
+    private void grow(int minCapacity) {
+        // overflow-conscious code
+        int oldCapacity = elementData.length;
+        int newCapacity = oldCapacity + (oldCapacity >> 1);
+        if (newCapacity - minCapacity < 0)
+            newCapacity = minCapacity;
+        if (newCapacity - MAX_ARRAY_SIZE > 0)
+            newCapacity = hugeCapacity(minCapacity);
+        // minCapacity is usually close to size, so this is a win:
+        elementData = Arrays.copyOf(elementData, newCapacity);
+    }
+```
+
+# Vector 与 Stack
+[Why does Stack extend Vector?](https://community.oracle.com/thread/1156973?start=0&tstart=0)

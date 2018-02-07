@@ -1,0 +1,197 @@
+# 0x00 问题
+1. collection 为什么要实现 Iterable
+0. java.lang.Iterable#forEach 和 java.util.Spliterator 是用来做什么的
+0. 方法的 default 修饰符的作用
+0. Iterator 有哪些方法，基本实现
+
+# 0x01 collection 为什么要实现 Iterable
+## 实现以使 collection 支持 for-each 循环
+在《The For-Each Loop》还介绍了嵌套循环时要注意内层不要使用外层的 next() 方法，而应该提取为变量。  
+但用 for-each 循环则不需要。
+
+## 为什么要实现 Iterable 而不直接实现 Iterator 
+传递对象时不影响位置；  
+同一个对象可以有多个迭代对象；
+
+来自[sydMobile《 Iterator和Iteratable的区别、介绍》](http://blog.csdn.net/sydmobile/article/details/51916969)
+> 那么有人可能会产生疑问了，为什么我们不直接Implement Iterator 呢？  
+> 如果Collection直接实现Iterator这个接口的时候，则当我们new 一个新的对象的时候，这个对象中就包含了当前迭代位置的数据（指针），当这个对象在不同的方法或者类中传递的时候，当前传递的对象的迭代的位置是不可预知的，那么我们在调用next（）方法的时候也就不知道是指到那一个元素。如果其中加上了一个reset（）方法呢？用来重置当前迭代的位置这样Collection也只能同时存在一个当前迭代位置的对象。所有不能直接选择实现 Iterator。 实现Iteratable ，里面的方法Iterator() 可以在同一个对象每次调用的时候都产生一个新的Iterator对象。这样多个迭代器就不会互相干扰了。
+
+
+# 0x02 java.lang.Iterable#forEach 和 java.util.Spliterator 是用来做什么的
+## forEach
+这 2 个是 1.8 新添加的功能。  
+forEach 用来简化 for-each 循环，如
+```
+    public void testForEach() {
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+        list.forEach(new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) {
+                System.out.println(integer);
+            }
+        });
+    }
+```
+与普通的 for-each 循环的差别在于，它可以用 lambda 简写为
+```
+list.forEach(integer -> System.out.println(integer));
+```
+还可再进一步简化为方法引用([method reference](https://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html)
+```
+list.forEach(System.out::println);
+```
+> You use lambda expressions to create anonymous methods. Sometimes, however, a lambda expression does nothing but call an existing method. In those cases, it's often clearer to refer to the existing method by name. Method references enable you to do this; they are compact, easy-to-read lambda expressions for methods that already have a name.
+
+## Spliterator
+用于并行迭代的  
+[Java8里面的java.util.Spliterator接口有什么用？](https://segmentfault.com/q/1010000007087438)  
+[Spliterator](https://docs.oracle.com/javase/8/docs/api/java/util/Spliterator.html)
+
+# 0x03 方法的 default 修饰符的作用
+[Controlling Access to Members of a Class](https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html)  
+使用的描述为  
+> At the top level—public, or package-private (no explicit modifier).  
+> At the member level—public, private, protected, or package-private (no explicit modifier).  
+
+而不像相关博文或其他语言中的 default ，也不能用 default 进行访问控制。  
+而 default 其实是 java8 添加的用于接口中的默认方法。  
+[Default Methods](https://docs.oracle.com/javase/tutorial/java/IandI/defaultmethods.html)
+子类接口或实现类可以选择是否重写。
+
+# 0x04 Iterator 有哪些方法，基本实现
+## boolean hasNext();
+## E next();
+## default void remove()
+> Removes from the underlying collection the last element returned by this iterator (optional operation). This method can be called only once per call to next(). The behavior of an iterator is unspecified if the underlying collection is modified while the iteration is in progress in any way other than by calling this method.  
+> 从迭代器指向的 collection 中移除迭代器返回的最后一个元素（可选操作）。每次调用 next 只能调用一次此方法。如果进行迭代时用调用此方法之外的其他方式修改了该迭代器所指向的 collection，则迭代器的行为是不确定的。
+
+文档很清楚，讲了3个地方
+1. 要先返回一个元素才能移除  
+这里有疑问，可选操作是什么意思？查了一下，原来只是说该 remove 方法的重写是可选的，没有别的含义。  
+[https://stackoverflow.com/questions/1536273](https://stackoverflow.com/questions/1536273)
+[https://stackoverflow.com/questions/8409979](https://stackoverflow.com/questions/8409979)
+2. 要 remove 需要调用 next ，每次 next 只能调用一次 remove
+3. 迭代不安全
+## default void forEachRemaining
+添加用于迭代
+
+## 简单实现 java.util.ArrayList.Itr
+```
+    private class Itr implements Iterator<E> {
+        int cursor;       // index of next element to return
+        int lastRet = -1; // index of last element returned; -1 if no such
+        int expectedModCount = modCount;
+
+        Itr() {
+        }
+
+        public boolean hasNext() {
+            //不是最后一个代表有下一个
+            return cursor != size;
+        }
+
+        @SuppressWarnings("unchecked")
+        public E next() {
+            //先检查
+            checkForComodification();
+            //先取出游标，用于取出元素及后面赋值给 cursor
+            int i = cursor;
+            if (i >= size)
+                //超限
+                throw new NoSuchElementException();
+            Object[] elementData = ArrayList.this.elementData;
+            if (i >= elementData.length)
+                //还是相当于并发检查
+                throw new ConcurrentModificationException();
+            //游标后移
+            cursor = i + 1;
+            //取出元素并赋值 lastRet
+            return (E) elementData[lastRet = i];
+        }
+
+        public void remove() {
+            //并须先取一个元素
+            if (lastRet < 0)
+                throw new IllegalStateException();
+            //检查
+            checkForComodification();
+
+            try {
+                //移除上一次取出的
+                ArrayList.this.remove(lastRet);
+                //游标等于移出去的,后一个元素会补上这个位置,
+                cursor = lastRet;
+                //最后取出项置为 -1
+                lastRet = -1;
+                expectedModCount = modCount;
+            } catch (IndexOutOfBoundsException ex) {
+                throw new ConcurrentModificationException();
+            }
+        }
+    }
+    
+    /**
+     * An optimized version of AbstractList.ListItr
+     */
+    private class ListItr extends Itr implements ListIterator<E> {
+        ListItr(int index) {
+            super();
+            cursor = index;
+        }
+
+        public boolean hasPrevious() {
+            return cursor != 0;
+        }
+
+        public int nextIndex() {
+            return cursor;
+        }
+
+        public int previousIndex() {
+            return cursor - 1;
+        }
+
+        @SuppressWarnings("unchecked")
+        public E previous() {
+            checkForComodification();
+            int i = cursor - 1;
+            if (i < 0)
+                throw new NoSuchElementException();
+            Object[] elementData = ArrayList.this.elementData;
+            if (i >= elementData.length)
+                throw new ConcurrentModificationException();
+            cursor = i;
+            return (E) elementData[lastRet = i];
+        }
+
+        public void set(E e) {
+            if (lastRet < 0)
+                throw new IllegalStateException();
+            checkForComodification();
+
+            try {
+                ArrayList.this.set(lastRet, e);
+            } catch (IndexOutOfBoundsException ex) {
+                throw new ConcurrentModificationException();
+            }
+        }
+
+        public void add(E e) {
+            checkForComodification();
+
+            try {
+                int i = cursor;
+                ArrayList.this.add(i, e);
+                cursor = i + 1;
+                lastRet = -1;
+                expectedModCount = modCount;
+            } catch (IndexOutOfBoundsException ex) {
+                throw new ConcurrentModificationException();
+            }
+        }
+    }
+```

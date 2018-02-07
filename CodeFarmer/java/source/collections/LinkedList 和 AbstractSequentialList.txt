@@ -1,0 +1,209 @@
+* 基本方法的实现
+* 与 ArrayList 的比较
+还实现了 Deque，将在 Queue 部分学习。
+
+# AbstractSequentialList
+AbstractSequentialList 用于方便顺序方问的数据。
+> 此类提供了 List 接口的骨干实现，从而最大限度地减少了实现受“连续访问”数据存储（如链接列表）支持的此接口所需的工作。
+
+其重写了 iterator() 和 listIterator() 方法；  
+并依赖 listIterator() 完成 get,set,add,remove 方法。
+```
+
+    public E get(int index) {
+        try {
+            return listIterator(index).next();
+        } catch (NoSuchElementException exc) {
+            throw new IndexOutOfBoundsException("Index: "+index);
+        }
+    }
+    public E set(int index, E element) {
+        try {
+            ListIterator<E> e = listIterator(index);
+            E oldVal = e.next();
+            e.set(element);
+            return oldVal;
+        } catch (NoSuchElementException exc) {
+            throw new IndexOutOfBoundsException("Index: "+index);
+        }
+    }
+    public void add(int index, E element) {
+        try {
+            listIterator(index).add(element);
+        } catch (NoSuchElementException exc) {
+            throw new IndexOutOfBoundsException("Index: "+index);
+        }
+    }
+    public E remove(int index) {
+        try {
+            ListIterator<E> e = listIterator(index);
+            E outCast = e.next();
+            e.remove();
+            return outCast;
+        } catch (NoSuchElementException exc) {
+            throw new IndexOutOfBoundsException("Index: "+index);
+        }
+    }
+    public boolean addAll(int index, Collection<? extends E> c) {
+        try {
+            boolean modified = false;
+            ListIterator<E> e1 = listIterator(index);
+            Iterator<? extends E> e2 = c.iterator();
+            while (e2.hasNext()) {
+                e1.add(e2.next());
+                modified = true;
+            }
+            return modified;
+        } catch (NoSuchElementException exc) {
+            throw new IndexOutOfBoundsException("Index: "+index);
+        }
+    }
+    public Iterator<E> iterator() {
+        return listIterator();
+    }
+    public abstract ListIterator<E> listIterator(int index);
+```
+
+# LinkedList
+LinkedList 继承了 AbstractSequentialList。   
+使用链表的结构，几个操作结点的方法
+```
+
+    /**
+     * Links e as first element.
+     */
+    private void linkFirst(E e) {
+        final Node<E> f = first;
+        final Node<E> newNode = new Node<>(null, e, f);
+        first = newNode;
+        if (f == null)
+            last = newNode;
+        else
+            f.prev = newNode;
+        size++;
+        modCount++;
+    }
+
+    /**
+     * Links e as last element.
+     */
+    void linkLast(E e) {
+        final Node<E> l = last;
+        final Node<E> newNode = new Node<>(l, e, null);
+        last = newNode;
+        if (l == null)
+            first = newNode;
+        else
+            l.next = newNode;
+        size++;
+        modCount++;
+    }
+
+    /**
+     * Inserts element e before non-null Node succ.
+     */
+    void linkBefore(E e, Node<E> succ) {
+        // assert succ != null;
+        final Node<E> pred = succ.prev;
+        final Node<E> newNode = new Node<>(pred, e, succ);
+        succ.prev = newNode;
+        if (pred == null)
+            first = newNode;
+        else
+            pred.next = newNode;
+        size++;
+        modCount++;
+    }
+
+    /**
+     * Unlinks non-null first node f.
+     */
+    private E unlinkFirst(Node<E> f) {
+        // assert f == first && f != null;
+        final E element = f.item;
+        final Node<E> next = f.next;
+        f.item = null;
+        f.next = null; // help GC
+        first = next;
+        if (next == null)
+            last = null;
+        else
+            next.prev = null;
+        size--;
+        modCount++;
+        return element;
+    }
+
+    /**
+     * Unlinks non-null last node l.
+     */
+    private E unlinkLast(Node<E> l) {
+        // assert l == last && l != null;
+        final E element = l.item;
+        final Node<E> prev = l.prev;
+        l.item = null;
+        l.prev = null; // help GC
+        last = prev;
+        if (prev == null)
+            first = null;
+        else
+            prev.next = null;
+        size--;
+        modCount++;
+        return element;
+    }
+
+    /**
+     * Unlinks non-null node x.
+     */
+    E unlink(Node<E> x) {
+        // assert x != null;
+        final E element = x.item;
+        final Node<E> next = x.next;
+        final Node<E> prev = x.prev;
+
+        if (prev == null) {
+            first = next;
+        } else {
+            prev.next = next;
+            x.prev = null;
+        }
+
+        if (next == null) {
+            last = prev;
+        } else {
+            next.prev = prev;
+            x.next = null;
+        }
+
+        x.item = null;
+        size--;
+        modCount++;
+        return element;
+    }
+
+```
+
+求结点的方法，判断了从前还是从后
+```
+    Node<E> node(int index) {
+        // assert isElementIndex(index);
+
+        if (index < (size >> 1)) {
+            Node<E> x = first;
+            for (int i = 0; i < index; i++)
+                x = x.next;
+            return x;
+        } else {
+            Node<E> x = last;
+            for (int i = size - 1; i > index; i--)
+                x = x.prev;
+            return x;
+        }
+    }
+```
+
+# ArrayList 与 LinkedList 的比较
+[When to use LinkedList over ArrayList?](https://stackoverflow.com/questions/322715)
+
+[Difference between ArrayList and LinkedList](https://www.javatpoint.com/difference-between-arraylist-and-linkedlist)

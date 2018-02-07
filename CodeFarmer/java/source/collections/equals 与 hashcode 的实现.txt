@@ -1,0 +1,34 @@
+需要了解
+* 为什么要 hashcode
+* Object 的实现
+* 其余子类的实现
+
+# 为什么要 hashcode
+这个 api 中有介绍
+> 返回该对象的哈希码值。支持此方法是为了提高哈希表（例如 java.util.Hashtable 提供的哈希表）的性能。  
+>hashCode 的常规协定是：  
+>在 Java 应用程序执行期间，在对同一对象多次调用 hashCode 方法时，必须一致地返回相同的整数，前提是将对象进行 equals 比较时所用的信息没有被修改。从某一应用程序的一次执行到同一应用程序的另一次执行，该整数无需保持一致。  
+>如果根据 equals(Object) 方法，两个对象是相等的，那么对这两个对象中的每个对象调用 hashCode 方法都必须生成相同的整数结果。  
+>如果根据 equals(java.lang.Object) 方法，两个对象不相等，那么对这两个对象中的任一对象上调用 hashCode 方法不 要求一定生成不同的整数结果。但是，程序员应该意识到，为不相等的对象生成不同整数结果可以提高哈希表的性能。  
+
+# Object 的实现
+[java 的Object类的hashcode()方法具体是怎么实现的？](https://www.zhihu.com/question/29976202)  
+并没有太看懂……
+
+# 其余子类的实现
+[一次性搞清楚equals和hashCode](https://www.cnblogs.com/lulipro/p/5628750.html)
+>定义一个int类型的变量 hash,初始化为 7。  
+>接下来让你认为重要的字段（equals中衡量相等的字段）参入散列运，算每一个重要字段都会产生一个hash分量，为最终的hash值做出贡献（影响）  
+>最后把所有的分量都总和起来，注意并不是简单的相加。选择一个倍乘的数字31，参与计算。然后不断地递归计算，直到所有的字段都参与了。
+
+[科普：为什么 String hashCode 方法选择数字31作为乘子](https://segmentfault.com/a/1190000010799123)
+
+[Why does Java's hashCode() in String use 31 as a multiplier?](https://stackoverflow.com/questions/299304)
+
+# equals
+这个在 api 上有
+* 自反性：对于任何非空引用值 x，x.equals(x) 都应返回 true。
+* 对称性：对于任何非空引用值 x 和 y，当且仅当 y.equals(x) 返回 true 时，x.equals(y) 才应返回 true。
+* 传递性：对于任何非空引用值 x、y 和 z，如果 x.equals(y) 返回 true，并且 y.equals(z) 返回 true，那么 x.equals(z) 应返回 true。
+* 一致性：对于任何非空引用值 x 和 y，多次调用 x.equals(y) 始终返回 true 或始终返回 false，前提是对象上 equals 比较中所用的信息没有被修改。
+* 对于任何非空引用值 x，x.equals(null) 都应返回 false。
