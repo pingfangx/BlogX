@@ -10,5 +10,9 @@ NavigableSet lower,floor,ceiling,higher
 使用  NavigableMap
 
 ## EnumSet
-抽象方法 addAll,addRange,complement
-### 
+抽象方法 addAll,addRange,complement  
+RegularEnumSet 和 JumboEnumSet
+
+## HashSet
+使用 HashMap
+LinkedHashSet 使用 LinkedHashMap，构造函数是定义于 HashSet 中的。

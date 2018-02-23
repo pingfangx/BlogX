@@ -1,0 +1,61 @@
+* Map,SortedMap,NavigableMap
+* TreeMap
+* HashTable 和 Properties
+* AbstractMap 及子类实现
+
+
+直接继承或实现 Map 接口的有 3 个接口（类）  
+SortedMap,AbstractMap 和 HashTable
+其中 SortedMap → NavigableMap → TreeMap  
+HashTable → Properties ，HashTable 继承自 Dictionary  
+而 AbstractMap 又派生出 
+
+# Map,SortedMap,NavigableMap
+和 set 中一样，SortedMap 进一步提供关于键的总体排序的 Map  
+NavigableMap 是扩展的 SortedMap，具有了针对给定搜索目标返回最接近匹配项的导航方法。
+
+
+# TreeMap
+> 基于红黑树（Red-Black tree）的 NavigableMap 实现。该映射根据其键的自然顺序进行排序，或者根据创建映射时提供的 Comparator 进行排序，具体取决于使用的构造方法。  
+> 此实现为 containsKey、get、put 和 remove 操作提供受保证的 log(n) 时间开销。
+
+
+# HashTable 和 Properties
+## HashTable
+HashTable 和 HashMap 相似，看文档。
+> As of the Java 2 platform v1.2, this class was retrofitted to implement the Map interface, making it a member of the Java Collections Framework. Unlike the new collection implementations, Hashtable is synchronized. If a thread-safe implementation is not needed, it is recommended to use HashMap in place of Hashtable. If a thread-safe highly-concurrent implementation is desired, then it is recommended to use java.util.concurrent.ConcurrentHashMap in place of Hashtable.
+
+即 HashTable 是同步的，如果不需要同步，则使用 HashMap ，如果需要线程安全的高并发实现，则使用 ConcurrentHashMap
+
+HashTable 为什么是同步的，因为相关方法都使用了 synchronized 方法。
+
+## Properties
+用于属性集。
+
+## Dictionary
+弃用，用 Map 代替。
+
+# AbstractMap 及子类实现
+除了上面提到的 TreeMap ，还有 HashMap,WeakHashMap,IdentityHashMap 以及 EnumMap 共 5 个直接子类（不包括 concurrent 包）。
+
+## HashMap 和 LinkedHashMap
+> 基于哈希表的 Map 接口的实现。此实现提供所有可选的映射操作，并允许使用 null 值和 null 键。（除了非同步和允许使用 null 之外，HashMap 类与 Hashtable 大致相同。）此类不保证映射的顺序，特别是它不保证该顺序恒久不变。
+
+### LinkedHashMap
+> Map 接口的哈希表和链接列表实现，具有可预知的迭代顺序。此实现与 HashMap 的不同之处在于，后者维护着一个运行于所有条目的双重链接列表。此链接列表定义了迭代顺序，该迭代顺序通常就是将键插入到映射中的顺序（插入顺序）。注意，如果在映射中重新插入 键，则插入顺序不受影响。（如果在调用 m.put(k, v) 前 m.containsKey(k) 返回了 true，则调用时会将键 k 重新插入到映射 m 中。）
+
+## WeakHashMap
+> 以 *弱键* 实现的基于哈希表的 Map。
+
+## IdentityHashMap
+> 此类利用哈希表实现 Map 接口，比较键（和值）时使用引用相等性代替对象相等性。
+
+## EnumMap
+> 与枚举类型键一起使用的专用 Map 实现。
+
+# Map 的顺序
+TODO 从源码解释顺序
+通过上面 HashMap、LinkedHashMap 和 TreeMap 的文档，
+HashMap 不保证有序，且不保证顺序不变。  
+LinkedHasMap 以链表维护迭代顺序，通常即插入顺序。  
+而 TreeMap 则是 key 的顺序。

@@ -1,0 +1,16 @@
+> Dictionary 类是任何可将键映射到相应值的类（如 Hashtable）的抽象父类。每个键和每个值都是一个对象。在任何一个 Dictionary 对象中，每个键至多与一个值相关联。给定一个 Dictionary 和一个键，就可以查找所关联的元素。任何非 null 对象都可以用作键或值。
+
+>通常，应该在此类的实现中使用 equals 方法，以决定两个键是否相同。
+
+>注：此类已过时。新的实现应该实现 Map 接口，而不是扩展此类。
+
+# 方法
+## int size()
+## boolean isEmpty()
+## Enumeration<K> keys()
+## Enumeration<V> elements()
+## V get(Object key)
+## V put(K key,V value)
+## V remove(Object key)
+
+Map 接口相比 Dictionary 类,除了几个方法修改外,还添加了几个方法.

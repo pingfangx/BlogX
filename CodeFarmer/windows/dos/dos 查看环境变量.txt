@@ -1,0 +1,14 @@
+[guofu.《Windows 如何在cmd命令行中查看、修改、删除与添加环境变量》](https://www.cnblogs.com/saptechnique/archive/2013/02/17/2914222.html)
+
+输入 help set
+```
+显示、设置或删除 cmd.exe 环境变量。
+
+SET [variable=[string]]
+
+  variable  指定环境变量名。
+  string    指定要指派给变量的一系列字符串。
+
+要显示当前环境变量，键入不带参数的 SET。
+...
+```

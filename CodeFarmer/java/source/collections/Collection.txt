@@ -13,3 +13,9 @@ boolean add(E e)
 
 int size()
 > 返回此 collection 中的元素数。如果此 collection 包含的元素大于 Integer.MAX_VALUE，则返回 Integer.MAX_VALUE。
+
+# 总结
+## 同步
+有的集合是同步的，而有的不是
+## 迭代器的快速失败
+ConcurrentModificationException 不一定由并发抛出，而可能是在迭代过程中发生了对结构的修改。
