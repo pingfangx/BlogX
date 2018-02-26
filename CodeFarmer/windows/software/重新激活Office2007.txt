@@ -1,0 +1,10 @@
+之前激活的，但是被漏洞修复后就各种问题不能用。
+
+首先是删除  
+C:\Documents and Settings\All Users\Application Data\Microsoft\Office\Data\Opa12.dat
+
+这样就需要重新激活。
+激活工具修改并备份的文件为  
+C:\Program Files (x86)\Common Files\Microsoft Shared\OFFICE12\MSO.DLL
+
+如果提示 nothing patched! 则恢复备份的文件，重新激活。

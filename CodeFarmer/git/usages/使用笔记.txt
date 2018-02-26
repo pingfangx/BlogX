@@ -1,0 +1,25 @@
+# 删除仓库中的大文件
+[Removing sensitive data from a repository](https://help.github.com/articles/removing-sensitive-data-from-a-repository/)
+
+git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch PATH-TO-YOUR-FILE-WITH-SENSITIVE-DATA' --prune-empty --tag-name-filter cat -- --all
+
+解释
+```
+git filter-branch --force --index-filter <command>
+用于执行
+
+--prune-empty
+这个看文档，应该是将空提交删除。  
+
+--tag-name-filter cat
+重写tag
+
+-- --all  
+文档中说明 [--] [<rev-list options>…​]
+
+git rm --cached --ignore-unmatch
+--ignore-unmatch 
+```
+
+# clone 仓库时引用本地已存在的数据
+git clone --dissociate --reference "LOCAL_PATH" REP_PATH

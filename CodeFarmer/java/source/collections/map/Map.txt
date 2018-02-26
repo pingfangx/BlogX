@@ -50,7 +50,7 @@ TODO 不同 Map 对 key,value的限制及原因
 TODO 上方测试没有报异常，是否有实现类会报异常  
 只有 AbstractMap 的 toString 方法中有对 this 的片理。
 
-# 方法
+# Query Operations
 ## int size()
 返回此映射中的键-值映射关系数。如果该映射包含的元素大于 Integer.MAX_VALUE，则返回 Integer.MAX_VALUE。
 
@@ -69,6 +69,8 @@ TODO 上方测试没有报异常，是否有实现类会报异常
 
 如果此映射允许 null 值，则返回 null 值并不一定 表示该映射不包含该键的映射关系；也可能该映射将该键显示地映射到 null。使用 containsKey 操作可区分这两种情况。
 
+# Modification Operations
+
 ## V put(K key,V value)
 将指定的值与此映射中的指定键关联（可选操作）。如果此映射以前包含一个该键的映射关系，则用指定值替换旧值（当且仅当 m.containsKey(k) 返回 true 时，才能说映射 m 包含键 k 的映射关系）。
 
@@ -80,12 +82,14 @@ TODO 上方测试没有报异常，是否有实现类会报异常
 
 调用返回后，此映射将不再包含指定键的映射关系。
 
+# Bulk Operations
 ## void putAll(Map<? extends K,? extends V> m)
 从指定映射中将所有映射关系复制到此映射中（可选操作）。对于指定映射中的每个键 k 到值 v 的映射关系，此调用等效于对此映射调用一次 put(k, v)。如果正在进行此操作的同时修改了指定的映射，则此操作的行为是不确定的。
 
 ## void clear()
 从此映射中移除所有映射关系（可选操作）。此调用返回后，该映射将为空。
 
+# Views
 ## Set<K> keySet()
 返回此映射中包含的键的 Set 视图。该 set 受映射支持，所以对映射的更改可在此 set 中反映出来，反之亦然。如果对该 set 进行迭代的同时修改了映射（通过迭代器自己的 remove 操作除外），则迭代结果是不确定的。set 支持元素移除，通过 Iterator.remove、Set.remove、removeAll、retainAll 和 clear 操作可从映射中移除相应的映射关系。它不支持 add 或 addAll 操作。
 
@@ -95,7 +99,11 @@ TODO 上方测试没有报异常，是否有实现类会报异常
 ## Set<Map.Entry<K,V>> entrySet()
 返回此映射中包含的映射关系的 Set 视图。该 set 受映射支持，所以对映射的更改可在此 set 中反映出来，反之亦然。如果对该 set 进行迭代的同时修改了映射（通过迭代器自己的 remove 操作，或者通过对迭代器返回的映射项执行 setValue 操作除外），则迭代结果是不确定的。set 支持元素移除，通过 Iterator.remove、Set.remove、removeAll、retainAll 和 clear 操作可从映射中移除相应的映射关系。它不支持 add 或 addAll 操作。
 
-# 方法二
+# Comparison and hashing
+## boolean equals(Object o)
+## int hashCode()
+
+# Defaultable methods
 参数 Function 和 BiFuction 分别接受一、二个参数，输出一个接果。
 ## compute(K key, BiFunction<? super K,? super V,? extends V> remappingFunction)
 ## computeIfAbsent(K key, Function<? super K,? extends V> mappingFunction)

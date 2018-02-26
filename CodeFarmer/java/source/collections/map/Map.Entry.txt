@@ -1,0 +1,24 @@
+>A map entry (key-value pair). The Map.entrySet method returns a collection-view of the map, whose elements are of this class. The only way to obtain a reference to a map entry is from the iterator of this collection-view. These Map.Entry objects are valid only for the duration of the iteration; more formally, the behavior of a map entry is undefined if the backing map has been modified after the entry was returned by the iterator, except through the setValue operation on the map entry.
+
+>映射项（键-值对）。Map.entrySet 方法返回映射的 collection 视图，其中的元素属于此类。获得映射项引用的唯一 方法是通过此 collection 视图的迭代器来实现。这些 Map.Entry 对象仅 在迭代期间有效；更确切地讲，如果在迭代器返回项之后修改了底层映射，则某些映射项的行为是不确定的，除了通过 setValue 在映射项上执行操作之外。
+
+
+## K getKey()
+## V getValue()
+## V setValue(V value)
+返回旧值
+## boolean equals(Object o)
+```
+     (e1.getKey()==null ?
+      e2.getKey()==null : e1.getKey().equals(e2.getKey()))  &&
+     (e1.getValue()==null ?
+      e2.getValue()==null : e1.getValue().equals(e2.getValue()))
+```
+
+## int hashCode()
+```
+     (e.getKey()==null   ? 0 : e.getKey().hashCode()) ^
+     (e.getValue()==null ? 0 : e.getValue().hashCode())
+```
+
+TODO

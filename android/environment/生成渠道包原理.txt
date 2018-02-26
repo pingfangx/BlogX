@@ -1,0 +1,78 @@
+[美团Android自动化之旅—生成渠道包](https://tech.meituan.com/mt-apk-packaging.html)
+
+[新一代开源Android渠道包生成工具Walle](https://tech.meituan.com/android-apk-v2-signature-scheme.html)
+
+[Android Apk 动态写入数据方案，用于添加渠道号，数据倒流等](http://linghaolu.github.io/apk/2016/04/02/apk-comment.html)
+# Maven
+```
+<meta-data
+        android:name="channel"
+        android:value="${channel}" />
+
+    private String getChannel(Context context) {
+        try {
+            PackageManager pm = context.getPackageManager();
+            ApplicationInfo appInfo = pm.getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            return appInfo.metaData.getString("channel");
+        } catch (PackageManager.NameNotFoundException ignored) {
+        }
+        return "";
+
+    }
+```
+
+# apktool
+解包后，修改 manifest ，打包，再签名。
+
+# META-INF
+> 如果在META-INF目录内添加空文件，可以不用重新签名应用。因此，通过为不同渠道的应用添加不同的空文件，可以唯一标识一个渠道。
+
+TODO 签名机制的原理
+
+```
+public static String getChannel(Context context) {
+        ApplicationInfo appinfo = context.getApplicationInfo();
+        String sourceDir = appinfo.sourceDir;
+        String ret = "";
+        ZipFile zipfile = null;
+        try {
+            zipfile = new ZipFile(sourceDir);
+            Enumeration<?> entries = zipfile.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = ((ZipEntry) entries.nextElement());
+                String entryName = entry.getName();
+                if (entryName.startsWith("mtchannel")) {
+                    ret = entryName;
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (zipfile != null) {
+                try {
+                    zipfile.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        String[] split = ret.split("_");
+        if (split != null && split.length >= 2) {
+            return ret.substring(split[0].length() + 1);
+
+        } else {
+            return "";
+        }
+    }
+```
+
+# End of central directory record
+最后一块中包含注释长度及注释，可以在注释中写入。
+# APK Signature Scheme v2
+原理，apk 包括 4 个区块，区块 2 为签名块不校验。  
+签名块中包含ID-value，可以加入一组 ID-value，不影响正常签名校验。  
+> 对新的应用签名方案生成的APK包中的ID-value进行扩展，提供自定义ID－value（渠道信息），并保存在APK中  
+>而APK在安装过程中进行的签名校验，是忽略我们添加的这个ID-value的，这样就能正常安装了  
+>在App运行阶段，可以通过ZIP的EOCD（End of central directory）、Central directory等结构中的信息（会涉及ZIP格式的相关知识，这里不做展开描述）找到我们自己添加的ID-value，从而实现获取渠道信息的功能  
