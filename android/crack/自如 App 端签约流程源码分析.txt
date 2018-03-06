@@ -1,0 +1,195 @@
+查看 Activity 
+
+com.ziroom.ziroomcustomer/.findhouse.view.RentHouseDetailActivity
+
+# 租房详情
+id为btn_b，在 public 中找到 id=0x7f0f1803  
+搜索定位到 RentHouseDetailFragment
+
+    case 2131695619: 
+      com.ziroom.ziroomcustomer.a.a.onClickEvent("house_look", "hid=" + str2 + "&rid=" + str1, b(), "");
+      UserInfo localUserInfo1 = ApplicationEx.d.getUser();
+      if ((localUserInfo1 == null) || (TextUtils.isEmpty(localUserInfo1.getUid())))
+      {
+        com.ziroom.commonlibrary.login.a.startLoginActivity(this.bl);
+        return;
+      }
+      this.bd.submitBtnB();
+      onEvent("NC_entire_detail_signup");
+      return;
+      
+bd 设置于 setPresenter，转到 getInstance
+
+this.t = RentHouseDetailFragment.getInstance(this.e, this.f, this.d);
+
+this.d_presenter = new com.ziroom.ziroomcustomer.findhouse.presenter.a(this, this.e, this.f, this, null);
+
+# 1 房源详情页
+## 1.1 doSign
+找了半天，发现没有进这个逻辑，而是直接调的 doSign()
+
+    API.getBookText(this.a, this.d.getId(), this.d.getHouse_id(), this.d.getHouse_type(), new f(this.a, new q(BookingOrderTextEntity.class)) {
+                                public void onFailure(Throwable arg1) {
+                                    super.onFailure(arg1);
+                                }
+
+                                public void onSuccess(int arg2, BookingOrderTextEntity arg3) {
+                                    super.onSuccess(arg2, arg3);
+                                    if(arg3 != null) {
+                                        RentHouseDetailPresenter.e(this.c).showBookDialog(arg3);
+                                    }
+                                }
+
+                                public void onSuccess(int arg1, Object arg2) {
+                                    this.onSuccess(arg1, ((BookingOrderTextEntity)arg2));
+                                }
+                            });
+                            
+这里的 showBookDialog 是 View (MVP) 的方法，赋值于 setSubView 方法，调用于
+activity 的 initWithData，实际就是传了 fragment 过去。
+
+## 获取个人信息，如果没有手机号就调去绑定手机号
+
+    public void doSign() {
+        com.ziroom.commonlibrary.login.a.getUserInfo(this.a, new com.ziroom.commonlibrary.login.a$b() {
+            public void onUserInfo(e arg3) {
+                if(arg3 != null) {
+                    RentHouseDetailPresenter.b(this.a, arg3.get("phone"));
+                    if(!TextUtils.isEmpty(RentHouseDetailPresenter.i(this.a))) {
+                        this.a.doAuthenticate(RentHouseDetailPresenter.i(this.a));
+                    }
+                    else {
+                        com.ziroom.commonlibrary.login.a.startBindPhoneActivity(RentHouseDetailPresenter.f(this.a));
+                    }
+                }
+            }
+        });
+    }
+
+## 1.2 doAuthenticate
+参数为 context,token,is_newsign,callback
+
+    public void doAuthenticate(String arg5) {
+        if(this.a != null) {
+            API.getCertInfo(this.a, com.ziroom.commonlibrary.login.a.getToken(this.a), 1, this.p);
+        }
+    }
+    
+获取结果为 4，转到
+
+    RentHouseDetailPresenter.getRentHouseDetailView(this.c).toCertInfoConfirm(RentHouseDetailPresenter.g(this.c), ((CertInfoEntity)v0), RentHouseDetailPresenter.i(this.c), 1);
+
+    public void toCertInfoConfirm(HouseDetail arg4, CertInfoEntity arg5, String arg6, int arg7) {
+        Intent v0 = new Intent(this.bl, SignedCertInfoConfirmActivity.class);
+        v0.putExtra("detail", ((Serializable)arg4));
+        v0.putExtra("phone", arg6);
+        v0.putExtra("cert_info", ((Parcelable)arg5));
+        v0.putExtra("type", arg7);
+        this.startActivity(v0);
+    }
+
+# 2 信息确认页 SignedCertInfoConfirmActivity
+有错别字
+
+                    if(ad.isNull(v0_1)) {
+                        this.showToast("请填写真是姓名");
+                        return;
+                    }
+                    
+                    
+走的流程为 
+
+                    if(this.mType != v3) {
+                        d.getRaConfig(((Context)this), this.A);
+                        this.showProgress("", 100000);
+                        return;
+                    }
+回调到
+
+                    if(((l)v0).getSuccess().booleanValue()) {
+                        SignedCertInfoConfirmActivity.e(this.a);
+                        SignedCertInfoConfirmActivity.f(this.a);
+                        return;
+                    }
+在 f 方法中调用 this.d(v1); 根据 69700 跳转,走的最后的逻辑
+
+                    v0_1 = new Intent(this.a, SignerAptitudeActivity.class);
+                    v0_1.putExtra("type", SignedCertInfoConfirmActivity.g(this.a));
+                    v0_1.putExtra("detail", SignedCertInfoConfirmActivity.d(this.a));
+                    this.a.startActivity(v0_1);
+                    
+# 3 资质信息页 SignerAptitudeActivity
+获取资质
+
+    com.freelxl.baselibrary.d.a.get(com.ziroom.ziroomcustomer.e.q.O + com.ziroom.ziroomcustomer.e.e$j.a).tag(this).addHeader("Accept", "application/json; version=1").params(com.ziroom.ziroomcustomer.e.g.getPassportSign(((Map)v0))).enqueue(this.O);
+
+点击调用的 b 方法
+
+    com.freelxl.baselibrary.d.a.post(com.ziroom.ziroomcustomer.e.q.O + com.ziroom.ziroomcustomer.e.e$j.b).tag(this).addHeader("Accept", "application/json; version=1").params(com.ziroom.ziroomcustomer.e.g.getPassportSign(((Map)v4))).enqueue(this.N);
+
+最后走的
+
+                    v0 = new Intent(this.b, SignedLeaseInfoActivity.class);
+                    v0.putExtra("detail", SignerAptitudeActivity.d(this.b));
+                    this.b.startActivity(v0);
+                    return;
+                    
+# 4 租期信息页 SignedLeaseInfoActivity
+
+        d.getTenancyInfo(this.g, this.d.getHouse_code(), this.d.getHouse_id(), this.d.getHouse_type());
+
+69667 回调到 handler 
+
+点击事件在 e() 中
+
+
+# 4 PayTermsActivity 支付方式
+
+        this.c = this.findViewById(2131696723);
+        
+    d.setPayWay(PayTermsActivity.j(this.a), PayTermsActivity.b(this.a).getHouse_code(), PayTermsActivity.b(this.a).getHouse_id(), PayTermsActivity.b(this.a).getHouse_type(), v6, v7, PayTermsActivity.i(this.a).getSignDate(), PayTermsActivity.i(this.a).getStopDate(), PayTermsActivity.i(this.a).getTenancyType(), PayTermsActivity.i(this.a).getIsShort(), PayTermsActivity.i(this.a).getPrice(), PayTermsActivity.i(this.a).getPriceUnit(), PayTermsActivity.g(this.a) + "", v15, v16, PayTermsActivity.e(this.a), PayTermsActivity.i(this.a).getTenancyChoice());
+    
+                            v0_1 = new Intent(this.a.getApplicationContext(), ContractTermsActivity.class);
+                            v0_1.putExtra("detail", PayTermsActivity.b(this.a));
+                            v0_1.putExtra("contract_code", PayTermsActivity.c(this.a));
+                            this.a.startActivity(v0_1);
+    
+# 5 合同条款 ContractTermsActivity
+获取条款
+
+    d.getTerms(this.z, this.v, this.x, this.w, this.s);
+
+点击后执行到 ContractTermsActivity.h(this.a);
+在 e() 中请求后,跳转到公约
+
+                        Intent v1_1 = new Intent(this.c.getApplicationContext(), SignedWebActivity.class);
+                        if(ContractTermsActivity.i(this.c) == null) {
+                            v1_1.putExtra("detail", ContractTermsActivity.f(this.c));
+                            v1_1.putExtra("contract_code", ContractTermsActivity.j(this.c));
+                        }
+                        else if(ad.notNull(ContractTermsActivity.i(this.c))) {
+                            v1_1.putExtra("cityCode", ContractTermsActivity.k(this.c));
+                            v1_1.putExtra("old_contract_code", ContractTermsActivity.i(this.c));
+                        }
+
+                        v1_1.putExtra("url", v0);
+                        v1_1.putExtra("title", "租住公约");
+                        this.c.startActivity(v1_1);
+
+# 6 自如公约 SignedWebActivity
+这是 web 页
+
+# 7 款项详情 PayInformationActivity
+点击 2131696685
+转到 ConfirmContractActivity
+
+# 8 确认合同 ConfirmContractActivity
+
+                            public void onRightClick(View arg6) {
+                                this.a.a.showProgress("");
+                                ConfirmContractActivity.a(this.a.a, ConfirmContractActivity.t(this.a.a), ConfirmContractActivity.k(this.a.a).getHouse_code(), ConfirmContractActivity.k(this.a.a).getHouse_id(), ConfirmContractActivity.k(this.a.a).getHouse_type());
+                            }
+
+这里有两个策略，一个是弹出验证验的，一个是直接请求的，还好我没点确认。  
+写了按键精灵应该是到这一步就停止了。
+# 9 

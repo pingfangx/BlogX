@@ -1,0 +1,47 @@
+# 集成时的问题
+## tools:overrideLibrary
+    <!--需要 18,15-->
+    <uses-sdk tools:overrideLibrary="com.alivc.videochat,com.aliyun.aliyunplayer" />
+## failed to resolve
+```
+repositories {  
+    flatDir {  
+        dirs project(':taesdk').file('libs')  
+    }  
+}
+或
+ dirs 'libs', '../模块名/libs'
+```
+
+>注意：v3.1.0+需要集成播放器sdk(AlivcPlayer.aar和AlivcReporter.aar)，采用aar集成方式时需要同时引入播放器SDK的aar，采用jar包+so集成时，可以在application层引入播放器SDK的aar。
+
+# 播放器
+基础播放器只提供简单的功能，
+注意添加亮屏、全屏、手势等操作。
+
+# 流程
+* 开播  
+请求获取播放地址
+* 列表  
+请求获取列表及播放地址
+* 观看  
+使用拉流地址播放
+* 回放  
+使用录制。
+
+
+# 直播间
+## 环信
+带有一个直播间服务，
+
+
+# 不能瘦脸的原因排查
+
+是不是因为我没有用 jar 而是用的 aar 集成。
+但是 demo 是可以的，于是将整个 demo 复制进来。
+是不是因为没有复制 demo 中的 assets 文件夹。
+是不是权限的问题
+启用 LogUtil 和 showDebugView
+
+好了，禁用 LogUtil 和 showDebugView ，依然是好的。
+再往后退一步，权限，读写，成功。

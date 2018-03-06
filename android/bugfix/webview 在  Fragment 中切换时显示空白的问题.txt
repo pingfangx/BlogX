@@ -1,0 +1,40 @@
+项目问题，非共性问题。
+
+下方 tab 会显示空白。
+定位到是因为切换是了带 WebView 的 Fragment  
+使用的是 ViewPager + FragmentPagerAdapter  
+只缓存 3 个，则会存 destroyItem
+```
+3 = {StackTraceElement@9544} "android.support.v4.app.Fragment.performDestroyView(Fragment.java:2418)"
+4 = {StackTraceElement@9545} "android.support.v4.app.FragmentManagerImpl.moveToState(FragmentManager.java:1381)"
+5 = {StackTraceElement@9546} "android.support.v4.app.FragmentManagerImpl.moveFragmentToExpectedState(FragmentManager.java:1528)"
+6 = {StackTraceElement@9547} "android.support.v4.app.BackStackRecord.executeOps(BackStackRecord.java:753)"
+7 = {StackTraceElement@9548} "android.support.v4.app.FragmentManagerImpl.executeOps(FragmentManager.java:2363)"
+8 = {StackTraceElement@9549} "android.support.v4.app.FragmentManagerImpl.executeOpsTogether(FragmentManager.java:2149)"
+9 = {StackTraceElement@9550} "android.support.v4.app.FragmentManagerImpl.optimizeAndExecuteOps(FragmentManager.java:2103)"
+10 = {StackTraceElement@9551} "android.support.v4.app.FragmentManagerImpl.execSingleAction(FragmentManager.java:1984)"
+11 = {StackTraceElement@9552} "android.support.v4.app.BackStackRecord.commitNowAllowingStateLoss(BackStackRecord.java:626)"
+12 = {StackTraceElement@9553} "android.support.v4.app.FragmentPagerAdapter.finishUpdate(FragmentPagerAdapter.java:143)"
+13 = {StackTraceElement@9554} "android.support.v4.view.ViewPager.populate(ViewPager.java:1268)"
+14 = {StackTraceElement@9555} "android.support.v4.view.ViewPager.setCurrentItemInternal(ViewPager.java:668)"
+15 = {StackTraceElement@9556} "android.support.v4.view.ViewPager.setCurrentItemInternal(ViewPager.java:630)"
+16 = {StackTraceElement@9557} "android.support.v4.view.ViewPager.setCurrentItem(ViewPager.java:611)"
+```
+
+好的问题来了，继然都会执行 onDestroyView 和 onViewCreated ，那之前的为什么不会？  
+因为之前持有了 rootView 不会重复创建，初始化应该在 initViews() 中，原代码中在 onViewCreated() 初始化，导致重复刷新。
+
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (mRootView == null) {
+            ...
+            initViews();
+        }
+        ViewGroup parent = (ViewGroup) mRootView.getParent();
+        if (parent != null) {
+            parent.removeView(mRootView);
+        }
+        return mRootView;
+    }
+    
+# 硬件加速
+解决了上述问题后，空白依然存在，是开启了硬件加速的原因（还有可能在其他地方造成空白，但是不开启又会造成视频无法播放）

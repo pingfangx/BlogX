@@ -1,0 +1,100 @@
+项目中的 RecyclerView 又开始卡顿了，长时间不检查就又卡顿了。
+
+# TraceView
+还是祭出 DDMS 中的TraceView  
+Tools → Android → Android Device Monitor  
+话说之前版本的 AndroidStudio 的 Monitor 不是这样的啊，之前在 cpu 处有 startMethodTracing 图标的。  
+
+后来发现，上述功能依然存在的。  
+在 Android Profiler 中点击 cpu 的图，就切换页面，然后就有图标可点了。
+
+# getResources
+首选找到这一个
+```
+    /**
+     * 设置默认字体大小，防止手机字体调大之后，布局发生错乱
+     */
+    @Override
+    public Resources getResources() {
+        Resources res = super.getResources();
+        Configuration config = new Configuration();
+        config.setToDefaults();
+        res.updateConfiguration(config, res.getDisplayMetrics());
+        return res;
+    }
+```
+项目中选择了这一方案，个人更偏向于使用 dp 代替 sp 的方案。  
+此处可优化为将其放入 onResume 中。  
+但是该方法并没有严重到引起不流畅。
+
+# 首页依然卡顿
+## 一些函数的性能问题
+String.format
+在 [TraceView工具的使用](https://yq.aliyun.com/articles/20467)  也有提到
+>20、了解一些函数的性能问题如字符串函数格式化函数等
+
+## DividerItemDecoration 中多余的 new RecyclerView
+应该是参考自
+[鸿洋_《 Android RecyclerView 使用完全解析 体验艺术般的控件》](http://blog.csdn.net/lmj623565791/article/details/45059587)  
+
+```
+    public void drawVertical(Canvas c, RecyclerView parent) {
+        final int left = parent.getPaddingLeft();
+        final int right = parent.getWidth() - parent.getPaddingRight();
+
+        final int childCount = parent.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            final View child = parent.getChildAt(i);
+            android.support.v7.widget.RecyclerView v = new android.support.v7.widget.RecyclerView(parent.getContext());
+            final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child
+                    .getLayoutParams();
+            final int top = child.getBottom() + params.bottomMargin;
+            final int bottom = top + mDivider.getIntrinsicHeight();
+            mDivider.setBounds(left, top, right, bottom);
+            mDivider.draw(c);
+        }
+    }
+
+```
+
+
+## WebView
+后来发现
+android.webkit.WebView.onDraw
+
+android.os.Looper#loop
+android.os.Handler#dispatchMessage
+android.os.Handler#handleCallback
+android.view.Choreographer.FrameDisplayEventReceiver#run
+android.view.Choreographer#doFrame
+android.view.Choreographer#doCallbacks
+android.view.Choreographer.CallbackRecord#run
+android.view.ViewRootImpl.TraversalRunnable#run
+android.view.ViewRootImpl#doTraversal
+android.view.ViewRootImpl#performTraversals
+android.view.ViewRootImpl#performDraw
+android.view.ViewRootImpl#draw
+android.view.ThreadedRenderer#draw
+android.view.ThreadedRenderer#updateRootDisplayList
+android.view.ThreadedRenderer#updateViewTreeDisplayList
+android.view.View#updateDisplayListIfDirty
+android.view.ViewGroup#dispatchGetDisplayList
+android.view.ViewGroup#recreateChildDisplayList
+android.view.View#updateDisplayListIfDirty
+在这里循环了，按文章中所说，应该
+>Profile Panel面板的函数有Parents和Chindren对于部分有递归调用的函数还会有Parents while recursive和Chindren while recursive。
+
+但是我的怎么查看不了……
+android.view.ViewGroup#dispatchDraw
+android.view.ViewGroup#drawChild
+android.view.View#draw
+android.view.View#buildDrawingCache(boolean)
+android.view.View#buildDrawingCacheImpl
+android.view.View#draw
+android.webkit.WebView#onDraw
+
+当切换到该 WebView 的时候，一直在渲染。  
+更换为 X5 内核之后，终于到了绿线之下，但是还是一直在渲染。  
+将此问题报给 h5 端处理。
+
+后来 h5 给的反馈是有一个加载更多的控件，一直在后台旋转。

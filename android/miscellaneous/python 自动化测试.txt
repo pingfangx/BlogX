@@ -1,0 +1,33 @@
+# appium
+[appium](https://github.com/appium/appium)
+## 使用
+[appium/python-client](https://github.com/appium/python-client)
+* pip install Appium-Python-Client
+* 安装 [appium-desktop](https://github.com/appium/appium-desktop/releases)
+
+## 遇到的错误
+* urllib.error.URLError: <urlopen error [WinError 10061] 由于目标计算机积极拒绝，无法连接。>
+
+启动 Appium-Python-Client
+
+
+# uiautomator
+[uiautomator ](https://github.com/xiaocong/uiautomator)
+
+## 使用
+
+    pip install uiautomator
+    
+    from uiautomator import device as d
+    
+    d.info
+
+## 问题
+* 长时间卡住，最后报 IOError: RPC server not started!
+[使用Uiautomator遇到的问题](https://www.cnblogs.com/ybcao/p/7402716.html)
+> 因为7.0的手机不会自动安装app-uiautomator.apk和app-uiautomator-test.apk。手动装一下就可以了。
+将apk文件直接拖到android模拟器就可以了。
+（C:\Python27\Lib\site-packages\uiautomator-0.3.2-py2.7.egg\uiautomator\libs）
+
+* cannot import name uiautomator  
+这个问题居然是因为有一个 .py 的文件名正好是 uiautomator 

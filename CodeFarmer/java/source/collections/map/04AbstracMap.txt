@@ -1,0 +1,16 @@
+# 问题
+* 实现了哪些方法
+
+如果不可变，只需实现 entrySet 方法。  
+要可变的，
+> 编程人员必须另外重写此类的 put 方法（否则将抛出 UnsupportedOperationException），entrySet().iterator() 返回的迭代器也必须另外实现其 remove 方法。
+
+# entrySet()
+基于此方法，AbstractMap 内部实现了其方法。
+
+# AbstractMap.SimpleEntry
+# AbstractMap.SimpleImmutableEntry
+
+# 回答问题
+对于不可变的 Map ，只需要实现 entrySet() 方法，其于此方法 AbstracMap 已经实现了 Map 接口的别的方法。  
+如果要可变，还需要实现 put 和 entrySet().iterator() 的 remove 方法。

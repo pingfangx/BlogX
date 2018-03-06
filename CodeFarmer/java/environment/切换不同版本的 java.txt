@@ -1,0 +1,15 @@
+
+因为 jeb 2.2.7 打开闪退，搜了一下，[jeb-2.2.7.打开后闪退](https://www.52pojie.cn/forum.php?mod=viewthread&tid=621887)  
+知道 131 不可用，于是要切换回 131 之前的。
+
+本以为修改环境变量就可以的，后来花了好几分钟。
+
+[关于电脑安装多个版本JDK后使用时的切换](http://www.cnblogs.com/yanzige/p/5377332.html)
+* 环境变量配置的 java_home 中有
+* 控制面板有 java 可以设置
+* C:\Windows\SysWOW64 中有 java
+* 环境变量中有 C:\ProgramData\Oracle\Java\javapath;
+
+改了这几个发现都不行，最后发现原因是我在 *用户变量* 中定义了 JAVA_HOME ，却在 *系统变量* 的 path 中引用。  
+本来 set 已经显示 JAVA_HOME 无法解析了，但一开始没有反应过来。  
+改为在 用户变量 中引用就可以了。

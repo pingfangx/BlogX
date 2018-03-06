@@ -1,0 +1,32 @@
+[Hardware Acceleration](https://developer.android.google.cn/guide/topics/graphics/hardware-accel.html)
+
+[Android 4.0硬件加速及绘制技巧](http://blog.csdn.net/mybook1122/article/details/9155353)
+
+[Android硬件加速原理与实现简介](http://blog.csdn.net/u011403718/article/details/54630760/)
+
+对应前 2 篇文章，我们了解：
+
+# 硬件加速的 4 级控制
+* Application
+* Activity
+* Window
+* View
+
+# 判断一个View是否已经启用了硬件加速
+
+# 安卓绘制模型
+## Software-based drawing model
+1. Invalidate the hierarchy
+2. Draw the hierarchy
+
+## Hardware accelerated drawing model
+1. Invalidate the hierarchy
+2. Record and update display lists
+3. Draw the display lists
+
+阅读第 3 篇，感谢总结
+* CPU更擅长复杂逻辑控制，而GPU得益于大量ALU和并行结构设计，更擅长数学运算。
+* 页面由各种基础元素（DisplayList）构成，渲染时需要进行大量浮点运算。
+* 硬件加速条件下，CPU用于控制复杂绘制逻辑、构建或更新DisplayList；GPU用于完成图形计算、渲染DisplayList。
+* 硬件加速条件下，刷新界面尤其是播放动画时，CPU只重建或更新必要的DisplayList，进一步提高渲染效率。
+* 实现同样效果，应尽量使用更简单的DisplayList，从而达到更好的性能（Shape代替Bitmap等）。

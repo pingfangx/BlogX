@@ -1,0 +1,27 @@
+直播页面
+com.luojilab.component.littleclass.live.LiveActivity
+
+可以看到使用的直播地址为
+invoke-virtual {v0}, Lcom/luojilab/component/littleclass/live/entity/LiveInfoEntity$CBean;->getL3flv()Ljava/lang/String;
+也就是说从服务器拉取直播地址进行播放。
+
+播放器使用的是
+com.luojilab.component.littleclass.widget.DDVideoView
+内部是封装的是
+tv.danmaku.ijk.media.player.IjkMediaPlayer;
+
+发送消息调用的
+  @POST("/v3/livemsg/post/")
+  public abstract Call<BaseEntity> livemsgPost(@Query("sign") String paramString, @Body MsgPostPEntity paramMsgPostPEntity);
+
+baseUrl 为   private String liveUrl = "https://live.igetget.com/v3/";
+
+聊天为
+com.luojilab.component.littleclass.live.chat;
+ConnectRongIMUtils
+可知用的融云
+
+用谷歌搜索“得到 app 直播架构”，找到
+罗辑思维直播项目负责人马优生：得到App直播实践
+http://www.csdn.net/article/a/2016-07-30/15839864
+可知用的百度云
