@@ -1,1 +1,119 @@
-TODO java.util.Objects#hash
+# Equals
+```
+Indicates whether some other object is "equal to" this one.
+The equals method implements an equivalence relation on non-null object references:
+It is reflexive: for any non-null reference value x, x.equals(x) should return true.
+It is symmetric: for any non-null reference values x and y, x.equals(y) should return true if and only if y.equals(x) returns true.
+It is transitive: for any non-null reference values x, y, and z, if x.equals(y) returns true and y.equals(z) returns true, then x.equals(z) should return true.
+It is consistent: for any non-null reference values x and y, multiple invocations of x.equals(y) consistently return true or consistently return false, provided no information used in equals comparisons on the objects is modified.
+For any non-null reference value x, x.equals(null) should return false.
+The equals method for class Object implements the most discriminating possible equivalence relation on objects; that is, for any non-null reference values x and y, this method returns true if and only if x and y refer to the same object (x == y has the value true).
+Note that it is generally necessary to override the hashCode method whenever this method is overridden, so as to maintain the general contract for the hashCode method, which states that equal objects must have equal hash codes.
+
+指示其他某个对象是否与此对象“相等”。
+equals 方法在非空对象引用上实现相等关系：
+
+自反性：对于任何非空引用值 x，x.equals(x) 都应返回 true。
+对称性：对于任何非空引用值 x 和 y，当且仅当 y.equals(x) 返回 true 时，x.equals(y) 才应返回 true。
+传递性：对于任何非空引用值 x、y 和 z，如果 x.equals(y) 返回 true，并且 y.equals(z) 返回 true，那么 x.equals(z) 应返回 true。
+一致性：对于任何非空引用值 x 和 y，多次调用 x.equals(y) 始终返回 true 或始终返回 false，前提是对象上 equals 比较中所用的信息没有被修改。
+对于任何非空引用值 x，x.equals(null) 都应返回 false。
+Object 类的 equals 方法实现对象上差别可能性最大的相等关系；即，对于任何非空引用值 x 和 y，当且仅当 x 和 y 引用同一个对象时，此方法才返回 true（x == y 具有值 true）。
+
+注意：当此方法被重写时，通常有必要重写 hashCode 方法，以维护 hashCode 方法的常规协定，该协定声明相等对象必须具有相等的哈希码。
+```
+
+
+# HashCode
+```
+Returns a hash code value for the object. This method is supported for the benefit of hash tables such as those provided by HashMap.
+The general contract of hashCode is:
+Whenever it is invoked on the same object more than once during an execution of a Java application, the hashCode method must consistently return the same integer, provided no information used in equals comparisons on the object is modified. This integer need not remain consistent from one execution of an application to another execution of the same application.
+If two objects are equal according to the equals(Object) method, then calling the hashCode method on each of the two objects must produce the same integer result.
+It is not required that if two objects are unequal according to the equals(java.lang.Object) method, then calling the hashCode method on each of the two objects must produce distinct integer results. However, the programmer should be aware that producing distinct integer results for unequal objects may improve the performance of hash tables.
+As much as is reasonably practical, the hashCode method defined by class Object does return distinct integers for distinct objects. (This is typically implemented by converting the internal address of the object into an integer, but this implementation technique is not required by the Java™ programming language.)
+
+返回该对象的哈希码值。支持此方法是为了提高哈希表（例如 java.util.Hashtable 提供的哈希表）的性能。
+hashCode 的常规协定是：
+
+在 Java 应用程序执行期间，在对同一对象多次调用 hashCode 方法时，必须一致地返回相同的整数，前提是将对象进行 equals 比较时所用的信息没有被修改。从某一应用程序的一次执行到同一应用程序的另一次执行，该整数无需保持一致。
+如果根据 equals(Object) 方法，两个对象是相等的，那么对这两个对象中的每个对象调用 hashCode 方法都必须生成相同的整数结果。
+如果根据 equals(java.lang.Object) 方法，两个对象不相等，那么对这两个对象中的任一对象上调用 hashCode 方法不 要求一定生成不同的整数结果。但是，程序员应该意识到，为不相等的对象生成不同整数结果可以提高哈希表的性能。
+实际上，由 Object 类定义的 hashCode 方法确实会针对不同的对象返回不同的整数。（这一般是通过将该对象的内部地址转换成一个整数来实现的，但是 JavaTM 编程语言不需要这种实现技巧。）
+```
+## hash 的相关方法
+* java.lang.Object#hashCode
+* java.util.Objects#hashCode
+* java.util.Objects#hash
+
+## 基本类型的 hashCode 方法
+之前看过一篇文章有提到，找了一下没找到，后来想到，我直接进基本类型的包装类就可以了嘛。
+
+[[Java基础要义] Java语言中Object对象的hashCode()取值的底层算法是怎样实现的？](http://blog.csdn.net/luanlouis/article/details/41547649)
+
+[基本类型的hashCode重写方案](http://blog.csdn.net/fengzijia/article/details/49766219)
+```
+  (1) 如果是boolean值，则计算f ? 1:0
+  (2) 如果是byte\char\short\int,则计算(int)f
+  (3) 如果是long值，则计算(int)(f ^ (f >>> 32))
+  (4) 如果是float值，则计算Float.floatToIntBits(f)
+  (5) 如果是double值，则计算Double.doubleToLongBits(f)，然后返回的结果是long,再用规则(3)去处理long,得到int
+```
+### Byte
+    public static int hashCode(byte value) {
+        return (int)value;
+    }
+### Short
+    public static int hashCode(short value) {
+        return (int)value;
+    }
+### Integer
+    public static int hashCode(int value) {
+        return value;
+    }
+### Long
+    public static int hashCode(long value) {
+        return (int)(value ^ (value >>> 32));
+    }
+### Float
+    public static int hashCode(float value) {
+        return floatToIntBits(value);
+    }
+### Double
+    public static int hashCode(double value) {
+        long bits = doubleToLongBits(value);
+        return (int)(bits ^ (bits >>> 32));
+    }
+### Character
+    public static int hashCode(char value) {
+        return (int)value;
+    }
+### Boolean
+    public static int hashCode(boolean value) {
+        return value ? 1231 : 1237;
+    }
+
+## java.lang.Float#floatToIntBits
+[Float.floatToIntBits(float value) 是什么意思?](http://bbs.csdn.net/topics/110073831)
+```
+public static int floatToIntBits(float value)
+
+根据 IEEE 754 的浮点“单一形式”中的位布局，返回指定浮点值的表示形式。 
+第 31 位（掩码 0x80000000 选定的位）表示浮点数字的符号。第 30-23 位（掩码 0x7f800000 选定的位）表示指数。第 22-0 位（掩码 0x007fffff 选定的位）表示浮点数字的有效位数（有时也称为尾数）。 
+如果参数为正无穷大，则结果为 0x7f800000。 
+如果参数为负无穷大，则结果为 0xff800000。 
+如果参数为 NaN，则结果为 0x7fc00000。 
+在所有情况下，结果都是一个整数，在将其赋予 intBitsToFloat(int) 方法时，将生成一个与 floatToIntBits 的参数相同的浮点值（除所有 NaN 值被折叠成一个“规范的”NaN 值之外）。 
+
+另外需要知道的是，float类型占用4个字节，从最低位（最右边）到最高位（最左边）的编号是从0-31。这样的话，上面的解释就容易看懂了。也就是说，转换成的32个0、1字符串中，31号表示符号，30-23表示指数，22-0表示尾数。
+```
+
+以及更详细的解释
+```
+按照IEEE 754标准，32位浮点数在计算机中二进制存储形式共三部分：S(1位，符号) E(8位，阶码) M(23位，尾数)
+给你举个例子吧，Float.floatToIntBits(20.5f)按照如下方式计算：
+20.5D=10100.1B=1.01001*2^4B 指数e=4
+S=0-->正数  E=4+127=131D=10000011B-->真实指数e变成阶码E时需加127  M=01001B
+则32位2进制存储形式为：0 10000011 01001000000000000000000
+转换成10进制即1101266944
+```

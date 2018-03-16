@@ -1,0 +1,98 @@
+Q:
+* 如何使用枚举的
+* natural order 
+* weakly consistent
+* null 支持性
+* isValidKey
+
+# 数据结构
+Object[] vals;  
+## index
+((Enum<?>) key).ordinal()
+
+# 如何使用枚举的
+K[] keyUniverse 保存了枚举  
+Object[] vals 保存了值
+## get
+
+    public V get(Object key) {
+        //先校验 key
+        //求 index 并取出值
+        //unmaskNull
+        return (isValidKey(key) ?
+                unmaskNull(vals[((Enum<?>) key).ordinal()]) : null);
+    }
+
+## put
+
+    public V put(K key, V value) {
+        //检查类型
+        typeCheck(key);
+
+        int index = key.ordinal();
+        Object oldValue = vals[index];
+        //处理使支持 null 值
+        vals[index] = maskNull(value);
+        if (oldValue == null)
+            size++;
+        return unmaskNull(oldValue);
+    }
+
+因为 get 和 contains 都使用了 isValidKey 的判断，而 put 则使用的 typeCheck  
+因此有文档中说的
+>  Attempts to insert a null key will throw NullPointerException. Attempts to test for the presence of a null key or to remove one will, however, function properly. 
+
+
+# 顺序
+KeyIterator 从 keyUniverse 中取 key，  
+ValueIterator 从 vals 中取值，
+next 方法通过 index 的递增取出，其顺序就是枚举的申明顺序（natural order）
+
+# weakly consistent
+别的 map 都是快速失败的，但 EnumMap 的迭代不受影响，即使迭代过程中删除了元素，只是某 index 处元素变为 null，会继续迭代。
+
+# 不支持 null 键，支持 null 值
+通过 isValidKey 判断不支持 null 键  
+通过 maskNull 和 unmaskNull 使支持 null 值  
+因为 key 必须是枚举，所以不支持 null 键
+
+# isValidKey
+    private boolean isValidKey(Object key) {
+        if (key == null)
+            return false;
+
+        // Cheaper than instanceof Enum followed by getDeclaringClass
+        Class<?> keyClass = key.getClass();
+        return keyClass == keyType || keyClass.getSuperclass() == keyType;
+    }
+
+在以 map 为参数的构造函数中
+
+            keyType = m.keySet().iterator().next().getDeclaringClass();
+
+## java.lang.Class#getSuperclass
+父类，枚举的父类肯定是 Enum (这里不正确,参见下文 Enum#getDeclaringClass)，因为枚举是 final 的无法再继承，所以上述判断中只取了一次 getSuperclass
+
+## java.lang.Class#getDeclaringClass
+> 如果此 Class 对象所表示的类或接口是另一个类的成员，则返回的 Class 对象表示该对象的声明类。如果该类或接口不是其他类的成员，则此方法返回 null。如果此 Class 对象表示一个数组类、基本类型或 void，则此方法返回 null。
+
+## java.lang.Enum#getDeclaringClass
+    public final Class<E> getDeclaringClass() {
+        Class<?> clazz = getClass();
+        Class<?> zuper = clazz.getSuperclass();
+        return (zuper == Enum.class) ? (Class<E>)clazz : (Class<E>)zuper;
+    }
+> 返回与此枚举常量的枚举类型相对应的 Class 对象。当且仅当 e1.getDeclaringClass() == e2.getDeclaringClass() 时，两个枚举常量 e1 和 e2 的枚举类型才相同。（由该方法返回的值不同于由 Object.getClass() 方法返回的值，Object.getClass() 方法用于带有特定常量的类主体的枚举常量。）
+
+为什么这里要取 super ,枚举的父类肯定是 Enum 不是吗?
+后来查到 [java.lang.Enum.getDeclaringClass()方法实例](https://www.yiibai.com/java/lang/enum_getdeclaringclass.html)
+
+[Java Enum getDeclaringClass vs getClass](https://stackoverflow.com/questions/5758660)
+
+    enum newEnum { 
+      M {     
+        },
+
+      N {
+        };
+    }

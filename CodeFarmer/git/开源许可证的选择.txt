@@ -1,0 +1,30 @@
+github help 
+
+[Licensing a repository](https://help.github.com/articles/licensing-a-repository/)
+
+[Which open source license is appropriate for my project?](https://opensource.guide/legal/#which-open-source-license-is-appropriate-for-my-project)
+
+[choosealicense.com](http://choosealicense.com/)
+
+
+[开源许可证都有什么区别,一般开源项目用什么许可证?](https://www.zhihu.com/question/28292322)
+
+[童仲毅的回答](https://www.zhihu.com/question/28292322/answer/40238421)
+# MIT
+Massachusetts Institute of Technology
+>1.  我想要一个简单宽松的许可证建议： MIT许可证。  
+这是一个宽松的、简明扼要的许可证，只要用户在项目副本中包含了版权声明和许可声明，他们就可以拿你的代码做任何想做的事情，你也无需承担任何责任。  
+使用该许可证的项目：jQuery、Rails
+
+# Apache
+>2.  我比较关心专利建议： Apache许可证。  
+这类似于MIT许可证，但它同时还包含了贡献者向用户提供专利授权相关的条款。  
+使用该许可证的项目：Apache、SVN和NuGet
+
+# GPL
+GNU General Public License
+>3.  我关心项目的共享改进建议：GPL（ V2或 V3）许可证。  
+这是一种copyleft许可证，要求修改项目代码的用户再次分发源码或二进制代码时，必须公布他的相关修改。  
+V3版本与V2类似，但其进一步约束了在某些限制软件更改的硬件上的使用范围。  
+使用该许可证的项目：Linux、Git
+

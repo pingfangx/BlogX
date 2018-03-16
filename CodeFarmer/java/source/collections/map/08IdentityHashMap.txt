@@ -1,0 +1,47 @@
+Q:
+* Identity 是什么意思，实现原理
+* 与 HashMap 的差异
+
+[【JDK1.8】JDK1.8集合源码阅读——IdentityHashMap](https://www.cnblogs.com/joemsu/p/8041763.html)
+
+[【集合框架】JDK1.8源码分析之IdentityHashMap（四）](https://www.cnblogs.com/leesf456/p/5253094.html)
+
+# Identity
+身份，即 id  
+使用 == 判断
+> using reference-equality in place of object-equality when comparing keys (and values)
+
+> This class is not a general-purpose Map implementation
+
+使用 linear-probe 而不是 chaining
+
+    
+# 数据结构
+linear-probe  
+数组，交替存放
+[【集合框架】JDK1.8源码分析之IdentityHashMap（四）](https://www.cnblogs.com/leesf456/p/5253094.html)
+
+
+# hash
+[【JDK1.8】JDK1.8集合源码阅读——IdentityHashMap](https://www.cnblogs.com/joemsu/p/8041763.html)  
+有解释，但没有认真看。
+
+    private static int hash(Object x, int length) {
+        int h = System.identityHashCode(x);
+        // Multiply by -127, and left-shift to use least bit as part of hash
+        return ((h << 1) - (h << 8)) & (length - 1);
+    }
+
+# hash 冲突
+
+    private static int nextKeyIndex(int i, int len) {
+        return (i + 2 < len ? i + 2 : 0);
+    }
+直接向后查找
+
+
+# 支持 null
+使用 maskNull 方法
+
+# 比较
+* 可以使用相同（equals）的key

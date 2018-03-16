@@ -1,0 +1,42 @@
+调试了一下，前导数字的
+```
+1 = {StackTraceElement@1571} "java.util.Formatter$FormatSpecifier.localizedMagnitude(Formatter.java:4385)"
+2 = {StackTraceElement@1572} "java.util.Formatter$FormatSpecifier.print(Formatter.java:3102)"
+3 = {StackTraceElement@1573} "java.util.Formatter$FormatSpecifier.print(Formatter.java:3083)"
+4 = {StackTraceElement@1574} "java.util.Formatter$FormatSpecifier.printInteger(Formatter.java:2787)"
+5 = {StackTraceElement@1575} "java.util.Formatter$FormatSpecifier.print(Formatter.java:2747)"
+6 = {StackTraceElement@1576} "java.util.Formatter.format(Formatter.java:2520)"
+7 = {StackTraceElement@1577} "java.util.Formatter.format(Formatter.java:2455)"
+8 = {StackTraceElement@1578} "java.lang.String.format(String.java:2940)"
+```
+记录了宽度，如果宽度不够，在前面 insert
+            // apply zero padding
+            len = sb.length();
+            if (width != -1 && f.contains(Flags.ZERO_PAD))
+                for (int k = 0; k < width - len; k++)
+                    sb.insert(begin, zero);
+                    
+而前导空格
+```
+1 = {StackTraceElement@1528} "java.util.Formatter$FormatSpecifier.justify(Formatter.java:2923)"
+2 = {StackTraceElement@1529} "java.util.Formatter$FormatSpecifier.print(Formatter.java:3139)"
+3 = {StackTraceElement@1530} "java.util.Formatter$FormatSpecifier.print(Formatter.java:3083)"
+4 = {StackTraceElement@1531} "java.util.Formatter$FormatSpecifier.printInteger(Formatter.java:2787)"
+5 = {StackTraceElement@1532} "java.util.Formatter$FormatSpecifier.print(Formatter.java:2747)"
+6 = {StackTraceElement@1533} "java.util.Formatter.format(Formatter.java:2520)"
+7 = {StackTraceElement@1534} "java.util.Formatter.format(Formatter.java:2455)"
+8 = {StackTraceElement@1535} "java.lang.String.format(String.java:2940)"
+```
+        private String justify(String s) {
+            if (width == -1)
+                return s;
+            StringBuilder sb = new StringBuilder();
+            boolean pad = f.contains(Flags.LEFT_JUSTIFY);
+            int sp = width - s.length();
+            if (!pad)
+                for (int i = 0; i < sp; i++) sb.append(' ');
+            sb.append(s);
+            if (pad)
+                for (int i = 0; i < sp; i++) sb.append(' ');
+            return sb.toString();
+        }

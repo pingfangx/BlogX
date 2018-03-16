@@ -1,0 +1,41 @@
+Q:
+* 与 HashMap 有什么区别
+* LinkedHashMap 维护双向链表
+* LinkedHashMap 有序
+* LinkedHashMap 的 collection 视图迭代所需时间与映射的大小 成比例
+
+
+# 顺序
+## 有序  
+因为继承 HashMap.Node 同时持有 before 和 after  
+因此能够有序
+## 通常为插入顺序  
+通过 accessOrder 指定  
+访问顺序是指最后访问的顺序（访问后移到最后），而不是访问次数的多少
+## 重新插入不受影响  
+因为插入顺序，移到最后的操作是在 newNode 或 newTreeNode 中执行  
+
+# 结构修改
+> In access-ordered linked hash maps, merely querying the map with get is a structural modification
+
+这里中文文档的翻译说“不是”，应该是错误的。
+
+# LRU
+Least Recently Used
+
+# 构造函数如何保证有序
+> It can be used to produce a copy of a map that has the same order as the original, regardless of the original map's implementation:
+
+这里的顺序是指原来的 Map 的顺序（比如 HashMap 则无序，但生成后，再添加的元素就按 LinkedHashMap 的顺序继续）
+
+
+# collection 视图迭代所需时间
+> LinkedHashMap 的 collection 视图迭代所需时间与映射的大小 成比例。
+
+> 迭代 collection 视图所需的时间与 HashMap 实例的“容量”（桶的数量）及其大小（键-值映射关系数）成比例。
+
+因为 Iterator 实现的不同，详见类中注释。
+
+            if ((next = (current = e).next) == null && (t = table) != null) {
+                do {} while (index < t.length && (next = t[index++]) == null);
+            }

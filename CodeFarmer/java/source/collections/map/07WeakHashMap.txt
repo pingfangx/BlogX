@@ -1,0 +1,24 @@
+Q:
+* 原理
+* 为什么要维护一个 queue
+* 对 null 支持的实现不一样
+
+# 原理
+Entry<K, V> extends WeakReference<Object>
+
+# 为什么要维护一个 queue
+> Reference queue for cleared WeakEntries
+
+该 queue 传到 Entry ，传给父类 WeakReference
+
+> q - the queue with which the reference is to be registered, or null if registration is not required
+
+使用时在 expungeStaleEntries 中用于删除旧的条目
+
+但是为什么这个 queue 是用来保存被清除的？文档没有这么说呀
+
+TODO 查看 WeakReference 整个系列
+
+# 对 null 支持的实现不一样
+HashMap 在 hash 方法中判断为 null 则 hash 为 0，这样它的 null 的 index 总为 0  
+WeakHashMap 则是在 求 hash 前转为用 maskNull 方法转为一个对象，在取出时再用 unmaskNull 转换。

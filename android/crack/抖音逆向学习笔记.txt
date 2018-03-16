@@ -1,0 +1,58 @@
+一开始想直接修改 app ，但是混淆太厉害。  
+于是改用抓包，抓包发现主要是 feed 接口，其中有播放地址，试了一下可以下载，于是只要搞定 feed 接口就可以了。  
+调用 feed 接口，报错，看来是参数校验的。  
+
+
+试了一下，通过 _rticket 定位到 com\ss\android\ugc\aweme\app\b\b  重点分析
+
+
+pre_url=url+"&ts=" 拼上服务器时间  
+调用 u.a 获取一个 map ，由 map 生成 String[]  
+调用原生方法生成一个字符串  
+使用生成的字符串生成 as cp 及 mas 
+
+如果分析 so 包，卡住了。  
+后来找到了 [Android逆向之旅---Android中分析抖音和火山小视频的数据请求加密协议(IDA动态调试SO)](http://blog.csdn.net/f0ed9czn4ly992g/article/details/78780254)  
+
+写得真好，分析了一下自已还要学习的。  
+
+jadx 的使用  
+xposed 的使用  
+IDA动态调试SO  
+
+# jadx 的使用
+[Android 反编译神器jadx的使用](http://blog.csdn.net/Fisher_3/article/details/78654450)
+
+[skylot/jadx](https://github.com/skylot/jadx)
+
+# xposed 的使用
+## 原理
+[How Xposed works](https://github.com/rovo89/XposedBridge/wiki/Development-tutorial#how-xposed-works)
+
+## 安装
+一开始想折腾 genymotion，但是看到夜神也可以，好像更简单。  
+[模拟器使用xposed框架(夜神适配版)](https://bbs.yeshen.com/forum.php?mod=viewthread&tid=1175&extra=page%3D1)
+
+* 用多开器新建一个 5.1 并启动
+* 安装对应的 *xposed.installer(5.11安卓系统).apk*
+
+## 开发模块
+[【Android】Xposed 框架解析](http://blog.csdn.net/walid1992/article/details/52976084)
+
+首先写一个获取 IMEI 的应用，装到模拟器上。
+
+[如何解决夜神模拟器连不上adb的问题](http://blog.csdn.net/leon1741/article/details/54896861)  
+将夜神安装目录下的 nox_adb 替换为系统版本的 adb
+
+参考
+[Xposed模块开发教程](http://blog.csdn.net/zhangmiaoping23/article/details/54891387)
+并查看官方文件
+* [Using the Xposed Framework API](https://github.com/rovo89/XposedBridge/wiki/Using-the-Xposed-Framework-API)
+* [Creating the project](https://github.com/rovo89/XposedBridge/wiki/Development-tutorial#creating-the-project)
+* 添加 xposed_init  
+一开始的时候,没有加这个,以为可以了,结果调试半天.(因为已经提示加载模块了,但是看日志明显缺少 loading class)
+
+
+# IDA动态调试SO  
+通过上面对 xposed 的解析，自己可以写出简单的 hook，但是，奇怪的是 抖音的 hook 失败了，不开心。  
+然后动态调试也没有继续，暂时搁置吧。

@@ -1,62 +1,99 @@
-* 如何 hash
-* 如何扩容
-* 为何无序
 * 相关性能
 
-看懂这两篇文章
+看懂以下文章
 https://www.cnblogs.com/killbug/p/7679043.html
-TODO http://blog.csdn.net/qq_27093465/article/details/52207152
-TODO http://blog.csdn.net/brycegao321/article/details/52527236
+http://blog.csdn.net/qq_27093465/article/details/52207152
+http://blog.csdn.net/brycegao321/article/details/52527236
+http://blog.csdn.net/ns_code/article/details/36034955
+    
+    
+# 为什么容量要是 2 的幂
+因为取 index 的算法，必须是 2 的幂才能使随机的 hash 均匀分布到表中。  
+如果不是 2 的幂，会使有的 index 永远取不到，而有的位置多次取到。  
+tab 是有容量的，如何将随机的 hash 对应到在 tab 中的 index 呢， HashMap 使用的是
 
-# 文档
-> 基于哈希表的 Map 接口的实现。此实现提供所有可选的映射操作，并允许使用 null 值和 null 键。（除了非同步和允许使用 null 之外，HashMap 类与 Hashtable 大致相同。）此类不保证映射的顺序，特别是它不保证该顺序恒久不变。
+    i = (n - 1) & hash
+按位与，假设 hash 是均匀分布的，那么按位与时，在每一位都要么是 1 要么是 0，就可以均匀地对应于 tab 中。  
+必须要是 2 的幂，这样才能保证减 1 后，每一位都是1，如果有一位是 0，按么按位与时那一位结果就总是0了，不能均匀分布。  
+如下，容量为 16
 
-TODO 为什么它可以支持 null?
+    n:      00010000
+    n-1:    00001111
+    hash:   11111111    index:  1111
+    hash:   00000000    index:  0000
+    
+# 取 index 的方法
 
-> 此实现假定哈希函数将元素适当地分布在各桶之间，可为基本操作（get 和 put）提供稳定的性能。迭代 collection 视图所需的时间与 HashMap 实例的“容量”（桶的数量）及其大小（键-值映射关系数）成比例。所以，如果迭代性能很重要，则不要将初始容量设置得太高（或将加载因子设置得太低）。
+    i = (n - 1) & hash
+之前在网上看到，为什么不用取模？
+>当length为2的n次方时，h&(length - 1)就相当于对length取模，而且速度比直接取模快得多，这是HashMap在速度上的一个优化。
 
-TODO 为什么稳定？迭代比例是什么意思，如何迭代。
+>To create a hashing function for a hash table, often a function is used that has a large domain. To create an index from the output of the function, a modulo can be taken to reduce the size of the domain to match the size of the array; however, it is often faster on many processors to restrict the size of the hash table to powers of two sizes and use a bitmask instead.
 
-> HashMap 的实例有两个参数影响其性能：初始容量 和加载因子。容量 是哈希表中桶的数量，初始容量只是哈希表在创建时的容量。加载因子 是哈希表在其容量自动增加之前可以达到多满的一种尺度。当哈希表中的条目数超出了加载因子与当前容量的乘积时，则要对该哈希表进行 rehash 操作（即重建内部数据结构），从而哈希表将具有大约两倍的桶数。
+# hash 方法
+判空，取 hashCode 然后异或上无符号右移 16 位  
+为了将 hash 散列到低位，如 Float 的 hashCode
 
-TODo 何时 rehash？如何 rehash? rehash 算法是否变化过
+    static final int hash(Object key) {
+        int h;
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+    }
 
-> 通常，默认加载因子 (.75) 在时间和空间成本上寻求一种折衷。加载因子过高虽然减少了空间开销，但同时也增加了查询成本（在大多数 HashMap 类的操作中，包括 get 和 put 操作，都反映了这一点）。在设置初始容量时应该考虑到映射中所需的条目数及其加载因子，以便最大限度地减少 rehash 操作次数。如果初始容量大于最大条目数除以加载因子，则不会发生 rehash 操作。
+## 构建一个 hash 冲突的 Map
+在默认 16 的空量的况下  
+求 index=(length-1) & hash  
+length-1=0B1111  
+则 1<<4 的 index 为 0，只要是左移大于 4 ，则 index 都是 0
 
-get 和 put 的实现代码？
+# java.util.HashMap#tableSizeFor
+```
+首先返加时要返回 2 的幂
+n<0?1:n>max?max:n+1
+所以最前面先减 1
+n=cap - 1
+然后 | 上无符号右移
+n |=n>>>1
+完整如下
+    static final int tableSizeFor(int cap) {
+        int n = cap - 1;
+        n |= n >>> 1;
+        n |= n >>> 2;
+        n |= n >>> 4;
+        n |= n >>> 8;
+        n |= n >>> 16;
+        return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
+    }
+```
 
-> Note that using many keys with the same hashCode() is a sure way to slow down performance of any hash table. To ameliorate impact, when keys are Comparable, this class may use comparison order among keys to help break ties.
+# 如何扩容
+求出一个新容量，扩大 table  
+对其中的原中重新设置索引，要么保持不变，要么加上之前的容量  
+详见方法中的注释
 
-Comparable 如何作用？
+# getNode 的过程
+不只是 getNode 方法，如 removeNode 等也这样
 
-# Implementation notes
-没有找到现成的翻译，不开心。
->This map usually acts as a binned (bucketed) hash table, but when bins get too large, they are transformed into bins of TreeNodes, each structured similarly to those in TreeMap. Most methods try to use normal bins, but relay to TreeNode methods when applicable (simply by checking instanceof a node).  Bins of TreeNodes may be traversed and used like any others, but additionally support faster lookup when overpopulated. However, since the vast majority of bins in normal use are not overpopulated, checking for existence of tree bins may be delayed in the course of table methods.
-  
-> 该 map 通常用作 binned 哈希表，但当 bin 过多时，它们会转换为 TreeNodes （树节点）的 bin，其结构与 TreeMap 中的结构类似。  
-> 大多数方法都尝试使用正常的 bin，但在适用时转发给 TreeNode 方法（仅使用 instanceof 检查是否为节点）。
-> TreeNodes 的 bin 可以像任何其他的一样被遍历和使用，但是数量过多时还支持更快的查找。  
-> 然而，大多数情况下 bins 不会过多，检查树 bins 的存在可能会延时到 table 方法中。（不明所以，需要修改翻译……）
+## index
+对 key 求 hash，然后与上 length -1  
+hash=hash(key)
+(length-1)& hash
 
 
-> Tree bins (i.e., bins whose elements are all TreeNodes) are ordered primarily by hashCode, but in the case of ties, if two elements are of the same "class C implements Comparable<C>", type then their compareTo method is used for ordering. (We conservatively check generic types via reflection to validate this -- see method comparableClassFor).  The added complexity of tree bins is worthwhile in providing worst-case O(log n) operations when keys either have distinct hashes or are orderable, Thus, performance degrades gracefully under accidental or malicious usages in which hashCode() methods return values that are poorly distributed, as well as those in which many keys share a hashCode, so long as they are also Comparable. (If neither of these apply, we may waste about a factor of two in time and space compared to taking no precautions. But the only known cases stem from poor user programming practices that are already so slow that this makes little difference.)
+## 取出第一个判断
+    first=table[index]  
+    first.hash == hash && 
+                    ((k = first.key) == key || (key != null && key.equals(k)))
+                    
+需要 hash 相等，且 key 相等
 
-> Tree bins （即 TreeNode 的 bin）主要通过 hashCode 排序，但如果两个元素都是 Comparable 类型（class C implements Comparable<C>），将会使用它们的 compareTo 方法来排序。  
-> 我们谨慎地通过反射检查泛型类型来验证是否是 Comparable，见 comparableClassFor 方法。  
-> tree bins 所增加的复杂度是值得的，当 keys 具有不同的哈希或者可排序时，都提供最坏 O(log n) 的操作。  
-> 因此，在无意或有意的使用中，如果 hashCode() 返回的值分布不均，或者多个 key 共享一个 hashCode，只要它们是 Comparable，性能地下降也会平滑。  
-> （如果两者都不适用，那么与未采取预防措施相比，我们可能浪费大约两倍的时间和空间。但是，唯一已知的情况源于糟糕的用户编程实践，这些实践已经非常缓慢，使得几乎没有区别）
+## 判断是不是树结点
+                if (first instanceof TreeNode)
+                    //如果是树结点
+                    return ((TreeNode<K, V>) first).getTreeNode(hash, key);
+                    
+## 普通链表结点
+遍历
 
-TODO comparableClassFor
 
-> Because TreeNodes are about twice the size of regular nodes, we use them only when bins contain enough nodes to warrant use (see TREEIFY_THRESHOLD). And when they become too small (due to removal or resizing) they are converted back to plain bins.  In usages with well-distributed user hashCodes, tree bins are rarely used.  Ideally, under random hashCodes, the frequency of nodes in bins follows a Poisson distribution (http://en.wikipedia.org/wiki/Poisson_distribution) with a parameter of about 0.5 on average for the default resizing threshold of 0.75, although with a large variance because of resizing granularity. Ignoring variance, the expected occurrences of list size k are (exp(-0.5) * pow(0.5, k) / factorial(k)). The first values are:
-
-> The root of a tree bin is normally its first node.  However, sometimes (currently only upon Iterator.remove), the root might be elsewhere, but can be recovered following parent links (method TreeNode.root()).
-
-> All applicable internal methods accept a hash code as an argument (as normally supplied from a public method), allowing them to call each other without recomputing user hashCodes. Most internal methods also accept a "tab" argument, that is normally the current table, but may be a new or old one when resizing or converting.
-
-> When bin lists are treeified, split, or untreeified, we keep them in the same relative access/traversal order (i.e., field Node.next) to better preserve locality, and to slightly simplify handling of splits and traversals that invoke iterator.remove. When using comparators on insertion, to keep a total ordering (or as close as is required here) across rebalancings, we compare classes and identityHashCodes as tie-breakers.
-
-> The use and transitions among plain vs tree modes is complicated by the existence of subclass LinkedHashMap. See below for hook methods defined to be invoked upon insertion, removal and access that allow LinkedHashMap internals to otherwise remain independent of these mechanics. (This also requires that a map instance be passed to some utility methods that may create new nodes.)
-
-> The concurrent-programming-like SSA-based coding style helps avoid aliasing errors amid all of the twisty pointer operations.
+# 红黑树
+http://blog.csdn.net/eson_15/article/details/51144079
