@@ -1,0 +1,3 @@
+# 查找指定 name 属性的 input
+    select_one('input[name="authenticity_token"]')
+    find('input',{'name':'authenticity_token'})

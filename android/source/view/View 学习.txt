@@ -1,0 +1,10 @@
+http://blog.csdn.net/guolin_blog/article/details/12921889
+https://www.cnblogs.com/jycboy/p/6219915.html
+
+没有系统的学习整理
+* 绘制流程
+* 是谁控制了 view 的刷新
+* 事件分发
+* anr
+* 卡顿
+

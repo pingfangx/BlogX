@@ -1,0 +1,75 @@
+[TextView源码解析-----绘制过程](http://blog.csdn.net/wz249863091/article/details/51872113)
+
+# EMS 如何生效
+[Em (typography)](https://en.wikipedia.org/wiki/Em_%28typography%29)
+
+[android ems具体意义？](http://blog.csdn.net/u011930471/article/details/50705462)
+
+>em是一个印刷排版的单位，表示字宽的单位。 em字面意思为：equal M   （和M字符一致的宽度为一个单位）简称em。
+
+>ems是em的复数表达。
+
+在安卓实现中，用 ems 乘以行高，行高的计算要  * mSpacingMult + mSpacingAdd
+
+            if (mMaxWidthMode == EMS) {
+                width = Math.min(width, mMaxWidth * getLineHeight());
+            } else {
+                width = Math.min(width, mMaxWidth);
+            }
+            
+    public int getLineHeight() {
+        return FastMath.round(mTextPaint.getFontMetricsInt(null) * mSpacingMult + mSpacingAdd);
+    }
+
+# DrawableLeft 不与文字一起居中
+首先先画了 DrawableLeft
+
+            if (dr.mShowing[Drawables.LEFT] != null) {
+                canvas.save();
+                canvas.translate(scrollX + mPaddingLeft + leftOffset,
+                        scrollY + compoundPaddingTop + (vspace - dr.mDrawableHeightLeft) / 2);
+                dr.mShowing[Drawables.LEFT].draw(canvas);
+                canvas.restore();
+            }
+
+而文字的绘制，在 onMeasure 中
+
+        int want = width - getCompoundPaddingLeft() - getCompoundPaddingRight();
+        ...
+        
+        if (mLayout == null) {
+            makeNewLayout(want, hintWant, boring, hintBoring,
+                          width - getCompoundPaddingLeft() - getCompoundPaddingRight(), false);
+        } else {
+            final boolean layoutChanged = (mLayout.getWidth() != want) || (hintWidth != hintWant)
+                    || (mLayout.getEllipsizedWidth()
+                            != width - getCompoundPaddingLeft() - getCompoundPaddingRight());
+
+            final boolean widthChanged = (mHint == null) && (mEllipsize == null)
+                    && (want > mLayout.getWidth())
+                    && (mLayout instanceof BoringLayout
+                            || (fromexisting && des >= 0 && des <= want));
+
+            final boolean maximumChanged = (mMaxMode != mOldMaxMode) || (mMaximum != mOldMaximum);
+
+            if (layoutChanged || maximumChanged) {
+                if (!maximumChanged && widthChanged) {
+                    mLayout.increaseWidthTo(want);
+                } else {
+                    makeNewLayout(want, hintWant, boring, hintBoring,
+                            width - getCompoundPaddingLeft() - getCompoundPaddingRight(), false);
+                }
+            } else {
+                // Nothing has changed
+            }
+        }
+在 layout 的创建或者 increaseWidthTo 时，所使用的 want 都是去掉了 getCompoundPaddingLeft() 的，
+
+    public int getCompoundPaddingLeft() {
+        final Drawables dr = mDrawables;
+        if (dr == null || dr.mShowing[Drawables.LEFT] == null) {
+            return mPaddingLeft;
+        } else {
+            return mPaddingLeft + dr.mDrawablePadding + dr.mDrawableSizeLeft;
+        }
+    }

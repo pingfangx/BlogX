@@ -1,0 +1,492 @@
+参考 [Android走进Framework之AppCompatActivity.setContentView](http://www.weyye.me/detail/framework-appcompatactivity-setcontentview/)
+
+* 整个窗口的结构是什么样的
+* requestFeature 是如何生效的
+
+# setContentView
+android.support.v7.app.AppCompatActivity
+
+    @Override
+    public void setContentView(@LayoutRes int layoutResID) {
+        getDelegate().setContentView(layoutResID);
+    }
+
+    @Override
+    public void setContentView(View view) {
+        getDelegate().setContentView(view);
+    }
+
+    @Override
+    public void setContentView(View view, ViewGroup.LayoutParams params) {
+        getDelegate().setContentView(view, params);
+    }
+
+    @Override
+    public void addContentView(View view, ViewGroup.LayoutParams params) {
+        getDelegate().addContentView(view, params);
+    }
+
+有关 Delegate 将在另一篇文章分析
+这里最终在 AppCompatDelegateImplV9 实现
+android.support.v7.app.AppCompatDelegateImplV9
+
+    @Override
+    public void setContentView(View v) {
+        ensureSubDecor();
+        ViewGroup contentParent = (ViewGroup) mSubDecor.findViewById(android.R.id.content);
+        contentParent.removeAllViews();
+        contentParent.addView(v);
+        mOriginalWindowCallback.onContentChanged();
+    }
+
+    @Override
+    public void setContentView(int resId) {
+        //做了什么
+        ensureSubDecor();
+        //findViewById 的实现
+        ViewGroup contentParent = (ViewGroup) mSubDecor.findViewById(android.R.id.content);
+        contentParent.removeAllViews();
+        //inflate 的实现
+        LayoutInflater.from(mContext).inflate(resId, contentParent);
+        //回调了什么
+        mOriginalWindowCallback.onContentChanged();
+    }
+
+    @Override
+    public void setContentView(View v, ViewGroup.LayoutParams lp) {
+        ensureSubDecor();
+        ViewGroup contentParent = (ViewGroup) mSubDecor.findViewById(android.R.id.content);
+        contentParent.removeAllViews();
+        contentParent.addView(v, lp);
+        mOriginalWindowCallback.onContentChanged();
+    }
+
+    @Override
+    public void addContentView(View v, ViewGroup.LayoutParams lp) {
+        ensureSubDecor();
+        ViewGroup contentParent = (ViewGroup) mSubDecor.findViewById(android.R.id.content);
+        contentParent.addView(v, lp);
+        mOriginalWindowCallback.onContentChanged();
+    }
+可以看到相似方法的实现一样，上面理出了 4 个问题，依次学习
+# SubDecor
+
+    private void ensureSubDecor() {
+        if (!mSubDecorInstalled) {
+            //创建 mSubDecor
+            mSubDecor = createSubDecor();
+
+            // If a title was set before we installed the decor, propagate it now
+            // 这是可能存在的，如果我们在 setContentView 之前调用了 setTitle，
+            // 最后调用 onTitleChanged 的时候 mDecorContentParent 等均为 null 不会设置处理
+            // 所以此处在 createSubDecor 之后重新调用一次 onContentChanged
+            CharSequence title = getTitle();
+            if (!TextUtils.isEmpty(title)) {
+                onTitleChanged(title);
+            }
+
+            applyFixedSizeWindow();
+
+            //好像也没有子类实现
+            onSubDecorInstalled(mSubDecor);
+
+            mSubDecorInstalled = true;
+
+            // Invalidate if the panel menu hasn't been created before this.
+            // Panel menu invalidation is deferred avoiding application onCreateOptionsMenu
+            // being called in the middle of onCreate or similar.
+            // A pending invalidation will typically be resolved before the posted message
+            // would run normally in order to satisfy instance state restoration.
+            // 看不懂，假装没看到这一段
+            PanelFeatureState st = getPanelState(FEATURE_OPTIONS_PANEL, false);
+            if (!isDestroyed() && (st == null || st.menu == null)) {
+                invalidatePanelMenu(FEATURE_SUPPORT_ACTION_BAR);
+            }
+        }
+    }
+
+    private ViewGroup createSubDecor() {
+        TypedArray a = mContext.obtainStyledAttributes(R.styleable.AppCompatTheme);
+
+        if (!a.hasValue(R.styleable.AppCompatTheme_windowActionBar)) {
+            a.recycle();
+            //之前可能遇到过的错误
+            throw new IllegalStateException(
+                    "You need to use a Theme.AppCompat theme (or descendant) with this activity.");
+        }
+        
+        // 调用一些 requestWindowFeature
+        if (a.getBoolean(R.styleable.AppCompatTheme_windowNoTitle, false)) {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+        } else if (a.getBoolean(R.styleable.AppCompatTheme_windowActionBar, false)) {
+            // Don't allow an action bar if there is no title.
+            requestWindowFeature(FEATURE_SUPPORT_ACTION_BAR);
+        }
+        if (a.getBoolean(R.styleable.AppCompatTheme_windowActionBarOverlay, false)) {
+            requestWindowFeature(FEATURE_SUPPORT_ACTION_BAR_OVERLAY);
+        }
+        if (a.getBoolean(R.styleable.AppCompatTheme_windowActionModeOverlay, false)) {
+            requestWindowFeature(FEATURE_ACTION_MODE_OVERLAY);
+        }
+        mIsFloating = a.getBoolean(R.styleable.AppCompatTheme_android_windowIsFloating, false);
+        a.recycle();
+
+        // Now let's make sure that the Window has installed its decor by retrieving it
+        // 通过获取 DecorView 来确认保已经安装了它
+        mWindow.getDecorView();
+
+        final LayoutInflater inflater = LayoutInflater.from(mContext);
+        ViewGroup subDecor = null;
+
+
+        if (!mWindowNoTitle) {
+            if (mIsFloating) {
+                // If we're floating, inflate the dialog title decor
+                subDecor = (ViewGroup) inflater.inflate(
+                        R.layout.abc_dialog_title_material, null);
+
+                // Floating windows can never have an action bar, reset the flags
+                mHasActionBar = mOverlayActionBar = false;
+            } else if (mHasActionBar) {
+                /**
+                 * This needs some explanation. As we can not use the android:theme attribute
+                 * pre-L, we emulate it by manually creating a LayoutInflater using a
+                 * ContextThemeWrapper pointing to actionBarTheme.
+                 */
+                TypedValue outValue = new TypedValue();
+                mContext.getTheme().resolveAttribute(R.attr.actionBarTheme, outValue, true);
+
+                Context themedContext;
+                if (outValue.resourceId != 0) {
+                    themedContext = new ContextThemeWrapper(mContext, outValue.resourceId);
+                } else {
+                    themedContext = mContext;
+                }
+
+                // Now inflate the view using the themed context and set it as the content view
+                // 加载
+                subDecor = (ViewGroup) LayoutInflater.from(themedContext)
+                        .inflate(R.layout.abc_screen_toolbar, null);
+
+                mDecorContentParent = (DecorContentParent) subDecor
+                        .findViewById(R.id.decor_content_parent);
+                mDecorContentParent.setWindowCallback(getWindowCallback());
+
+                /**
+                 * Propagate features to DecorContentParent
+                 */
+                if (mOverlayActionBar) {
+                    mDecorContentParent.initFeature(FEATURE_SUPPORT_ACTION_BAR_OVERLAY);
+                }
+                if (mFeatureProgress) {
+                    mDecorContentParent.initFeature(Window.FEATURE_PROGRESS);
+                }
+                if (mFeatureIndeterminateProgress) {
+                    mDecorContentParent.initFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+                }
+            }
+        } else {
+            ...
+        }
+
+        if (subDecor == null) {
+            throw new IllegalArgumentException(
+                    "AppCompat does not support the current theme features: { "
+                            + "windowActionBar: " + mHasActionBar
+                            + ", windowActionBarOverlay: "+ mOverlayActionBar
+                            + ", android:windowIsFloating: " + mIsFloating
+                            + ", windowActionModeOverlay: " + mOverlayActionMode
+                            + ", windowNoTitle: " + mWindowNoTitle
+                            + " }");
+        }
+
+        if (mDecorContentParent == null) {
+            mTitleView = (TextView) subDecor.findViewById(R.id.title);
+        }
+
+        // Make the decor optionally fit system windows, like the window's decor
+        ViewUtils.makeOptionalFitsSystemWindows(subDecor);
+
+        final ContentFrameLayout contentView = (ContentFrameLayout) subDecor.findViewById(
+                R.id.action_bar_activity_content);
+
+        final ViewGroup windowContentView = (ViewGroup) mWindow.findViewById(android.R.id.content);
+        // 取出之前的 contentView
+        if (windowContentView != null) {
+            // There might be Views already added to the Window's content view so we need to
+            // migrate them to our content view
+            // 将之前 contentView 中的 child 迁移到新的 contentView
+            while (windowContentView.getChildCount() > 0) {
+                final View child = windowContentView.getChildAt(0);
+                windowContentView.removeViewAt(0);
+                contentView.addView(child);
+            }
+
+            // Change our content FrameLayout to use the android.R.id.content id.
+            // Useful for fragments.
+            // 更改 id
+            windowContentView.setId(View.NO_ID);
+            contentView.setId(android.R.id.content);
+
+            // The decorContent may have a foreground drawable set (windowContentOverlay).
+            // Remove this as we handle it ourselves
+            if (windowContentView instanceof FrameLayout) {
+                ((FrameLayout) windowContentView).setForeground(null);
+            }
+        }
+
+        // Now set the Window's content view with the decor
+        mWindow.setContentView(subDecor);
+
+        contentView.setAttachListener(new ContentFrameLayout.OnAttachListener() {
+            @Override
+            public void onAttachedFromWindow() {}
+
+            @Override
+            public void onDetachedFromWindow() {
+                dismissPopups();
+            }
+        });
+
+        return subDecor;
+    }
+上面的代码加载了布局
+
+    android.support.v7.widget.ActionBarOverlayLayout,id=decor_content_parent
+        android.support.v7.widget.ContentFrameLayout,id=action_bar_activity_content
+        android.support.v7.widget.ActionBarContainer,id=action_bar_container
+            android.support.v7.widget.Toolbar,id=action_bar
+            android.support.v7.widget.ActionBarContextView,id=action_context_bar
+# mWindow
+## mWindow.getDecorView()
+
+    public final View getDecorView() {
+        if (mDecor == null || mForceDecorInstall) {
+            installDecor();
+        }
+        return mDecor;
+    }
+    private void installDecor() {
+        mForceDecorInstall = false;
+        if (mDecor == null) {
+            mDecor = generateDecor(-1);
+            mDecor.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
+            mDecor.setIsRootNamespace(true);
+            if (!mInvalidatePanelMenuPosted && mInvalidatePanelMenuFeatures != 0) {
+                mDecor.postOnAnimation(mInvalidatePanelMenuRunnable);
+            }
+        } else {
+            mDecor.setWindow(this);
+        }
+        if (mContentParent == null) {
+            mContentParent = generateLayout(mDecor);
+            ...
+        }
+    }
+    protected DecorView generateDecor(int featureId) {
+        // System process doesn't have application context and in that case we need to directly use
+        // the context we have. Otherwise we want the application context, so we don't cling to the
+        // activity.
+        Context context;
+        if (mUseDecorContext) {
+            Context applicationContext = getContext().getApplicationContext();
+            if (applicationContext == null) {
+                context = getContext();
+            } else {
+                context = new DecorContext(applicationContext, getContext().getResources());
+                if (mTheme != -1) {
+                    context.setTheme(mTheme);
+                }
+            }
+        } else {
+            context = getContext();
+        }
+        return new DecorView(context, featureId, this, getAttributes());
+    }
+    
+    protected ViewGroup generateLayout(DecorView decor) {
+        // Apply data from current theme.
+        ...
+
+        // Inflate the window decor.
+
+        int layoutResource;
+        int features = getLocalFeatures();
+        // System.out.println("Features: 0x" + Integer.toHexString(features));
+        if ((features & (1 << FEATURE_SWIPE_TO_DISMISS)) != 0) {
+            layoutResource = R.layout.screen_swipe_dismiss;
+            setCloseOnSwipeEnabled(true);
+        }
+        ...
+        else {
+            // Embedded, so no decoration is needed.
+            layoutResource = R.layout.screen_simple;
+            // System.out.println("Simple!");
+        }
+
+        mDecor.startChanging();
+        mDecor.onResourcesLoaded(mLayoutInflater, layoutResource);
+
+        ViewGroup contentParent = (ViewGroup)findViewById(ID_ANDROID_CONTENT);
+        if (contentParent == null) {
+            throw new RuntimeException("Window couldn't find content container view");
+        }
+        ...
+
+        mDecor.finishChanging();
+
+        return contentParent;
+    }
+    com.android.internal.policy.DecorView#onResourcesLoaded
+    void onResourcesLoaded(LayoutInflater inflater, int layoutResource) {
+        mStackId = getStackId();
+
+        if (mBackdropFrameRenderer != null) {
+            loadBackgroundDrawablesIfNeeded();
+            mBackdropFrameRenderer.onResourcesLoaded(
+                    this, mResizingBackgroundDrawable, mCaptionBackgroundDrawable,
+                    mUserCaptionBackgroundDrawable, getCurrentColor(mStatusColorViewState),
+                    getCurrentColor(mNavigationColorViewState));
+        }
+
+        mDecorCaptionView = createDecorCaptionView(inflater);
+        final View root = inflater.inflate(layoutResource, null);
+        if (mDecorCaptionView != null) {
+            if (mDecorCaptionView.getParent() == null) {
+                addView(mDecorCaptionView,
+                        new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
+            }
+            mDecorCaptionView.addView(root,
+                    new ViewGroup.MarginLayoutParams(MATCH_PARENT, MATCH_PARENT));
+        } else {
+
+            // Put it below the color views.
+            addView(root, 0, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
+        }
+        mContentRoot = (ViewGroup) root;
+        initializeElevation();
+    }
+上述代码首先生成 DecorView  
+然后选择 layoutResource ，inflate 出布局，赋值给 mContentRoot 并添加进 DecorView
+
+    DecorView
+        LinearLayout，字段名为 mContentRoot
+            ViewStub,id=action_mode_bar_stub
+                com.android.internal.widget.ActionBarContextView,id=action_mode_bar
+            FrameLayout,id=content,赋值给 mContentParent
+## mWindow.setContentView(subDecor)
+
+    @Override
+    public void setContentView(View view) {
+        setContentView(view, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
+    }
+
+    @Override
+    public void setContentView(View view, ViewGroup.LayoutParams params) {
+        // Note: FEATURE_CONTENT_TRANSITIONS may be set in the process of installing the window
+        // decor, when theme attributes and the like are crystalized. Do not check the feature
+        // before this happens.
+        if (mContentParent == null) {
+            installDecor();
+        } else if (!hasFeature(FEATURE_CONTENT_TRANSITIONS)) {
+            mContentParent.removeAllViews();
+        }
+
+        if (hasFeature(FEATURE_CONTENT_TRANSITIONS)) {
+            view.setLayoutParams(params);
+            final Scene newScene = new Scene(mContentParent, view);
+            transitionTo(newScene);
+        } else {
+            mContentParent.addView(view, params);
+        }
+        mContentParent.requestApplyInsets();
+        final Callback cb = getCallback();
+        if (cb != null && !isDestroyed()) {
+            cb.onContentChanged();
+        }
+        mContentParentExplicitlySet = true;
+    }
+这里看到，上面的 FrameLayout 原本 id 为 content  
+但是在 createSubDecor() 中被置为了 NO_ID ，并且往里面 add 了上面生成的 ActionBarOverlayLayout
+那么整体布局应该为
+
+    DecorView
+        LinearLayout，字段名为 mContentRoot
+            ViewStub,id=action_mode_bar_stub
+                com.android.internal.widget.ActionBarContextView,id=action_mode_bar
+            FrameLayout,id=-1,赋值给 mContentParent                            
+                android.support.v7.widget.ActionBarOverlayLayout,id=decor_content_parent
+                    android.support.v7.widget.ContentFrameLayout,id=action_bar_activity_content，后被修改为 content
+                    android.support.v7.widget.ActionBarContainer,id=action_bar_container
+                        android.support.v7.widget.Toolbar,id=action_bar
+                        android.support.v7.widget.ActionBarContextView,id=action_context_bar
+
+                        
+# requestFeature 是如何生效的
+如果要设置全屏，可以使用代码
+
+    requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+    public final boolean requestWindowFeature(int featureId) {
+        return getWindow().requestFeature(featureId);
+    }        
+    
+    public boolean requestFeature(int featureId) {
+        final int flag = 1<<featureId;
+        mFeatures |= flag;
+        mLocalFeatures |= mContainer != null ? (flag&~mContainer.mFeatures) : flag;
+        return (mFeatures&flag) != 0;
+    }
+但是该方法却失效了，设置了之后，依然有标题，原因是什么呢？
+原来是因为我们的 Activity 继承了 AppCompatActivity，
+如果继承 Activity，走的逻辑是
+
+    public void setContentView(@LayoutRes int layoutResID) {
+        getWindow().setContentView(layoutResID);
+        initWindowDecorActionBar();
+    }
+    private void initWindowDecorActionBar() {
+        Window window = getWindow();
+
+        // Initializing the window decor can change window feature flags.
+        // Make sure that we have the correct set before performing the test below.
+        window.getDecorView();
+
+        if (isChild() || !window.hasFeature(Window.FEATURE_ACTION_BAR) || mActionBar != null) {
+            return;
+        }
+
+        mActionBar = new WindowDecorActionBar(this);
+        mActionBar.setDefaultDisplayHomeAsUpEnabled(mEnableDefaultActionBarUp);
+
+        mWindow.setDefaultIcon(mActivityInfo.getIconResource());
+        mWindow.setDefaultLogo(mActivityInfo.getLogoResource());
+    }
+可以看到，如果没有 FEATURE_ACTION_BAR 就不会设置标题，那为什么我们是使用的 FEATURE_NO_TITLE 呢？
+
+# FEATURE_NO_TITLE 占主导
+当我们使用主题为 Theme.Holo 的时候，
+
+        <item name="windowNoTitle">false</item>
+        <item name="windowActionBar">true</item>
+在 com.android.internal.policy.PhoneWindow#generateLayout 中有
+
+        if (a.getBoolean(R.styleable.Window_windowNoTitle, false)) {
+            requestFeature(FEATURE_NO_TITLE);
+        } else if (a.getBoolean(R.styleable.Window_windowActionBar, false)) {
+            // Don't allow an action bar if there is no title.
+            requestFeature(FEATURE_ACTION_BAR);
+        }
+请求 FEATURE_ACTION_BAR 时，被忽略。
+
+        if ((features & (1 << FEATURE_NO_TITLE)) != 0 && featureId == FEATURE_ACTION_BAR) {
+            return false; // Ignore. No title dominates.
+        }
+所以在这种情况下，如果我们设置了 FEATURE_NO_TITLE，FEATURE_ACTION_BAR会被忽略，则没有标题。  
+如果没设置，会设置 FEATURE_ACTION_BAR，于是在 android.app.Activity#initWindowDecorActionBar 中设置了 ActionBar  
+这里有个问题是，如果是继承 Activity,主题用 Theme.AppCompat.Light.DarkActionBar ，则总是没有标题
+当我们默认创建的时候，默认继承 AppCompatActivity，Style 是 Theme.AppCompat.Light.DarkActionBar
+
+        <item name="windowNoTitle">false</item>
+        <item name="windowActionBar">true</item>
+这个时候 FEATURE_NO_TITLE 就失效了，是由 AppCompatActivity 控制，显示的应该是 ActionBar。
