@@ -1,0 +1,6 @@
+在 PyCharm 中可以运行，但是单独运行为无法 import module
+[Python中ImportError: No module named的解决](https://www.iteblog.com/archives/2148.html)
+
+在系统的 PATH 中添加，好像无效。  
+在系统的 PYTHONPATH 中添加，成功，可以用 sys.path 查看
+但是可以能会有相对路径的问题，所以还是切到 .py 文件目录，再执行。
