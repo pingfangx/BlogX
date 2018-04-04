@@ -1,0 +1,75 @@
+
+# 0x04 Decoration 的绘制
+## 在 layoutChunk 中求上下左右的过程
+    
+            if (isLayoutRTL()) {
+                right = getWidth() - getPaddingRight();
+                left = right - mOrientationHelper.getDecoratedMeasurementInOther(view);
+            } else {
+                // 求 left
+                left = getPaddingLeft();
+                // 求 right = left 加上占用宽度
+                right = left + mOrientationHelper.getDecoratedMeasurementInOther(view);
+            }
+            if (layoutState.mLayoutDirection == LayoutState.LAYOUT_START) {
+                bottom = layoutState.mOffset;
+                top = layoutState.mOffset - result.mConsumed;
+            } else {
+                // 求 top = offset
+                top = layoutState.mOffset;
+                // 求 bottom = top + 占用高度
+                bottom = layoutState.mOffset + result.mConsumed;
+            }
+            ...
+            
+        // 我们用 View 的边框（包括装饰和边距）计算了所有，
+        // 要计算正确的布局位置，我们减去边距。
+        layoutDecoratedWithMargins(view, left, top, right, bottom);
+其中求占用宽度
+
+            // 以 perpendicular 方向返回此视图占用的空间，包括decorations and margins
+            public int getDecoratedMeasurementInOther(View view) {
+                final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams)
+                        view.getLayoutParams();
+                return mLayoutManager.getDecoratedMeasuredWidth(view) + params.leftMargin
+                        + params.rightMargin;
+            }
+            
+        /**
+         * 返回给定 child 的测量宽度，加上 ItemDecoration 应用的任何 insets 的额外尺寸。
+         */
+        public int getDecoratedMeasuredWidth(View child) {
+            final Rect insets = ((LayoutParams) child.getLayoutParams()).mDecorInsets;
+            return child.getMeasuredWidth() + insets.left + insets.right;
+        }
+        
+## layout 
+android.support.v7.widget.RecyclerView.LayoutManager#layoutDecoratedWithMargins
+
+        public void layoutDecoratedWithMargins(View child, int left, int top, int right,
+                int bottom) {
+            final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+            final Rect insets = lp.mDecorInsets;
+            child.layout(left + insets.left + lp.leftMargin, top + insets.top + lp.topMargin,
+                    right - insets.right - lp.rightMargin,
+                    bottom - insets.bottom - lp.bottomMargin);
+        }
+        
+## inflate 是一个耗时操作，能不能直接复制相同的 item
+因为同一屏幕内显示多个，所以才多次创建，如果滑出屏幕就会复用。
+
+# 0x05 动画
+# 0x06 监听
+
+    RecyclerView.ChildDrawingOrderCallback
+        onGetChildDrawingOrder(int childCount, int i)
+    RecyclerView.OnChildAttachStateChangeListener
+        onChildViewAttachedToWindow(View view)
+        onChildViewDetachedFromWindow(View view)
+    RecyclerView.OnItemTouchListener
+        onInterceptTouchEvent(RecyclerView rv, MotionEvent e)
+        onRequestDisallowInterceptTouchEvent(boolean disallowIntercept)
+        onTouchEvent(RecyclerView rv, MotionEvent e)
+    RecyclerView.RecyclerListener
+        onViewRecycled(RecyclerView.ViewHolder holder)
+    

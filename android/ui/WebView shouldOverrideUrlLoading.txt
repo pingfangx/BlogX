@@ -1,0 +1,110 @@
+我们知道，如果在 shouldOverrideUrlLoading 中调用
+android.webkit.WebView#loadUrl(java.lang.String)
+可以自己跳转（我记得以前不这么写，会调用系统浏览器打开还是什么的）  
+然后返回 true
+
+但是发现，存在一个页面自动跳转的情况，返回以后又跳转到下一页。  
+只要去掉 android.webkit.WebView#loadUrl(java.lang.String) ，然后返回 false ，就不会重复返回了。
+
+# 后来进行了测试
+[源码](https://github.com/pingfangx/AndroidX/tree/demo/demo/WebViewDemo)
+## 不设置
+调用系统浏览器打开
+
+## 设置空的 WebViewClient
+正常
+
+## client 返回 super
+正常
+
+## client 返回 ture
+不加载
+
+## client 返回 false
+正常
+
+## client 调用 view.loadUrl 返回 true
+循环，无法返回
+
+## client 调用 view.loadUrl 返回 false
+循环，无法返回
+
+所以看到，关键的问题，还是是否调用 view.loadUrl
+
+
+# shouldOverrideUrlLoading 的调用堆栈查看
+这个返回值是表示是否自己处理
+> True if the host application wants to leave the current WebView and handle the url itself, otherwise return false.
+
+
+那么上一层调用方法是怎么使用返回值的呢，想着查看源码学习一下，结果并没有追到……只得作罢。
+```
+3 = {StackTraceElement@10001} "com.tencent.smtt.sdk.aa.shouldOverrideUrlLoading(Unknown Source:41)"
+4 = {StackTraceElement@10002} "android.webkit.WebViewClient.shouldOverrideUrlLoading(WebViewClient.java:73)"
+5 = {StackTraceElement@10003} "com.android.webview.chromium.WebViewContentsClientAdapter.shouldOverrideUrlLoading(WebViewContentsClientAdapter.java:354)"
+6 = {StackTraceElement@10004} "org.chromium.android_webview.AwContentsClient.shouldIgnoreNavigation(AwContentsClient.java:168)"
+7 = {StackTraceElement@10005} "org.chromium.android_webview.AwContentsClientBridge.shouldOverrideUrlLoading(AwContentsClientBridge.java:352)"
+8 = {StackTraceElement@10006} "org.chromium.base.SystemMessageHandler.nativeDoRunLoopOnce(Native Method)"
+9 = {StackTraceElement@10007} "org.chromium.base.SystemMessageHandler.handleMessage(SystemMessageHandler.java:41)"
+10 = {StackTraceElement@10008} "android.os.Handler.dispatchMessage(Handler.java:105)"
+```
+
+第 4 处，
+    
+    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+        return shouldOverrideUrlLoading(view, request.getUrl().toString());
+    }
+    
+5 在 源码中可查看 com\android\webview\chromium
+
+    /**
+     * @see AwContentsClient#shouldOverrideUrlLoading(java.lang.String)
+     */
+    @Override
+    public boolean shouldOverrideUrlLoading(String url) {
+        TraceEvent.begin();
+        if (TRACE) Log.d(TAG, "shouldOverrideUrlLoading=" + url);
+        boolean result = mWebViewClient.shouldOverrideUrlLoading(mWebView, url);
+        TraceEvent.end();
+        return result;
+    }
+
+6 到 [chromium/chromium](https://github.com/chromium/chromium) 中查看
+
+    public final boolean shouldIgnoreNavigation(Context context, String url, boolean isMainFrame,
+            boolean hasUserGesture, boolean isRedirect) {
+        AwContentsClientCallbackHelper.CancelCallbackPoller poller =
+                mCallbackHelper.getCancelCallbackPoller();
+        if (poller != null && poller.shouldCancelAllCallbacks()) return false;
+
+        if (hasWebViewClient()) {
+            AwWebResourceRequest request = new AwWebResourceRequest();
+            request.url = url;
+            request.isMainFrame = isMainFrame;
+            request.hasUserGesture = hasUserGesture;
+            request.isRedirect = isRedirect;
+            request.method = "GET";  // Only GET requests can be overridden.
+            return shouldOverrideUrlLoading(request);
+        } else {
+            return sendBrowsingIntent(context, url, hasUserGesture, isRedirect);
+        }
+    }
+    
+7 
+
+    @CalledByNativeUnchecked
+    private boolean shouldOverrideUrlLoading(
+            String url, boolean hasUserGesture, boolean isRedirect, boolean isMainFrame) {
+        return mClient.shouldIgnoreNavigation(
+                mContext, url, isMainFrame, hasUserGesture, isRedirect);
+    }
+8-9
+    @Override
+    public void handleMessage(Message msg) {
+        if (mNativeMessagePumpForUI == 0) return;
+        boolean delayed = msg.what == DELAYED_SCHEDULED_WORK;
+        if (delayed) mScheduledDelayedWork = false;
+        nativeDoRunLoopOnce(mNativeMessagePumpForUI, delayed);
+    }
+    
+    private native void nativeDoRunLoopOnce(long nativeMessagePumpForUI, boolean delayed);

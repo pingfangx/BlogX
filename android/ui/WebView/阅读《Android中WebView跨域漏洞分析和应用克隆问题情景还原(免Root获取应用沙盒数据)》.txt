@@ -1,0 +1,9 @@
+[ 赵四《Android中WebView跨域漏洞分析和应用克隆问题情景还原(免Root获取应用沙盒数据)》](https://mp.weixin.qq.com/s?__biz=MzIzNDA3MDgwNA==&mid=2649230758&idx=1&sn=be7c333c2dd596c0b32d6e73ed7f7449&chksm=f0e75bddc790d2cbe7c690ebfcd5673b5e6e1535f6b193921940783892a142266dcfb0b0b2d3&mpshare=1&s_q_s_h_a_r_e_1=MTc4MTc3MTUyMjY1ODY5NTcyMTc2MjY1OSYzRUFJWUg=)
+
+简单了解了一下。
+
+网页 A，网页 B，应用 B
+
+* 打开网页 A ，会自动下载一个网页 B 保存到本地
+* 应用 B 有一个协议，接受一个 url 然后会打开。
+* 网页 A 通过该协议，将网页 B 传给应用 B，应用 B 打开了网页 B，于是执行网页 B 中的代码，便可以获取及上传应用 B 的数据。

@@ -1,0 +1,18 @@
+    
+    android.view.LayoutInflater#rInflate
+    android.view.LayoutInflater#createViewFromTag(android.view.View, java.lang.String, android.content.Context, android.util.AttributeSet)
+    android.view.LayoutInflater#createViewFromTag(android.view.View, java.lang.String, android.content.Context, android.util.AttributeSet, boolean)
+    android.view.LayoutInflater#createView
+    java.lang.reflect.Constructor#newInstance
+    java.lang.reflect.Constructor#newInstance0
+    android.widget.TextView#TextView(android.content.Context, android.util.AttributeSet)
+    在这里只有两个参数，于是使用了默认的  com.android.internal.R.attr.textViewStyle
+    
+    接下来在 sdk\platforms\android-26\data\res\values\attrs.xml ，有
+    
+        <!-- Default TextView style. -->
+        <attr name="textViewStyle" format="reference" />
+    
+    然后在不同的 themes_?.xml 文件中，有不同的 textViewStyle 定义
+    查看项目中的使用，一层层转至 Theme.Material.Light
+        <item name="textViewStyle">@style/Widget.Material.Light.TextView</item>
