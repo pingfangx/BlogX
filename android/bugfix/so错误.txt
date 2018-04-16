@@ -1,0 +1,66 @@
+项目中有两个库引用了不同版本的 ffmpeg.so，出错。
+
+报错信息分别为
+## 找不到
+couldn't find "libVhallLiveApi.so"
+## 加载另一个库提供的 so
+java.lang.UnsatisfiedLinkError: dlopen failed: cannot locate symbol "__exidx_end" referenced by
+
+
+# 删除其中一个 so
+删除其中一个库引用的 so，其在加载时会加载另一个库提供的 so，但两者都会报错，它们使用的 so 可能经过修改。
+
+尝试将 so 库分别置于 armeabi 和 armeabi-v7a 中，想着可以让项目分别加载。  
+比如加载 A 从 armeabi 加载，加载 B 则从 armeabi-v7a 加载。  
+失败，因为项目中还有 armeabi-v7a 文件夹，出错找不到 so 包。  
+TODO 这里可以了解 so 的加载逻辑。
+
+# 重命名
+将其中一个 so 改为别的名字，然后库中加载的地方也修改名字。
+
+[jar包修改并重新打包](https://blog.csdn.net/new_abc/article/details/52243772)
+> javac -classpath okhttp-2.6.0.jar Cache.java 编译为class文件，生成Cache.class
+
+失败，似乎在其他 so 包中也引用了 so 的名字，直接修改名字不现实。
+
+
+# 动态加载
+## 在加载前将文件重命名
+失败，lib 文件夹只读不可写
+
+## 在加载前复制所需 so ，再加载，部分成功
+[动态加载so库的实现方法与问题处理](https://blog.csdn.net/aqi00/article/details/72763742)
+
+其中一个库成功，这样修改后 so 中的相关内容是可以调用的，因为其做了 try catch 处理，后续可以正常加载 so。  
+而另一个不仅没有做捕获，后续加载别的 so 包也会出问题
+
+# 保留其中一个，另一个动态加载
+[深入理解 System.loadLibrary](https://pqpo.me/2017/05/31/system-loadlibrary/)
+
+
+正常加载和动态加载（先复制，再加载复制的 so，再加载原来的 so，此时抛出异常被拦截）  
+两者都能加载，但是加载一个 so，另一个再加载时会出错
+## 卸载已加载的 so
+没有直接的办法可以卸载，除非在原生代码中处理  
+[Android so的热升级尝试](http://www.10tiao.com/html/179/201711/2652317005/1.html)  
+这里面给出了原生中卸载 so 的方法，但是其中需要重新注册函数地址，似乎是不能实现。
+
+## 重启应用，重新加载，成功
+[android 应用 kill ，restart ，重启，方法](https://www.aliyun.com/jiaocheng/96059.html)
+
+# 整理最后的解决方案。
+保留微吼的 so 包，删除阿里的 so 包，使用动态加载。  
+因为动态加载了 so 包，阿里的在 com.alivc.player.TBMPlayer 中调用 System.loadLibrary("ffmpeg") 时进行了 try catch ，不会异常，继续后面的加载。  
+而微吼的即使动态加载了 so 包，仍会崩溃。
+
+## 1 打开微吼
+### 1.1 直接打开
+不处理，直接加载微吼使用的 so 包
+### 1.2 先动态加载了阿里的 so，再打开
+提示用户重启
+
+## 2 打开阿里
+### 2.1 直接打开
+动态加载 so，其在继续加载时，异常被拦截，后续正常加载别的 so
+### 2.2 先加载了微吼的 so 包，再打开
+提示用户重启
