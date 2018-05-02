@@ -1,0 +1,133 @@
+# 0x01 设置 shader 绘制圆角矩形
+[glide-transformations](https://github.com/wasabeef/glide-transformations)
+
+
+* 设置 shader 
+* 绘制一个圆角矩形
+* 绘制源 bitmap
+
+---
+
+    private fun createRoundBitmap(imageView: ImageView, bitmap: Bitmap, cornerRadius: Int): Bitmap {
+        mPaint.reset()
+        mPaint.isAntiAlias = true
+        mPaint.shader = BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+        //此处的宽高，要注意取imageView还是资源
+        //此处的config不能设置为RGB_565
+        val output = Bitmap.createBitmap(imageView.width, imageView.height, Bitmap.Config.ARGB_8888)
+
+        //产生一个同样大小的画布
+        val canvas = Canvas(output)
+
+        //创建矩形
+        val rectF = RectF(0f, 0f, imageView.width.toFloat(), imageView.height.toFloat())
+
+        //绘制圆角矩形
+        canvas.drawRoundRect(rectF, cornerRadius.toFloat() * 2, cornerRadius.toFloat(), mPaint)
+
+        return output
+    }
+
+Q:
+## Shader 有什么用
+见另一篇文章
+
+# 0x02 圆角矩形配合 xfermode
+
+* 绘制一个圆角矩形
+* 设置 xfermode 
+* 绘制源 bitmap
+
+---
+
+    private fun createRoundBitmap(imageView: ImageView, bitmap: Bitmap, cornerRadius: Int): Bitmap {
+        mPaint.reset()
+        mPaint.isAntiAlias = true
+        //此处的宽高，要注意取imageView还是资源
+        //此处的config不能设置为RGB_565
+        val output = Bitmap.createBitmap(imageView.width, imageView.height, Bitmap.Config.ARGB_8888)
+
+        //产生一个同样大小的画布
+        val canvas = Canvas(output)
+
+        //创建矩形
+        val rectF = RectF(0f, 0f, imageView.width.toFloat(), imageView.height.toFloat())
+
+        //绘制圆角矩形
+        canvas.drawRoundRect(rectF, cornerRadius.toFloat(), cornerRadius.toFloat(), mPaint)
+
+        //设置SRC_IN
+        mPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
+
+        //绘制图片
+        val srcRect = Rect(0, 0, bitmap.width, bitmap.height)
+        canvas.drawBitmap(bitmap, srcRect, rectF, mPaint)
+
+        return output
+    }
+    
+## 为什么要设为 ARGB_8888
+丢失了透明度？不了解。
+
+## 为什么构建 canvas ，绘制之后返回的 output 就变了
+> Construct a canvas with the specified bitmap to draw into. The bitmap must be mutable.  
+The initial target density of the canvas is the same as the given bitmap's density.
+
+也就是说绘制相当于直接绘制在 bitmap 上
+
+## Canvas#drawRoundRect 与 RoundRectShape#RoundRectShape
+
+
+    /**
+     * Draw the specified round-rect using the specified paint. The roundrect will be filled or
+     * framed based on the Style in the paint.
+     *
+     * @param rect The rectangular bounds of the roundRect to be drawn
+     * @param rx The x-radius of the oval used to round the corners
+     * @param ry The y-radius of the oval used to round the corners
+     * @param paint The paint used to draw the roundRect
+     */
+    public void drawRoundRect(@NonNull RectF rect, float rx, float ry, @NonNull Paint paint) {
+        super.drawRoundRect(rect, rx, ry, paint);
+    }
+    
+    /**
+     * RoundRectShape constructor.
+     * <p>
+     * Specifies an outer (round)rect and an optional inner (round)rect.
+     *
+     * @param outerRadii An array of 8 radius values, for the outer roundrect. 
+     *                   The first two floats are for the top-left corner
+     *                   (remaining pairs correspond clockwise). For no rounded
+     *                   corners on the outer rectangle, pass {@code null}.
+     * @param inset A RectF that specifies the distance from the inner
+     *              rect to each side of the outer rect. For no inner, pass
+     *              {@code null}.
+     * @param innerRadii An array of 8 radius values, for the inner roundrect.
+     *                   The first two floats are for the top-left corner
+     *                   (remaining pairs correspond clockwise). For no rounded
+     *                   corners on the inner rectangle, pass {@code null}. If
+     *                   inset parameter is {@code null}, this parameter is
+     *                   ignored.
+     */
+    public RoundRectShape(@Nullable float[] outerRadii, @Nullable RectF inset,
+            @Nullable float[] innerRadii)
+            
+由此我们知道，圆角不是完全的圆角，也可是椭圆角，实际是 1/4 的椭圆。  
+rx 指 x 轴（即水平方向）的半径。
+
+而 RoundRectShape 共 4 个圆角，可以设置 8 个值。  
+由于描边，又可设置内缩的左、上、右、下，以及内部的 innerRadii
+
+## xfermode 的使用
+新开一篇单独记录。
+
+## 如保画单独的圆角
+画完圆角矩形后，再画矩形覆盖不需要的圆角
+
+# 这两种实现有什么不同
+在 Glide 进行变换时，用 shader 生成的 bitmap 为 source 的大小，然后显示时进行缩放，导致最终圆角的大小也跟着缩放。  
+如果改为 output 的宽高，则因为使用 source 为 shader，只会绘制 source 的大小，超出部分根据 TileMode 进行绘制。  
+所以最后还是用的 source 大小，但是计算比例，提前修正半径的大小。  
+
+但是使用 xfermode 则没有这个问题，直接使用 output 的宽高，绘制圆角后，指定 srcRect 和 dstRect 就将 bitmap 缩放绘制在所需的 bitmap 上。

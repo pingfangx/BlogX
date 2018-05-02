@@ -1,0 +1,24 @@
+因为不经常使用，担心以后忘了。
+# 安装
+## 安装 Reflector
+从爱盘下载，按文档安装破解。
+
+## 如何安装 Reflexil
+Tools → Add-Ins
+
+# 使用
+## 搜索方法
+点放大镜（F3），搜索框选中 Member
+
+## 修改
+选中方法，Tools → Reflexil  
+右键 edit
+
+## 保存
+选中 dll，右键，Reflexil 
+
+## 刷新
+好像要保存了重新加载才能？
+
+## 查看引用
+Tools → Analyze (Ctrl+R)

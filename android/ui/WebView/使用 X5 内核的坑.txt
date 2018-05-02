@@ -1,0 +1,62 @@
+# 长按保存图片时类型转换错误
+为 webView 设置长按事件  
+
+    WebView.HitTestResult result = ((WebView) view).getHitTestResult();
+修改为 X5 后,此处更换 WebView 也就为 X5 的,实际此处是原生的 WebView 要注意判断
+
+# 选择文件后 Uri 的处理
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        mUploadMessage.onReceiveValue(new Uri[]{uri});
+    } else {
+        mUploadMessage.onReceiveValue(uri);
+    }
+    
+之前根据版本判断来决定传数组还是单个元素，使用 X5 之后，即使是 21 以下（如 4.4.4 的 19），也是接收的数组。  
+
+com.tencent.smtt.sdk.q implements ValueCallback<Uri[]>
+
+进行判断处理
+
+    /**
+     * 这里原本可以根据版本号判断
+     * 但是换了 x5 内核后，其实现为 com.tencent.smtt.sdk.q implements ValueCallback<Uri[]>
+     * 低版本也是数组了，所以对参数进行判断
+     */
+    private void receiveUri(Uri uri) {
+        if (uri != null) {
+            if (mUploadMessage != null) {
+                boolean isArray = false;
+                //泛型接口
+                Type[] genericInterfaces = mUploadMessage.getClass().getGenericInterfaces();
+                if (genericInterfaces != null) {
+                    //遍历接口
+                    for (Type genericInterface : genericInterfaces) {
+                        if (genericInterface instanceof ParameterizedType) {
+                            //获取泛型参数
+                            Type[] actualTypeArguments = ((ParameterizedType) genericInterface).getActualTypeArguments();
+                            if (actualTypeArguments != null) {
+                                //遍历参数
+                                for (Type actualTypeArgument : actualTypeArguments) {
+                                    //如果是数组
+                                    if (actualTypeArgument instanceof GenericArrayType) {
+                                        //如果是 uri
+                                        if (((GenericArrayType) actualTypeArgument).getGenericComponentType() == Uri.class) {
+                                            isArray = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                //判断结束
+                if (isArray) {
+                    mUploadMessage.onReceiveValue(new Uri[]{uri});
+                } else {
+                    mUploadMessage.onReceiveValue(uri);
+                }
+                mUploadMessage = null;
+            }
+        }
+    }

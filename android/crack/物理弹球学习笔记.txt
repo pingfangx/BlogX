@@ -1,0 +1,107 @@
+之前学习过 [《Polyforge学习笔记》](https://blog.csdn.net/pingfangx/article/details/52138040)  
+正好这两天看雪公众号推了一篇 unity3d 破解的文章，于是想用最近玩了下的物理弹球来学习。
+
+[王正飞《[原创]unity3d手游破解（一）》](https://bbs.pediy.com/thread-226135.htm)
+
+[王正飞《[原创]unity3d手游破解（二）》](https://bbs.pediy.com/thread-226208.htm)
+
+[王正飞《[原创]unity3d手游破解（三）--基于inline hook》](https://bbs.pediy.com/thread-226261.htm)
+
+整理原作者的布骤
+1. 确认
+> libmono.so以及\assets\bin\Data\Managed\Assembly-CSharp.dll，可以确定是unity3d手游
+
+2. 解密dll
+> 把 libmono.so扔进ida，找到mono_image_open_from_data_with_name函数，F5查看发现了解密代码：  
+> 在这个函数先判断加载的dll是否包含ssem字符串，接着判断前两个字节是否等于82（0x52）,77（0x4d），因此可以确定下面的for循环是解密代码，比较简单，抄下来自己写一个解密程序（附件有一份），然后对这个 Assembly-CSharp.dll进行解密。
+
+3. 修改dll
+> 把 Assembly-CSharp.dll扔进Reflector+reflexil环境进行修改（不会的同学百度学习一下），找到关键函数get_DamageValue，直接改成返回100W，然后攻击就变成了100W。
+
+开始尝试修改
+# 修改 Assembly-CSharp.dll
+搜索 score ，看到 Declaring Type 为 GamePanel，双击  
+看到 Game、GamePanel、GameSingle等类  
+进行一番查看，有一些可能使用的方法  
+GameSingle.GameRevive  
+GameSingle.JudgeFinish  
+GamePanel.OnRevive  
+GamePanel.AddScore  
+VectorAdsInstance.ShowNGS  
+尝试修改，发现打开闪退。  
+
+发现好像是使用 360 加固的，加固这一块还需要再学习，放弃。  
+
+# 修改 sp
+尝试修改 sp 文件，以便使用 SL 大法。  
+在 `game.color.ballz.block.brick.puzzle.free.physics.balls.xc.v2.playerprefs.xml` 中保存了相关信息。  
+进行修改后，打开后数据清空，猜测可能是有加密字段。  
+看到  key_useInfo_s  总是在变，怀疑就是加密字段。  
+简单对 key_useInfo 进行 md5 ，没有发现匹配，于是又回去看源码。 
+
+    GameSingle.SaveGame() : Void
+    GameUser.SaveLastGameData(Boolean, Single, Int64, Boolean, List<DataDots>, List<DataBlocks>, List<DataProps>) : Void
+    GameUser.Save() : Void
+        public static void Save()
+    {
+        string str = JsonUtility.ToJson(Instance);
+        Storage.WriteConfig("useInfo", str);
+    }
+    Storage.WriteConfig(String, String) : Void
+        public static void WriteConfig(string type, string value)
+    {
+        PlayerPrefs.SetString("key_" + type, value);
+        PlayerPrefs.SetString("key_" + type + "_s", md5(iemi + value + iemi));
+    }
+
+    可以看到是拼接了 iemi
+    public static void Init(string iemi = "vectorAlwaysLoveU")
+    {
+        Storage.iemi = iemi + "vectorAlwaysLoveU";
+        if (!ReadConfig("version", "null").Equals("1.0"))
+        {
+            WriteConfig("version", "1.0");
+        }
+    }
+    调用为
+    InitScript.InitAll() : Void
+        public static void InitAll()
+    {
+        if (!alreadyInited)
+        {
+            alreadyInited = true;
+            Input.set_multiTouchEnabled(true);
+            Application.set_targetFrameRate(60);
+            UIManager.UpdateRandomState(-1);
+            Storage.Init("vectorAlwaysLoveU");
+            DotSkins.Init();
+            Localization.Init();
+            AudioSystem.Init();
+            GameUser.ReadFromLocal();
+            if (Application.get_platform() == 8)
+            {
+                isLoginGameCenter = true;
+            }
+            else if (Application.get_platform() == 11)
+            {
+                isLoginGameCenter = false;
+                string msg = "pb_noads";
+                VectorNative.invokeNative(100, msg);
+            }
+        }
+    }
+
+    最终确认，iemi为 "vectorAlwaysLoveU"+"vectorAlwaysLoveU"
+    保存时 md5(iemi + value + iemi)
+    测试
+    <string name="key_version">1.0</string>
+    <string name="key_version_s">c1cd799023551f8eb3bcc805ff736717</string>
+    加密成功。
+    不过，在保存 useInfo 的时候，要注意转为 json 后，再存入 sp 是被转义了，所以应该按如下步骤
+
+# 修改 sp 步骤
+    去除转义
+    进行修改
+    加密
+    转义保存
+    

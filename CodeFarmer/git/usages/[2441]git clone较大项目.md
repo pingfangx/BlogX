@@ -10,7 +10,8 @@ Receiving objects: 100% (101728/101728), 437.93 MiB | 984.00 KiB/s, done.
 
 # 备注
 后来又想到一个方法，但没测试，下载 zip 再使用 --dissociate --reference  
-见[git clone 时引用本地仓库](http://blog.pingfangx.com/2428.html)
+见[git clone 时引用本地仓库](http://blog.pingfangx.com/2428.html)  
+再备注，应该不行吧，项目文件不代表仓库文件
 
 # 0x01 无效 --bare 
 [fracjackmac的回复](https://stackoverflow.com/a/31781016)  
@@ -45,5 +46,5 @@ git checkout master
 [Jakub Narębski的回复](https://stackoverflow.com/a/3957733)
 效果还不错
 
-# 0x05 有效 git clone --depth <Number> <repository> --branch <branch name> --single-branch
+# 0x05 有效 `git clone --depth <Number> <repository> --branch <branch name> --single-branch`
 [Ahed Eid的回复](https://stackoverflow.com/a/26488855)
