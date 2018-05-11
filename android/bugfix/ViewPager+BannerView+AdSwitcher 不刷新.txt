@@ -1,0 +1,31 @@
+查看布局，发现没有 measureWidth
+
+断点，发现没有调用 onMeasure 方法
+
+经过了一堆尝试，最后发现在
+
+    android.view.ViewRootImpl#performTraversals
+        boolean layoutRequested = mLayoutRequested && (!mStopped || mReportNextDraw);
+        
+    此时 mLayoutRequested 是 false 
+    
+    以及，在
+    android.view.View#requestLayout
+    
+        if (mParent != null && !mParent.isLayoutRequested()) {
+            mParent.requestLayout();
+        }
+        
+    项目中使用 BannerView 来显示广告，用 AdSwitcher 来切换广告。
+    在项目中使用的 BannerView 的 isLayoutRequested 方法中 打 log 
+    发现正常情况下，AdSwitcher 切换广告时，isLayoutRequested 方法 调用两次，返回 false 、true
+    和有 bug 的情况下，调用两次，返回 true ture 
+    
+BannerView 的 isLayoutRequested（实际是mParent.isLayoutRequested()）  
+如果返回 true，就不会再走 mParent.requestLayout()
+
+于是在 AdSwitcher 中，手动调用 mParent.requestLayout()
+
+成功，但是原因不太明白，是因为某一个布局流程没有走完？  
+还是因为 parent 认为没有发生变化？  
+以后再学习。

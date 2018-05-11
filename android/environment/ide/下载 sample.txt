@@ -1,0 +1,56 @@
+之前的是在 sdk 里的  
+后来不再提供 sample ，需要 import  
+项目在 [Google Samples](https://github.com/googlesamples)  
+
+即使翻了墙也获取失败。  
+按网上的教程设置了代理也失败。（最后发现是没设置对，参见 AndroidStudio 设置 shadowsocks）  
+
+# 查找 import sample 操作
+
+    搜索 import sample  
+    定位到 \plugins\google-cloud-tools-as\lib\google-cloud-tools-as.jar  
+    com.google.gct.studio.samples.SampleImportAction
+    
+    使用了 com.appspot.gsamplesindex.samplesindex.SamplesIndex
+    在 samplesindex-v1-1.0-SNAPSHOT.jar
+    
+    https://gsamplesindex.appspot.com/_ah/api/samplesindex/v1/
+    列表
+    /sample
+    
+    https://gsamplesindex.appspot.com/_ah/api/samplesindex/v1/sample?technology=android
+    
+发现该地址是可以打开的，但是 AndroidStudio 就是打不开，于是有两种思路。
+* 使用 python 写个脚本自己解析
+* 用 idea 打开调试
+
+# 用 idea 打开调试插件
+简单试了一下失败……  
+再尝试，因为加载插件需要 plugin.xml 搜索定位到  
+
+    com.intellij.ide.plugins.PluginManagerCore
+    com.intellij.ide.plugins.PluginManagerCore#getPlugins()
+    com.intellij.ide.plugins.PluginManagerCore#initializePlugins
+    com.intellij.ide.plugins.PluginManagerCore#loadDescriptors(com.intellij.ide.StartupProgress, java.util.List<java.lang.String>)
+    com.intellij.openapi.application.PathManager#getPluginsPath
+    
+    路径定位到 \intellij-community\config\AndroidStudio\plugins
+    将此方法返回 AndroidStudio 的 plugins，加载出错，与 properties 冲突  
+    将 properties 暂时移走，还是出错，无法加载  git4idea  
+    将  com.intellij.ide.BootstrapClassLoaderUtil#addIDEALibraries  中的 libFolder
+    指向 AndroidStudio 的 lib 加载成功，虽然有的功能不能用，但可以在启动页看到 import sample
+    
+# 用 idea 附加 jar 包进行断点
+没有搜到相关方法，猜想了一下，一试居然可以。  
+就是把 jar 包复制进项目中，然后添加为 library   
+打开后进行断点，就可以正常调试了。  
+
+    下断点
+    com.google.gct.studio.samples.SampleImportAction#actionPerformed
+    报错
+    javax.net.ssl.SSLHandshakeException: java.security.cert.CertificateException: No subject alternative DNS name matching gsamplesindex.appspot.com found.
+    
+    java.net.SocketTimeoutException: Read timed out
+
+    尝试改为 http ，报错
+    SSL is required to perform this operation.
