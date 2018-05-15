@@ -1,0 +1,48 @@
+# 0x01 相关概念
+## VPN
+Virtual Private Network  
+虚拟私人网络
+
+## SS 与 SSR
+即 [Shadowsocks](https://zh.wikipedia.org/wiki/Shadowsocks) 和 ShadowsocksR
+
+## 搬瓦工
+即 [bandwagonhost](https://bandwagonhost.com/)  
+[bwh1.net](https://bwh1.net/)
+
+# 0x02 购买服务器
+[搬瓦工新手完全指引](https://www.banwagong.com/337.html)  
+## 2.1 价格
+[购买方案](https://www.bandwagonhost.net/about)  
+[优惠码](https://www.banwagong.com/youhuima)  
+
+## 2.2 架构 KVM or OpenVZ
+
+### OpenVZ advantages:
+* IPv6 support
+* Better CPU performance
+
+### KVM advantages:
+* Full virtualization
+* Custom kernel support (BBR, etc)
+* Docker support
+* Better isolation
+* Better network throughput
+
+## 2.3 机房
+
+最后选了 19.9$ 的 KVM 的  
+(可迁移，到CN2流量变为1/3)
+
+# 0x03 安装 shadowsocks
+* 重置密码
+* xshell 登录
+* 修改密码
+* 安装 shadowsocks
+
+因为系统为 Centos 6 x86 bbr  支持 [bbr](https://github.com/google/bbr) 就没重装系统。  
+因为没有一键安装了，折腾半天没成功。  
+[centos6 安装配置ss【转载，亲测有效】](https://www.cnblogs.com/letsopen/p/7710939.html)  
+[Shadowsocks Python版一键安装脚本](https://teddysun.com/342.html)  
+
+# 0x04 使用

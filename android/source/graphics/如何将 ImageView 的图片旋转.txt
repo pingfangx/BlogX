@@ -1,0 +1,41 @@
+项目中有向上向下箭头，如何只用一张图片实现呢？
+
+# android.view.View#setRotation
+> Sets the degrees that the view is rotated around the pivot point. Increasing values result in clockwise rotation.
+
+> 设置 view 围绕枢轴点旋转的角度。 增加值会导致顺时针旋转。
+
+TODO View 的相关方法
+
+# bitmap 旋转
+        val drawable = imageView.drawable
+        if (drawable is BitmapDrawable) {
+            val bitmap = drawable.bitmap
+            val m = Matrix()
+            m.postRotate(ROTATE_DEGREE)
+            val rotateBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
+            imageView.setImageBitmap(rotateBitmap)
+        }
+
+# android.graphics.Canvas#rotate(float, float, float)
+
+    override fun onDraw(canvas: Canvas) {
+        canvas.save()
+        canvas.rotate(mRotationDegrees, (width / 2).toFloat(), (height / 2).toFloat())
+        super.onDraw(canvas)
+        canvas.restore()
+    }
+
+TODO Canvas 的相关方法
+
+# Animation
+TODO Animation 的原理  
+    
+        val animation = RotateAnimation(mRotateDegrees, mRotateDegrees + ROTATE_DEGREE, (view.width / 2).toFloat(), (view.height / 2).toFloat())
+        mRotateDegrees += ROTATE_DEGREE
+        mRotateDegrees = if (mRotateDegrees == 360F) 0F else mRotateDegrees
+        animation.duration = 300
+        //不需要,只影响 fillBefore ?
+        //animation.isFillEnabled = true
+        animation.fillAfter = true
+        view.startAnimation(animation)
