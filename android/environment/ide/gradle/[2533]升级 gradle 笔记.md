@@ -27,6 +27,8 @@ There are some combinations of libraries, or tools and libraries, that are incom
 原因是 support-core-ui 和 support-v4-24.3 中都有  
 查找未找到失用，降回 26.1.0 后，发现 support-v4-26.1.0 中为空，并没有别的文件。
 
+后来学习了 gradle 后使用 :app:dependencies 命令知道是七鱼客服使用的，又是它！
+
 # 2 app 中 build.gradle 的修改
 ## output.outputFile 改为 outputFileName
 > Cannot set the value of read-only property 'outputFile'

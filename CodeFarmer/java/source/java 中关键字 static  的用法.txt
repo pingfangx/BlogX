@@ -1,0 +1,56 @@
+TODO
+我记得有一次在某乎好像看到的这个问题。
+
+Q:
+* static 的用法
+* 总结查阅过程
+
+# 简单整理
+回想一下 static 的用法，可以想出来的有
+* 修饰类、方法、字段
+* 导入
+* 接口中的默认方法
+
+在 tutorial 中对 static 进行了搜索，筛选出一些文件进一步查看
+
+* java/package/usepkgs.html
+包的用法
+* extra\certification\javase-8-programmer1.html
+Variables
+Understanding Class Members
+Default Methods
+
+* extra\certification\javase-8-programmer2.html
+    extra\certification\javase-8-upgrade.html
+
+    extra\generics\fineprint.html
+>
+As consequence, the static variables and methods of a class are also shared among all the instances. That is why it is illegal to refer to the type parameters of a type declaration in a static method or initializer, or in the declaration or initializer of a static variable.
+
+    
+    information\glossary.html
+    简单包含
+    java\generics\restrictions.html
+    
+    java\IandI\abstract.html 
+    java\IandI\override.html
+    
+    
+    java\javaOO\summaryclasses.html
+    java\javaOO\classvars.html 
+    java\javaOO\initial.html 
+    java\javaOO\localclasses.html
+    java\javaOO\methodreferences.html 
+    java\javaOO\nested.html
+    
+    java\nutsandbolts\_keywords.html 
+    包含了关键字
+    java\nutsandbolts\variables.html 
+    java\nutsandbolts\variablesummary.html
+    
+    reflect\class\classNew.html
+    reflect\member\fieldModifiers.html
+    
+    
+    
+# public 和 static 是可以调换的
