@@ -1,0 +1,60 @@
+# Glide 是如何 buildTarget 的
+
+    com.bumptech.glide.Glide#buildImageViewTarget
+    com.bumptech.glide.request.target.ImageViewTargetFactory#buildTarget
+    <R> Target<R> buildImageViewTarget(ImageView imageView, Class<R> transcodedClass) {
+        return imageViewTargetFactory.buildTarget(imageView, transcodedClass);
+    }
+    参数为 GlideDrawable
+    com.bumptech.glide.RequestManager#load(java.lang.String)
+    com.bumptech.glide.RequestManager#fromString
+    com.bumptech.glide.RequestManager#loadGeneric
+    com.bumptech.glide.RequestManager.OptionsApplier#apply
+    此时 apply 的参数为 com.bumptech.glide.DrawableTypeRequest
+    com.bumptech.glide.DrawableTypeRequest#DrawableTypeRequest
+    com.bumptech.glide.DrawableRequestBuilder#DrawableRequestBuilder
+        super(context, modelClass, loadProvider, GlideDrawable.class, glide, requestTracker, lifecycle);
+    
+# Glide 是如何 decode bitmap 的
+
+    在 com.bumptech.glide.load.engine.DecodeJob#decodeSource 中
+    com.bumptech.glide.load.engine.DecodeJob#decodeFromSourceData
+            decoded = loadProvider.getSourceDecoder().decode(data, width, height);
+    com.bumptech.glide.load.resource.gifbitmap.GifBitmapWrapperResourceDecoder#decode(com.bumptech.glide.load.model.ImageVideoWrapper, int, int)
+    com.bumptech.glide.load.resource.gifbitmap.GifBitmapWrapperResourceDecoder#decode(com.bumptech.glide.load.model.ImageVideoWrapper, int, int, byte[])
+    com.bumptech.glide.load.resource.gifbitmap.GifBitmapWrapperResourceDecoder#decodeStream
+    com.bumptech.glide.load.resource.gifbitmap.GifBitmapWrapperResourceDecoder#decodeBitmapWrapper
+    com.bumptech.glide.load.resource.bitmap.ImageVideoBitmapDecoder#decode
+    com.bumptech.glide.load.resource.bitmap.StreamBitmapDecoder#decode
+    com.bumptech.glide.load.resource.bitmap.Downsampler#decode
+    
+            final int[] inDimens = getDimensions(invalidatingStream, bufferedStream, options);
+            final int inWidth = inDimens[0];
+            final int inHeight = inDimens[1];
+
+            final int degreesToRotate = TransformationUtils.getExifOrientationDegrees(orientation);
+            final int sampleSize = getRoundedSampleSize(degreesToRotate, inWidth, inHeight, outWidth, outHeight);
+
+            final Bitmap downsampled =
+                    downsampleWithSize(invalidatingStream, bufferedStream, options, pool, inWidth, inHeight, sampleSize,
+                            decodeFormat);
+
+    com.bumptech.glide.load.resource.bitmap.Downsampler#downsampleWithSize
+    
+    读取资源后，可以通过 com.bumptech.glide.load.resource.bitmap.Downsampler#getDimensions
+    读取出 inWidth 和 inHeight
+    然后 outWidth 和 outHeight 一路传过来
+    根据比值计算 sampleSize ，也就是说 outWidth 小于 inWidth，则可以设置 sampleSize 
+    public static final Downsampler AT_LEAST = new Downsampler() {
+        @Override
+        protected int getSampleSize(int inWidth, int inHeight, int outWidth, int outHeight) {
+            return Math.min(inHeight / outHeight, inWidth / outWidth);
+        }
+
+        @Override
+        public String getId() {
+            return "AT_LEAST.com.bumptech.glide.load.data.bitmap";
+        }
+    };
+    
+    

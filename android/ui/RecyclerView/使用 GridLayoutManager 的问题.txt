@@ -1,0 +1,6 @@
+在使用 GridLayoutManager 时，spanCount 设为 3。  
+然后 recyclerView 的宽度会适应 item 数量，为 1、2 时会相应缩小。
+结果是，当只有 1 个 item 时，recyclerView 宽度缩小了，item 宽度也缩小了只占了 1/3 ，不能充满 recyclerView。  
+检查了一个应该是 GridLayoutManager 计算 padding 的原因，因此在 item 数量小于 3 时，修改 spanCount 即可。
+
+后来还使用了重写 LayoutManager 等方法

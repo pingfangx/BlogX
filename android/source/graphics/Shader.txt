@@ -1,0 +1,13 @@
+# 着色器
+设置给 paint 后，用来从 shader 中获取颜色。
+
+子类有
+* BitmapShader,
+* ComposeShader, 组合
+* LinearGradient, 线性渐变
+* RadialGradient, 径向渐变
+* SweepGradient，扇形扫区渐变
+
+写 demo，已完成
+
+查看调用源码，是原生方法。

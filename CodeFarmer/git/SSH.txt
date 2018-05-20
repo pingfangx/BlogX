@@ -1,0 +1,11 @@
+# 设置用户名及邮箱
+    $ git config --global user.name "xxx"
+    $ git config --global user.email "xxx@xxx.com"
+
+# 生成密钥
+## 查看
+    cd ~/.ssh
+## 生成
+    $ ssh-keygen -t rsa -C "xxx@xxx.com"
+    
+# 在服务器配置

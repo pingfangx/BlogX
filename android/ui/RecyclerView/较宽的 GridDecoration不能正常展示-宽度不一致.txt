@@ -1,0 +1,59 @@
+3个 view 平分 1080，decoration 为 15，2个 decoration 为 30  
+手动设置 item 的宽为 350=(1080-15-15)/3，但是绘制出错  
+分析下面的代码，其认为第二个 item 为 350+15，于是认为整体为 1095，导致绘制出错
+
+也就是说，必须每个 item 的宽度加 decoration 相等才能正常绘制  
+于是修改为每一个 item 的 decoration 的左右各为分隔线宽度的一半
+但是这会导致第一列左边也有间距，如果想去掉，可以考虑设置第一列 left 为 0，right 为 2/3
+中间列 left 和 right 为 1/3
+
+分析绘制过程
+
+    在 android.support.v7.widget.GridLayoutManager#layoutChunk
+    layoutDecoratedWithMargins(view, left, top, right, bottom);
+    此时的 left 和 right 不正确
+    
+    往上是由 mCachedBorders 提供的，
+    查看 mCachedBorders 的计算过程
+    private void calculateItemBorders(int totalSpace) {
+        mCachedBorders = calculateItemBorders(mCachedBorders, mSpanCount, totalSpace);
+    }
+    
+    调用为
+    private void guessMeasurement(float maxSizeInOther, int currentOtherDirSize) {
+        final int contentSize = Math.round(maxSizeInOther * mSpanCount);
+        // always re-calculate because borders were stretched during the fill
+        calculateItemBorders(Math.max(contentSize, currentOtherDirSize));
+    }
+    
+    此时传的 maxSizeInOther 不正确
+    调用为
+    android.support.v7.widget.GridLayoutManager#layoutChunk
+    
+        for (int i = 0; i < count; i++) {
+            ...
+            final float otherSize = 1f * mOrientationHelper.getDecoratedMeasurementInOther(view)
+                    / lp.mSpanSize;
+            if (otherSize > maxSizeInOther) {
+                maxSizeInOther = otherSize;
+            }
+        }
+        if (flexibleInOtherDir) {
+            // re-distribute columns
+            guessMeasurement(maxSizeInOther, currentOtherDirSize);
+            ...
+        }
+    
+    android.support.v7.widget.OrientationHelper#getDecoratedMeasurementInOther
+            public int getDecoratedMeasurementInOther(View view) {
+                final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams)
+                        view.getLayoutParams();
+                return mLayoutManager.getDecoratedMeasuredWidth(view) + params.leftMargin
+                        + params.rightMargin;
+            }
+
+    android.support.v7.widget.RecyclerView.LayoutManager#getDecoratedMeasuredWidth
+        public int getDecoratedMeasuredWidth(View child) {
+            final Rect insets = ((LayoutParams) child.getLayoutParams()).mDecorInsets;
+            return child.getMeasuredWidth() + insets.left + insets.right;
+        }

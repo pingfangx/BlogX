@@ -1,0 +1,17 @@
+显示大图时
+
+开启硬件加速时  
+W/OpenGLRenderer: Bitmap too large to be uploaded into a texture (750x10505, max=8192x8192)
+
+开启软件加速时  
+AppCompatImageView not displayed because it is too large to fit into a software layer (or drawing cache), needs 108432000 bytes, only 14745600 available
+
+不开时  
+Bitmap too large to be uploaded into a texture (750x10505, max=8192x8192)
+
+查看原图，京东是用 webveiw 展示  
+而且 webveiw 中也是加载的多张图。
+
+
+要解决这个问题，还是需要手动指定 sampleSize ，参见  
+Glide 是如何 decode bitmap 的

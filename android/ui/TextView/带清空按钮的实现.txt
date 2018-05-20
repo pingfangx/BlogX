@@ -1,0 +1,12 @@
+# 使用 DrawableRight
+隐藏清空按钮时将其设置为 null  
+不足：  
+如果需要 drawableRight 时将被占用，如显示密码的小眼睛  
+如果设置 Gravity 居中，则不显示时与显示时，文字会因为 drawableRight 是否显示而移动。
+
+# 使用布局
+隐藏清空按钮时，将其设置为 INVISIBLE
+不足：  
+无法直接使用 TextView 的相关属性和方法。
+
+# 自定义 view 手动绘制上去。

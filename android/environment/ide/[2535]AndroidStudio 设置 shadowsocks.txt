@@ -1,0 +1,9 @@
+因为要下载 sample ，折腾了半天。
+
+①打开 shadowsocks ，不用设置正向代理（设置了反而上不了网了）
+
+File > Settings > Appearance & Behavior > System Settings > HTTP Proxy
+
+②选择 Manual proxy configuration （如果是 Auto-detect proxy settings 不行）  
+③选择 HTTP （SOCKS 不行）  
+④ 127.0.0.1 1080 （1087不行）

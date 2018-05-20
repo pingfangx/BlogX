@@ -1,0 +1,48 @@
+可以使用相关方法，其类在
+org.jetbrains.java.generate.element.AbstractElement
+com.intellij.openapi.util.text.StringUtil
+type 和 typeName 分别为
+java.lang.Integer
+Integer
+
+
+    ##-----修饰符 static-----
+    #if($field.modifierStatic)
+    static ##
+    #end
+    ##-----设置为 typeName-----
+    #set($type=$field.typeName)
+    ##-----判断 Integer 或者 Long-----
+    #if ($type=="Integer")
+    #set($type="int")
+    #set($modify=true)
+    #elseif($type=="Long")
+    #set($type="long")
+    #set($modify=true)
+    #else
+    ##-----这里取 type，与上面的 typeName 不同-----
+    #set($type=$field.type)
+    #set($modify=false)
+    #end
+    ##-----输出 type-----
+    ${type}##
+    ##-----设置名字-----
+    #set($name = $StringUtil.capitalizeWithJavaBeanConvention($StringUtil.sanitizeJavaIdentifier($helper.getPropertyName($field, $project))))
+    ##-----输出 is 或 get-----
+    #if ($field.boolean && $field.primitive)
+      is##
+    #else
+      get##
+    #end
+    ##-----输出名字-----
+    ${name}##
+    ##-----根据是否修改输出不同 return-----
+    #if ($modify)
+    OrZero() {
+      return $field.name == null ? 0 : $field.name;
+    }
+    #else
+    () {
+      return $field.name;
+    }
+    #end

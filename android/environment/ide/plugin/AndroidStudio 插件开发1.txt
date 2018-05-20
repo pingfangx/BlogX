@@ -1,0 +1,154 @@
+完成这个系列，想对插件开发有所了解。
+
+Q:
+* 插件开发的官方文档在哪里
+* 学习相关插件
+* 完成一个简单插件，修改输入时的状态（有现成插件）
+* 完成一个简单插件，可以重命名文件
+* 完成一个简单~~插件~~(库)，实现 BindView （参照 ButterKnife）
+* 完成一个简单~~插件~~(库)，用于构建时处理
+
+一开始我好像有什么不得了的误会，以为类似 ButterKnife 是一个插件。  
+学习了插件开发以后，咦，好像哪里不对劲。T_T
+
+# 0x01 开发文档
+[Plugin Development Guidelines](https://www.jetbrains.com/help/idea/plugin-development-guidelines.html)  
+[IntelliJ Platform SDK DevGuide](http://www.jetbrains.org/intellij/sdk/docs/welcome.html)  
+[学会编写Android Studio插件 别停留在用的程度了](https://blog.csdn.net/lmj623565791/article/details/51548272)  
+
+## Demo
+* 一个安装的 IntelliJIDEA 充当一个 SDK  
+* 创建时选择 Gradle, IntelliJ Platform Plugin
+* 构建时，居然要下载 ideaIC-2018.1.1.zip，啊，为什么……
+* 新建一个 Action 
+* 在 xml 中注册
+* 运行 runIdea
+
+# 0x02 学习插件 activate-power-mode
+[ViceFantasyPlace/activate-power-mode](https://github.com/ViceFantasyPlace/activate-power-mode)  
+震动和粒子散发效果
+
+## 注册
+在 plugin.xml 中注册了 component 
+
+
+    <application-components>
+        <component>
+            <implementation-class>com.jiyuanime.ActivatePowerModeApplicationPlugin
+            </implementation-class>
+        </component>
+    </application-components>
+
+## 初始化
+实现 ApplicationComponent，在 initComponent 中获取 ProjectManager 并注册临听
+
+    @Override
+    public void initComponent() {
+        ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerAdapter() {
+            @Override
+            public void projectOpened(Project project) {
+                if (state.IS_ENABLE)
+                    ActivatePowerModeManage.getInstance().init(project);
+                super.projectOpened(project);
+            }
+            ...
+        });
+    }
+
+    com.jiyuanime.ActivatePowerModeManage#init
+    转到
+    com.jiyuanime.ActivatePowerModeManage#initDocument
+    添加监听
+    com.intellij.openapi.editor.Document#addDocumentListener(com.intellij.openapi.editor.event.DocumentListener)
+    com.jiyuanime.listener.ActivatePowerDocumentListener#beforeDocumentChange
+    com.jiyuanime.listener.ActivatePowerDocumentListener#handleActivatePower
+## 处理事件
+    com.jiyuanime.listener.ActivatePowerDocumentListener#handleActivatePower
+    com.jiyuanime.ActivatePowerModeManage#resetEditor
+    com.jiyuanime.ActivatePowerModeManage#initEditor        
+        private void initEditor(Editor editor) {
+            if (editor != null) {
+                initShake(editor.getComponent());
+                initParticle(editor.getContentComponent());
+            }
+        }
+    com.jiyuanime.ActivatePowerModeManage#initParticle
+    com.jiyuanime.particle.ParticlePanel#reset
+    com.jiyuanime.particle.ParticlePanel#setEnableAction
+        //启动了线程，后面粒子中会用到
+        mPThread.start();
+## 震动
+
+    public void shake() {
+        if (isEnable) {
+            isShaking = true;
+
+            int x = shakeIntensity(SHAKE_MIN, SHAKE_MAX);
+            int y = shakeIntensity(SHAKE_MIN, SHAKE_MAX);
+
+            if (mTimer != null) {
+                mTimer.schedule(new TimerTask() {
+                    public void run() {
+                        try {
+                            SwingUtilities.invokeLater(new ChangingLocationOfComponent(mNowEditorJComponent, x, y));
+                            Thread.sleep(75);
+                            SwingUtilities.invokeLater(new ChangingLocationOfComponent(mNowEditorJComponent, 0, 0));
+                            isShaking = false;
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, 1);
+            }
+        } else {
+            System.out.println("还没初始化 ShakeManager");
+        }
+
+    }
+    
+    private class ChangingLocationOfComponent implements Runnable {
+        private final JComponent target;
+        private final Pair<Integer, Integer> location;
+
+        ChangingLocationOfComponent(JComponent component, int x, int y) {
+            target = component;
+            location = new Pair<>(x, y);
+        }
+
+        @Override
+        public void run() {
+            if (target != null) {
+                target.setLocation(location.getFirst(), location.getSecond());
+            }
+        }
+    }
+
+## 粒子
+粒子容器 ParticlePanel，实现了 Runnable ，在初始化时会启动线程
+在 run 方法中遍历 mParticleViews  
+调用 com.jiyuanime.particle.ParticleView#update
+粒子 ParticleView
+
+## action config 等
+需要时可以再学习
+
+
+# 0x03 学习插件 backgroundImagePlus
+[backgroundImagePlus](https://github.com/lachlankrautz/backgroundImagePlus)  
+设置背景图片
+
+这个插件非常有意思啊。
+因为，它注册的 Action 是 org.intellij.images.editor.actions.SetBackgroundImageAction  
+是系统的，什么？系统自带的吗？
+查找操作 set background image 果然是有的，厉害了……
+
+# 0x04 完成一个插件，输入时的震动效果
+## 思路
+获取到当前编辑器，修改它的位置。
+
+# 0x05 完成一个插件，可以重命名文件
+需求：UI 会给一些图，每次使用时需要
+1. 重命名为项目所需的文件名（可能需要选中要替换的文件，然后复制它的名字）
+2. 移动到项目中（可能会替换原文件）
+3. 原文件可能需要重命名回云（因为使用了版本控制，不想生成更改）
+

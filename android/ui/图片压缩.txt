@@ -1,0 +1,31 @@
+[NeilZhang《android图片压缩总结》](https://www.cnblogs.com/NeilZhang/p/7763206.html)  
+[静心Study 《Android Study 之聊聊关于图片压缩那点事儿》](http://www.apkbus.com/blog-904057-68356.html)  
+[《Android的图片压缩处理速度与压缩质量问题？》](https://www.zhihu.com/question/30118200)  
+
+# bitmap 占用内存
+长 * 宽 * 每像素占用字节数
+
+
+每像素占用字节数与 [Bitmap.Config](https://developer.android.google.cn/reference/android/graphics/Bitmap.Config.html) 
+有关，可以用来减少加载时的内存消耗。
+
+# BitmapFactory.decodeFile
+[BitmapFactory](https://developer.android.google.cn/reference/android/graphics/BitmapFactory.html)  
+[BitmapFactory.Options](https://developer.android.google.cn/reference/android/graphics/BitmapFactory.Options.html)
+
+通过设置 inJustDecodeBounds ，然后获取图片的宽高。  
+根据宽高计算 inSampleSize ，从而缩小图片大小。  
+通过设置 inPreferredConfig 也减小占用内存大小。  
+最后解析出一个 bitmap  
+
+
+## Q：这里为什么不直接通过 outWidth 指定宽高呢  
+因为设置了无效，一定是我打开文档的方式不正确……
+## Q:根据文档，inSampleSize 的取值应该是 2 的幂，为什么传了 3 却是按 3 来解析的呢？  
+1080*1920 的图片  
+解析后为 3456*4608
+传了 inSampleSize=3，结果为 1152*1536
+
+
+# Bitmap.compress
+压缩

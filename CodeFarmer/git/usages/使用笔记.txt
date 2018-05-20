@@ -33,4 +33,11 @@ git clone --dissociate --reference "LOCAL_PATH" REP_PATH
     如果未指定 <upstream>，则配置在 branch.<name>.remote 和 branch.<name>.merge 选项(详见 git-config[1] ) 中的 upstream 将被使用，并假定 --fork-point 选项。如果您当前不在任何分支上，或者如果当前分支没有配置上游，则 rebase 将中止。
     
 # 如何删除第一个提交
-git rebase -i --root
+git rebase -i --root    
+    
+    
+# gitlab clone 较大的项目时失败 502
+使用 https 下载超时了,换用 ssh 后成功.
+
+# ssh 和 https 如何切换
+修改 config 文件即可
