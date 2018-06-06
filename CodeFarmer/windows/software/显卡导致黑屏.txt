@@ -1,0 +1,27 @@
+# 更新独立显卡后，开启蓝屏
+
+displaylink manager和LOL新版客户端不兼容
+Oray display mirror driver
+还有一个好像是华硕的驱动
+反正卸载了这3个终于能装最新版的驱动了。
+
+# 亮度调节无效
+更新最新驱动，无效
+360禁用取消，无效
+装电源驱动，无效
+
+卸载核显，系统会黑屏，然后自动重新安装一个。
+可能安装的是 9.18.10.3055，无效
+用 360 检查更新，安装 10.18.10.3277，无效
+后来从官方下载了 8.15.19.2598，终于好了。
+
+# 安装华硕显卡
+安装后依然黑屏，因为与核显 8.15.19.2598 冲突， 报错为 Dlkmd.sys  
+[How To Fix Dlkmd.sys Blue Screen Errors (BSOD)](https://www.solvusoft.com/en/files/bsod-blue-screen-error/sys/windows/displaylink-corp/displaylink-core-software-v6-3-40660-0/dlkmd-sys/)  
+
+但是安全模式无法卸载，于是直接删除 Dlkmd.sys 重启成功。  
+升级核显为 10.18.10.3277 ，华硕驱动安装成功，但是无法调节亮度。
+
+软件
+Gamma Panel
+[dot-osk/monitor_ctrl](https://github.com/dot-osk/monitor_ctrl)
