@@ -1,0 +1,29 @@
+[PEP 263 -- Defining Python Source Code Encodings](https://www.python.org/dev/peps/pep-0263/)
+
+[PEP 3120 -- Using UTF-8 as the default source encoding](https://www.python.org/dev/peps/pep-3120/)
+
+# 定义
+Python will default to ASCII as standard encoding if no other encoding hints are given.
+
+To define a source code encoding, a magic comment must be placed into the source files either as first or second line in the file, such as:
+
+    # coding=<encoding name>
+or (using formats recognized by popular editors):
+
+    #!/usr/bin/python
+    # -*- coding: <encoding name> -*-
+or:
+
+    #!/usr/bin/python
+    # vim: set fileencoding=<encoding name> :
+More precisely, the first or second line must match the following regular expression:
+
+    ^[ \t\v]*#.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)
+    
+# 默认
+> This PEP proposes to change the default source encoding from ASCII to UTF-8. Support for alternative source encodings [1] continues to exist; an explicit encoding declaration takes precedence over the default.
+
+因此，最终决定不要求文件定义编码，维持默认的即可。
+
+但要注意的问题，之前使用 jython 在 java 中加载 python，其是 python 2 的。  
+需要显示申明编码为 utf-8，否则会出错。

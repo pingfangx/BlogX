@@ -66,7 +66,8 @@ gradle init
 
 ## Gradle Build Language Reference
 ## Improving the Performance of Gradle Builds
-
+## Dependency Management
+### Managing Transitive Dependencies
 
 # 0x03 Gradle Wrapper
 [The Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html)  

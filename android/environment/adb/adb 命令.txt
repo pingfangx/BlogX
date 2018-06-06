@@ -1,0 +1,28 @@
+[官方 adb 文档](https://developer.android.com/studio/command-line/adb?hl=zh-cn)
+
+    adb shell ls /system/bin
+    
+    >adb shell input
+    Usage: input [<source>] <command> [<arg>...]
+
+    The sources are:
+          dpad
+          keyboard
+          mouse
+          touchpad
+          gamepad
+          touchnavigation
+          joystick
+          touchscreen
+          stylus
+          trackball
+
+    The commands and default sources are:
+          text <string> (Default: touchscreen)
+          keyevent [--longpress] <key code number or name> ... (Default: keyboard)
+          tap <x> <y> (Default: touchscreen)
+          swipe <x1> <y1> <x2> <y2> [duration(ms)] (Default: touchscreen)
+          draganddrop <x1> <y1> <x2> <y2> [duration(ms)] (Default: touchscreen)
+          press (Default: trackball)
+          roll <dx> <dy> (Default: trackball)
+          tmode <tmode>

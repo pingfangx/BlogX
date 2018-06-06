@@ -1,0 +1,14 @@
+https://www.zhihu.com/question/47184512
+
+>由于python3字符串采用utf8编码，cv2.imread将utf8当作本地码(如GBK)，这个问题无解了。  
+Python 2.7可以用decode/encode的方法（包括崔鸣浩用的默认GBK编码）解决，此方法在Python 3中已不能用了。  
+可以采用以下方法代替
+
+    # imread
+    img = cv2.imdecode(np.fromfile('unicode_path', dtype=np.uint8), flags)
+    # imwrite
+    cv2.imencode('.jpg', img)[1].tofile('unicode_path')
+    imencode/imdecode包含了imwrite/imread的参数
+
+作者：冯卡门  
+链接：https://www.zhihu.com/question/47184512/answer/129381203

@@ -15,7 +15,7 @@ if exist %dll_back% (
     echo ´æÔÚ%dll_back%
 ) else (
     echo ²»´æÔÚ %dll_back%
-    go stop
+    goto stop
 )
 
 if exist %dll% (

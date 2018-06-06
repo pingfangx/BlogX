@@ -1,0 +1,166 @@
+# 0x01 场景
+用于 h5 通过地址打开 app 内指定页面
+
+* web 页面内跳转时，如 h5 页面调用跳转  
+shouldOverrideUrlLoading 中处理
+* web 打开网页时，如广告跳转、功能图标跳转  
+initialize 中直接处理
+* 外部打开 llb:// 时，如自带浏览器打开指定地址  
+WelcomeActivity 中处理
+
+# 0x02 规则
+## scheme
+必须为 llb
+
+## host
+用于指定 Activity 名  
+可以省略前面的 `com.cloudy.linglingbang.activity.`  
+可以省略后面的 Activity，但是如果后面是 Activity2 之类的，则无法省略，代码中使用 contains 判断是否需要补全
+
+    如 llb://Home
+    补全为 com.cloudy.linglingbang.activity.HomeActivity
+    
+    llb://vhall.watch.WatchWebActivity2/850949628
+    补全为 com.cloudy.linglingbang.activity.vhall.watch.WatchWebActivity2
+
+## path
+用于解析参数  
+拆分为 path segments  
+如果数量为奇数，则将第一个 segment 设为通用参数（名字为 INTENT_EXTRA_COMMON）  
+奇数剩余部分及偶数所有部分，按 key/value 成对设置参数
+
+    如 llb://vhall.watch.WatchActivity2/850949628/type/2
+    解析后为 {"INTENT_EXTRA_COMMON":"850949628","type":"2"}
+
+## query
+用于解析参数  
+以 key/value 设置
+
+    如 llb://store.CarStyle?carTypeId=68&shopId=-1
+
+# 0x03 示例
+
+       打开 app 首页
+       llb://Home
+      
+       1.打开某个帖子页面
+       llb://community.post.PostDetail?postId=10001
+      
+       2.打开某个社区页面
+       llb://community.CommunityDetail?channelId=306
+      
+       3.打开某个车友会页面
+       llb://club.CarClubDetail?channelId=1120
+      
+       4.打开福利社
+       llb://welfare.WelfareHome
+      
+       5.打开某个福利社商品页面
+       llb://welfare.CommodityWeb/17
+      
+       6.打开某个车款详情页
+       llb://store.CarStyle?carTypeId=68&shopId=-1
+      
+       7.原生看直播
+       llb://vhall.watch.WatchActivity2/850949628/type/2
+       type/1 为直播 type/2 为回放
+      
+       8.H5看直播
+       llb://vhall.watch.WatchWebActivity2/850949628
+      
+       9.技师主页
+       llb://user.UserInfo/MTE1MjIzNg==
+       
+
+# 0x04 注意
+传参时，如果只有一个**通用**参数，应该用 path 的形式  
+如果有多个参数，则 path 、 query 都可以。
+
+接参时，因为传的是 String ，如果要接为 long 注意使用 getOrParseIntentLongExtra 方法。
+
+# 0x05 相关代码
+    
+    manifest 注册
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="llb" />
+            </intent-filter>
+            
+    activity 解析
+    private boolean parseIntentUri() {
+        Intent originalIntent = getIntent();
+        if (originalIntent == null) {
+            return false;
+        }
+
+        String action = originalIntent.getAction();
+        if (!Intent.ACTION_VIEW.equals(action)) {
+            return false;
+        }
+
+        Uri uri = originalIntent.getData();
+        if (uri == null) {
+            return false;
+        }
+
+        String host = uri.getHost();
+        if (TextUtils.isEmpty(host)) {
+            return false;
+        }
+        //①补全包名
+        //补全前面的包名，这里要写死，不能使用 getPackageName()
+        String activityPackage = "com.cloudy.linglingbang.activity.";
+        if (!host.startsWith(activityPackage)) {
+            host = activityPackage + host;
+        }
+
+        //补全后面的 Activity
+        String suffix = "Activity";
+        //用 contains 有时候可能会添加 New 、2 等
+        if (!host.contains(suffix)) {
+            host += suffix;
+        }
+
+        Intent startIntent = new Intent();
+        startIntent.setClassName(this, host);
+
+        //②解析参数
+        //解析 path
+        List<String> pathSegments = uri.getPathSegments();
+        if (pathSegments != null) {
+            int size = pathSegments.size();
+            if (size > 0) {
+                int offset = 0;
+                if (size % 2 == 1) {
+                    //为奇数，第一个保存为 common ，偏移 1
+                    startIntent.putExtra(IntentUtils.INTENT_EXTRA_COMMON, pathSegments.get(0));
+                    offset = 1;
+                }
+                for (int i = offset; i + 1 < size; i += 2) {
+                    startIntent.putExtra(pathSegments.get(i), pathSegments.get(i + 1));
+                }
+            }
+        }
+        //解析 query
+        Set<String> queryParameterNames = uri.getQueryParameterNames();
+        if (queryParameterNames != null) {
+            for (String queryParameterName : queryParameterNames) {
+                startIntent.putExtra(queryParameterName, uri.getQueryParameter(queryParameterName));
+            }
+        }
+
+        try {
+            //使返回时回到首页
+            //从外部调起，默认为 true ，从 app 内跳转，传值 false
+            boolean isFromNotify = originalIntent.getBooleanExtra(ConfigConstant.IS_FROM_NOTIFY, true);
+            startIntent.putExtra(ConfigConstant.IS_FROM_NOTIFY, isFromNotify);
+            startActivity(startIntent);
+            return true;
+        } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }

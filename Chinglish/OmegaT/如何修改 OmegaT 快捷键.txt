@@ -1,0 +1,51 @@
+因为总是用到 Register Identical Translation   
+ctrl shift E
+
+# 想要修改，查看帮助
+```
+1. 自定义快捷键
+在主菜单中的大部分菜单项可设置新的快捷键。通过 OmegaT 首选项文件夹（请参阅用户文件位置）中的快捷键定义文件，您可改变已分配的快捷键或添加新的快捷键。
+
+快捷键定义文件名称必须为 MainMenuShortcuts.properties，同时每行最多包含一个快捷键的定义。可接受空行，而注释行应以 "//" 开头。在 "//" 后的所有内容将被忽略。
+
+修改 MainMenuShortcuts.properties 文件后，必须重新运行 OmegaT 才能让新的快捷键生效。
+
+快捷键定义的语法如下：<menu item code>=<shortcut>，其中<menu item code>取自下表，而<shortcut>是用户指定的按键组合[2].
+
+<shortcut>必须为下面的形式：0或多个<modifier>后跟着0或1个<event>后跟着1个<key>，其中：
+
+<modifier> 可以为：shift, control, ctrl, meta[3], alt, altGraph
+
+<event> 可以为：typed, pressed, released
+
+而 <key> 可以为您键盘上有效的任何键。[4].
+
+例如，缺省的OmegaT快捷键[5]，其中可以看到：
+
+projectOpenMenuItem=ctrl O
+
+editCreateGlossaryEntryMenuItem=ctrl shift G
+
+第一个是打开项目的快捷键，第二个为创建词汇表条目。
+
+如果想用Shift+Ctrl+O来打开项目，请把MainMenuShortcuts.properties修改成这样：
+
+projectOpenMenuItem=shift ctrl O.
+
+如果您用Mac且想设置Shift+Command+S为工具 → 统计的快捷方式，请在MainMenuShortcuts.properties中添加此行：
+
+toolsShowStatisticsStandardMenuItem=shift meta S
+
+然后保存文件并重新启动OmegaT。现在新的快捷键应该出现在刚修改的菜单项旁边。不会和系统快捷键冲突的话，它们在OmegaT中应该有效了。
+```
+
+# 文件
+"C:\Users\Admin\AppData\Roaming\OmegaT\MainMenuShortcuts.properties"
+
+# 缺省的 OmegaT 快捷键
+org/omegat/gui/main/MainMenuShortcuts.properties
+
+# 修改
+因为想改的被 editInsertTranslationMenuItem 占用了，  
+需要将 editInsertTranslationMenuItem 修改为别的  
+再 editRegisterIdenticalMenuItem=ctrl I

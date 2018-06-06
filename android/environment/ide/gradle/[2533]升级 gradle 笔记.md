@@ -12,9 +12,9 @@ gradle-wrapper 中升级为 gradle-4.4-all.zip
 Android SDK Build Tools 27.0.3 will be used.
 To suppress this warning, remove "buildToolsVersion '26.0.3'" from your build.gradle file, as each version of the Android Gradle Plugin now has a default version of the build tools.
 
-## compileSdkVersion 升级为 27（后降回 26）
+## compileSdkVersion 升级为 27
 
-## androidSupportVersion 升级为 27.1.1 （后来有问题降回 26.1.0）
+## androidSupportVersion 升级为 27.1.1 
 >This support library should not use a different version (26) than the compileSdkVersion (27) (Ctrl+F1)   
 There are some combinations of libraries, or tools and libraries, that are incompatible, or can lead to bugs. One such incompatibility is compiling with a version of the Android support libraries that is not the latest version (or in particular, a version lower than your targetSdkVersion).
 
@@ -24,10 +24,17 @@ There are some combinations of libraries, or tools and libraries, that are incom
 但是修改后
 >Program type already present: android.support.v4.view.ViewPager$ViewPositionComparator    
 
-原因是 support-core-ui 和 support-v4-24.3 中都有  
+原因是 support-core-ui 和 support-v4-23.4 中都有  
 查找未找到失用，降回 26.1.0 后，发现 support-v4-26.1.0 中为空，并没有别的文件。
 
-后来学习了 gradle 后使用 :app:dependencies 命令知道是七鱼客服使用的，又是它！
+后来学习了 gradle 后使用 :app:dependencies 命令知道是七鱼客服使用的，又是它！  
+于是使用 exclude 进行排除
+
+
+    implementation('com.qiyukf.unicorn:unicorn:3.11.1') {
+        //因为有冲突，将其 exclude
+        exclude module: 'support-v4'
+    }
 
 # 2 app 中 build.gradle 的修改
 ## output.outputFile 改为 outputFileName

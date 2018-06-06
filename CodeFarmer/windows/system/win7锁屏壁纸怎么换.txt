@@ -1,0 +1,12 @@
+3 个步骤
+# 0x01 注册表
+    HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\Background
+将 OEMBackground 修改为 1
+
+# 0x02 组策略编辑器
+gpedit.msc  
+计算机配置-管理模块-系统-登录  
+将 始终使用自定义登录背景 改为已启用
+
+# 0x03 图片
+    C:\Windows\System32\oobe\info\backgrounds\backgroundDefault.jpg

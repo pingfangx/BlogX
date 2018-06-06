@@ -1,0 +1,17 @@
+设置了谷歌搜索结果为中文+英文，有时候只想要英文，怎么办呢。
+
+[Google Web Interface and Search Language Codes](https://sites.google.com/site/tomihasa/google-language-codes#searchlanguage)
+
+# 可以拼接 hl=en 或者 lr=lang_en
+lr=lang_en 有效
+
+# 那么 hl 和 lr 分别表示什么呢？（理解后方便记忆）
+## host language
+## language restrict
+[What does hl stand for?](https://stackoverflow.com/a/14271777)
+> It stands for "host language", according to [this page](https://developers.google.com/custom-search/docs/xml_results?hl=en#WebSearch_Query_Parameter_Definitions)
+
+[Request Parameters](https://developers.google.com/custom-search/docs/xml_results?hl=en#request-parameters)
+> The hl parameter specifies the interface language (host language) of your user interface. 
+
+> The lr (language restrict) parameter restricts search results to documents written in a particular language.

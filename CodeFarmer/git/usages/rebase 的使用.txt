@@ -6,4 +6,4 @@
     git rebase --continue | --skip | --abort | --quit | --edit-todo
     
 * git rebase --onto <newbase> <upstream> <branch>
-将 <branch> 分支，从 <upstream> 开始的提交，rebase 到 newbase 上。
+将 <branch> 分支，从 <upstream> （不包含）开始的提交，rebase 到 newbase 上。

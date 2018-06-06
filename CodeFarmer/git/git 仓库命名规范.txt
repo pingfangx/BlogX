@@ -1,0 +1,7 @@
+想汉化一下《The Java™ Tutorials》，在给仓库命名的时候纠结了。  
+看了很多中文版仓库的命名，想命名为 Java-Tutorials-in-Chinese  
+但是为什么很多仓库都是小写呢，我想命名为大写的 Chinese 啊，(←_←)  
+然后查了一下  
+[Is there a naming convention for git repositories?](https://stackoverflow.com/questions/11947587)
+
+决定遵循  lowercase-with-hyphens
