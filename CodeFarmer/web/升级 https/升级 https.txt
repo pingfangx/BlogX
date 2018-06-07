@@ -1,0 +1,11 @@
+因为要将网站升级为 https （主要还是小程序强制 API 必须为 https 的促进）  
+几经周折差不多完成了，作完整的记录。
+
+1. https 相关知识  
+    网站是可以与 http 共存的
+2. 证书的购买与配置
+    localhost 的配置失败
+3. discuz 的 https 升级  
+    .htaccess 的配置  
+    相关文件的修改  
+    跨域 iframe js 图片的修改

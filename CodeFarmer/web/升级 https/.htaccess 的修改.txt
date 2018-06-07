@@ -1,0 +1,77 @@
+特别注意的是，如果修改导致解析失败了  
+再次修改后要清除一下缓存，否则还有可能是失败。
+
+TODO
+
+
+# blog 转为 www
+因为 blog 没有配置 https，所以需要将  
+blog.pingfangx.com 转到 www.pingfangx.com/blog
+
+一开始直接转到 forum 的地址，但是地址很不友好
+
+后来转为 /blog 好了，/blog 再由后续规则转到 forum
+
+# http 转 https
+一开始搜的 [apache配置.htaccess使http转向https](https://segmentfault.com/q/1010000008346752)
+
+    RewriteCond %{SERVER_PORT} !^443$
+    RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [L,R]
+
+    以及
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    和
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+
+都不行，后来看的
+[部署https(ssl)后设置301跳转将http跳转到https](http://www.zgwen.net/faq/list.asp?unid=475)
+
+    RewriteCond %{HTTP:From-Https} !^on$ [NC]
+    RewriteCond %{HTTP_HOST} ^(www.)?abc.com$ [NC]                
+    #将abc.com和www.abc.com跳转到https://www.abc.com,防止apache子站继承上级目录.htaccess受影响
+    RewriteRule ^(.*)$ https://www.abc.com$1 [R=301,L]
+    
+    以及看到
+    #RewriteCond  %{HTTPS} !^on$ [NC]                      
+    # 非亚数机房用这一行替换上一行规则
+但是不能实现 blog 转 /blog ，/blog 再转为 https 不知为什么。
+
+判断 https ，在我这里，只有第4种方式有用
+
+    RewriteCond %{SERVER_PORT} !^443$
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTPS} !=on
+    #RewriteCond  %{HTTPS} !^on$
+    
+跳转
+    RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [L,R]
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    RewriteRule ^(.*)$ https://www.abc.com$1 [R=301,L]
+    
+其中 $1 的
+会导致
+http://www.pingfangx.com/forum.php/?mod=redirect&tid=2532&goto=lastpost
+https://www.pingfangx.comforum.php/?mod=redirect&tid=2532&goto=lastpost
+
+
+    RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [L,R]
+    http://www.pingfangx.com
+    https://www.pingfangx.com
+    
+    以及
+    
+    
+    http://www.pingfangx.com/space-username-%25E5%25B9%25B3%25E6%2596%25B9X.html
+    
+    https://www.pingfangx.com/space-username-%E5%B9%B3%E6%96%B9X.html?mod=space&username=%E5%B9%B3%E6%96%B9X
+    
+之前甚至想用
+RewriteRule ^/?topic-(.+)\.html$ /portal.php?mod=topic&topic=$1&%1
+
+RewriteRule ^topic-(.+)\.html$ portal.php?mod=topic&topic=$1&%1    
+
+不过最后将 http 转 https 的放到 discuz 的之前就好。  
+但是之前提前过，有问题（难道是没清缓存？）

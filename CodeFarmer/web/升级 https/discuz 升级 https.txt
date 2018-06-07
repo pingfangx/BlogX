@@ -1,0 +1,95 @@
+[向上的葱子《史上最全！discuz X3.2开启https的教程》](http://www.discuz.net/thread-3798634-1-1.html)
+
+
+
+# 1 修改相关文件
+## discuz_application.php  
+
+		$_G['isHTTPS'] = ($_SERVER['HTTPS'] && strtolower($_SERVER['HTTPS']) != 'off') ? true : false;
+		$_G['siteurl'] = dhtmlspecialchars('http'.($_G['isHTTPS'] ? 's' : '').'://'.$_SERVER['HTTP_HOST'].$sitepath.'/');
+
+这个用来好多地方都会使用，如
+
+    <base href="{$_G['siteurl']}" />
+可以直接修改为 true ，也可以判断端口
+
+    $_G['isHTTPS']=true
+    或
+    $_SERVER['SERVER_PORT'] == 443 ||
+
+
+
+
+## uc_server/avatar.php
+这个用来获取用户的头像，
+
+    define('UC_API', strtolower(($_SERVER['HTTPS'] == 'on' ? 'https' : 'http').'://'.$_SERVER['HTTP_HOST'].substr($_SERVER['PHP_SELF'], 0, strrpos($_SERVER['PHP_SELF'], '/'))));
+
+修改为判断端口号
+
+    $_SERVER['SERVER_PORT'] == 443 || $_SERVER['HTTPS'] == 'on'
+但是却还是不能展示，打开发现请求的网址为
+https://www.pingfangx.com/uc_server/avatar.php?uid=10001&size=small
+然后跳转为
+https://www.pingfangx.comuc_server/images/noavatar_small.gif
+
+又是解析的锅，但是这一次跳转是在代码中完成的  
+直接在正式服务器输出 log ，发现跳转了http://www.pingfangx.com/uc_server/images/noavatar_small.gif
+然后由于 http 转 https 丢失了 / （TODO 为什么）
+
+输出发现，前面判断端口时，值是 80 ？？？难道是因为配置 https 时设置端口没有配置正确？？？
+直接改为 https ，成功
+
+
+# 2 将相关 http 的 js 图片等修改为 https
+## php 文件中加载的 js
+source\plugin\manyou\Service\DiscuzTips.php
+source\plugin\pcmgr_url_safeguard\pcmgr_url_safeguard.class.php
+
+### getdzjs 和 filter
+前面加载的插件可能是腾讯安全之类的  
+pcmgr_url_safeguard 中加载了 getdzjs  
+但将 getdzjs 改为 https 后，加载仍是失败  
+filter.js 则是根本找不到在哪里加载的，也找不到在哪里修改。  
+后来才发现是由前者跳转到了后者，难怪找不到
+
+    https://openapi.guanjia.qq.com/fcgi-bin/getdzjs?cmd=urlquery_utf-8_zh_cn
+
+    http://s.pc.qq.com/discuz/js/filter.js
+
+
+
+## 修改模板中的 http 的使用
+有一部分写死的 http ，进行修改
+> 主要在模板的 foot.html 以及 header.html 等文件中，使用工具逐一排查模板文件中写死的 HTTP 链接，修改为 HTTPS 。
+
+顺便改了下年份 TODO
+
+## 站点 logo
+界面 > 风格管理 > 编辑 > 站点 Logo  
+相对 static/image/common/ 路径
+
+## 修改引用的图片
+因为之前用的七牛的，因为只提供 http ，https 要花钱，于是换回自己的
+
+## 修改自己使用的 tp 框加中使用的 http
+
+
+# 3 后台设置
+## 后台 >全局 > 站点 URL 
+首页这个用来下方的地址展示等
+
+## 后台 > 站长 > UCenter 设置 > UCenter 访问地址
+这个应该也影响头像等
+
+## UCenter 后台 > 应用管理 > 应用的主 URL
+这个我的没有
+
+# 4 数据库的调整
+这个我也不想改了，反正不多，而且本站的打开会自动转为 https  
+DZ 后台：站长 – 数据库 – 升级
+
+    UPDATE pre_forum_post SET message=REPLACE(message,'http://你的网址','https://你的网址');
+    
+# 5 .htaccess 的修改
+在另一篇文章中讨论
