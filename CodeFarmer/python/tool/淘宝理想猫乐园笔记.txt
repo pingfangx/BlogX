@@ -1,0 +1,5 @@
+[wechat_jump_game](https://github.com/wangshub/wechat_jump_game)
+
+微信跳一跳的脚本提供了很多借鉴。
+# 夜神模拟器-淘宝-请将苹果拖到购物车里
+下载 6.10.1 版本的淘宝即可。

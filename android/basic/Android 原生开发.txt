@@ -1,0 +1,202 @@
+# 0x00 基本概念与文档
+[NDK 入门指南](https://developer.android.com/ndk/guides/?hl=zh-cn)
+
+[示例：hello-jni](https://developer.android.com/ndk/samples/sample_hellojni?hl=zh-cn)
+
+[向您的项目添加 C 和 C++ 代码](https://developer.android.com/studio/projects/add-native-code?hl=zh-cn)
+
+[剑西《Android下玩JNI的新老三种姿势》](https://blog.csdn.net/mabeijianxi/article/details/68525164)
+
+## jni 与 ndk
+与 java 关联，不是特指 Android 中使用
+[Java Native Interface](https://en.wikipedia.org/wiki/Java_Native_Interface)
+
+Native Development Kit，也是指原生开发工具包，只有配合 Android 才指 Android 中使用的。
+
+
+以下是几种构建方式
+# 0x01 手写 Android.mk 然后 ndk-build
+## 1 在main下新建 jni 目录
+
+## 2 在 jni 下新建一个 c 或者 c++ 文件  
+hello_jni.c
+
+## 3 在 java 中声明 native 方法
+    private external fun reply(text: String): String
+
+## 4 在 .c 文件中实现
+复制引用，换 . 为 _  
+
+    #include <jni.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+
+    jstring Java_com_pingfangx_demo_manual_MainActivity_reply(JNIEnv *env, jobject obj, jstring str) {
+        const char *in = (*env)->GetStringUTFChars(env, str, JNI_FALSE);
+        char *out = " replay:中文";
+        char *result = (char *) malloc(strlen(in) + strlen(out));
+        strcpy(result, in);
+        strcat(result, out);
+        return (*env)->NewStringUTF(env, result);
+    }
+    
+这里如果需要生成 .h 文件，也可以使用 javah 命令  
+直接 javah 总是提示找不到类，所以
+
+    javah -classpath . com.pingfangx.demo.manual.MainActiivty
+    
+要注意，如果使用 kotlin ，也是找不到类的。
+## 5 在 jni 下新建 Android.mk 和 Application.mk
+## 6 编写 Android.mk
+    LOCAL_PATH := $(call my-dir)
+    include $(CLEAR_VARS)
+    LOCAL_MODULE := manual
+    LOCAL_SRC_FILES := hello_jni.c
+    LOCAL_C_INCLUDES += $(LOCAL_PATH)
+    #LOCAL_LDLIBS := -llog
+    include $(BUILD_SHARED_LIBRARY)
+
+## 7 编写 Application.mk
+    # 指定生成哪些cpu架构的库
+    APP_ABI := armeabi-v7a x86
+    # 此变量包含目标 Android 平台的名称
+    APP_PLATFORM := android-22
+
+测试时模拟器是 x86，所以添加 x86 的。
+
+## 8 在 jni 目录下执行 ndk-build
+    D:\workspace\AndroidX\demo\NDKDemo\manual\src\main\jni>D:\xx\software\program\android\sdk\ndk-bundle\ndk-build
+
+## 9 移动生成的 libs 目录
+项目 gradle 中 android 下配置
+    
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/libs']
+        }
+    }
+
+移动到 jniLibs 下不行，还是需要配置，所以直接配置为 src/main/libs 好了。
+
+## 10 java 中使用
+
+    private fun initViews() {
+        tv.text = reply("测试")
+    }
+
+
+    companion object {
+        init {
+            System.loadLibrary("manual")
+        }
+    }
+
+或者直接
+
+    
+    private fun initViews() {
+        System.loadLibrary("manual")
+        tv.text = reply("测试")
+    }
+    
+
+## Q:
+### no rule to make target
+路径不正确，后来发现我的 c 是下划线 hello_jni.c，却写成了短线 LOCAL_SRC_FILES := hello-jni.c（Demo 中是 -）
+
+###  implicitly declaring library function 'strcat' with type
+[https://stackoverflow.com/a/17477268](https://stackoverflow.com/a/17477268)
+```
+JNI calls from C program look like
+
+(*env)->fun(env, p1, ...)
+Your calling style is OK from C++, where a special wrapper class is defined in jni.h:
+
+env->fun(p1, ...)
+You can probably resolve your problems by simply renaming jni/cybrrlevel9.c to jni/cyberlevel9.cpp
+
+Or,
+
+jobject directBuffer = (*env)->NewDirectByteBuffer(env, buffer, size); 
+jobject globalRef = (*env)->NewGlobalRef(env, directBuffer);
+```
+
+### warning: incompatible implicit declaration of built-in function ‘xyz’
+[https://stackoverflow.com/questions/977233](https://stackoverflow.com/questions/977233)
+>Instead of stdlib.h, you should try:
+
+>#include <string.h>
+
+### > Error: Your project contains C++ files but it is not using a supported native build system.
+  Consider using CMake or ndk-build integration. For more information, go to:
+   https://d.android.com/r/studio-ui/add-native-code.html
+  Alternatively, you can use the experimental plugin:
+   https://developer.android.com/r/tools/experimental-plugin.html
+   
+把 jni 目录移走即可，已经生成 so 了
+
+# 0x02 使用 build.gradle
+
+## 1 在main下新建 jni 目录
+
+## 2 在 jni 下新建一个 c 或者 c++ 文件  
+hello-jni.cpp
+
+## 3
+
+## 4 在 android.defaultConfig 中添加
+        ndk {
+            moduleName 'buildgradle'
+            abiFilter "x86"
+        }
+        
+## 5 在 java 中声明 native 方法
+    private external fun reply(text: String): String
+
+## 6 在 .cpp 文件中实现
+    #include <jni.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+
+    extern "C"
+    jstring Java_com_pingfangx_demo_ndk_buildgradle_MainActivity_reply(JNIEnv *env, jobject obj, jstring str) {
+        const char *in = env->GetStringUTFChars(str, JNI_FALSE);
+        char *out = " replay:中文 C++";
+        char *result = (char *) malloc(strlen(in) + strlen(out));
+        strcpy(result, in);
+        strcat(result, out);
+        return env->NewStringUTF(result);
+    }
+    
+## 7 java 中使用
+
+这个方法失效了，运行时如前面提示  
+
+    Error: Your project contains C++ files but it is not using a supported native build system.
+      Consider using CMake or ndk-build integration
+      
+但是其在 模块的build\intermediates\ndk\debug\Android.mk  可以拿来用。
+
+# 0x03 cMake
+新建项目时勾上 Incude C++ Support 即可，新建模块不行。
+
+android 里多了
+
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+defaultConfig 里多了
+    
+        externalNativeBuild {
+            cmake {
+                cppFlags ""
+            }
+        }
+根目录下多了 CMakeLists.txt
+
+该方法会自动报错 Cannot resolve corresponding JNI function Java_...  
+然后可以手动生成。（要在 Java 中，kotlin 不支持）
