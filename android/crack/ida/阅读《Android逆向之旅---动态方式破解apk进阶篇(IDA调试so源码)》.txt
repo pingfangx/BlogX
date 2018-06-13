@@ -1,0 +1,52 @@
+[尼古拉斯.赵四《Android逆向之旅---动态方式破解apk进阶篇(IDA调试so源码)》](https://mp.weixin.qq.com/s?__biz=MzIzNDA3MDgwNA==&mid=2649229963&idx=1&sn=d2496391eb44727b0709321401f0d08f&scene=21#wechat_redirect)
+
+
+# 0x01 步骤
+## 1 将 \dbgsrv\android_server 文件 push 到手机
+可以推到 data/ 或是 data/local/tmp  
+应该放在哪里都可以
+
+## 2 启动 android_server
+chmod 777 android_server 修改权限  
+然后 ./android_server 运行  
+会显示
+    
+    Listening on port #23946...
+    
+## 3 adb 转发
+adb forward tcp:23946 tcp:23946
+
+## 4 IDA 连接
+新建一个 IDA 实例，选择 go  
+Debugger > Attach > Remote ARMLinux/ANdroid debugger  
+输入 127.0.0.1:23946  
+连上后输入包名过滤，
+
+## 5 找到函数地址下断
+Ctrl + S ，输入 so 名，有 RXD RD RWD，选第一个 so，双击跳转到 so 基址  
+使用另一个 IDA 查看函数相对地址  
+按 G 跳转，so 基址加上相对地址为绝对地址  
+前面有绿点的即可下断。
+
+## 一些注意
+指定 so 为 armeabi-v7a，在 defaultConfig 中添加
+    
+        ndk{
+            abiFilters "armeabi-v7a"
+        }
+
+# 0x02 一些快捷键
+
+1>、Shift+F12快速查看so文件中包含的字符串信息
+
+2>、F5快捷键可以将arm指令转化成可读的C代码，这里同时可以使用Y键，修改JNIEnv的函数方法名
+
+3>、Ctrl+S有两个用途，在IDA View页面中可以查看so文件的所有段信息，在调试页面可以查看程序所有so文件映射到内存的基地址
+
+4>、G键可以在调试界面，快速跳转到指定的绝对地址，进行下断点调试，这里如果跳转到目的地址之后，发现是DCB数据的话，可以在使用P键，进行转化即可，关于DCB数据，下面会介绍的。
+
+5>、F7键可以单步进入调试，F8键可以单步调试
+
+
+# 0x03 常用的 ARM 指令集知识
+TODO
