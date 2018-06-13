@@ -1,0 +1,50 @@
+# Scrapy
+源于 scrape [skreɪp]，读作 [skreɪpi]
+> A Fast and Powerful Scraping and Web Crawling Framework
+
+[https://scrapy.org/](https://scrapy.org/)
+
+[scrapy/scrapy](https://github.com/scrapy/scrapy)
+
+
+
+# 1 安装
+    pip install scrapy
+
+## 安装时又遇上了 Twisted 无法安装
+参照另一篇文章，装 vs  
+feature → Programming Languages → Visual C++ Common Tools for Visual C++ 2015
+
+## 运行时  No module named 'win32api'
+    pip install pypiwin32
+
+# 2 文档
+[marchtea/scrapy_doc_chs](https://github.com/marchtea/scrapy_doc_chs)  
+以及英文的，使用 Sphinx 生成
+
+    sphinx-build -b html -d build/doctrees . build/html
+
+# 3 使用
+scrapy crawl <spider>
+## Forbidden by robots.txt
+    # Obey robots.txt rules
+    ROBOTSTXT_OBEY = True 改为 False
+    
+## 在 spider 下新建包的问题
+新建后找不到 setting module 了，后来发现是新的 spider 中，引用了外层的模块。
+而外层模块因为在 PyCharm 一个项目中，外面又多了一个文件夹，导致认为是多了一个包，不正确的 import  
+最后改了 import，然后 spider 要指名全名成功。
+
+
+# 4 其他 
+## Settings 
+
+CONCURRENT_REQUESTS = 100
+LOG_LEVEL = 'INFO'
+DOWNLOAD_DELAY=2
+
+## 调试
+    from scrapy import cmdline
+
+    cmdline.execute("scrapy crawl dmoz".split())
+## 并发

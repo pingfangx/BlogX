@@ -1,0 +1,20 @@
+# Sphinx
+[sfɪŋks] 狮身人面像
+> Sphinx is a tool that makes it easy to create intelligent and beautiful documentation, written by Georg Brandl and licensed under the BSD license.
+
+[Sphinx 使用手册](http://zh-sphinx-doc.readthedocs.io/en/latest/contents.html)
+
+# windows 使用 Makefile 构建
+sphinx-quickstart 将会创建 make.bat  
+但是 Scrapy 的文档中只有 Makefile 文件，怎么构建呢。
+
+    >sphinx-build --help
+    usage: sphinx-build [OPTIONS] SOURCEDIR OUTPUTDIR [FILENAMES...]
+    
+    Makefile 中的内容
+    ALLSPHINXOPTS = -b $(BUILDER) -d build/doctrees \
+                -D latex_elements.papersize=$(PAPER) \
+                $(SPHINXOPTS) . build/$(BUILDER) $(SOURCES)
+
+    于是拼出命令，执行即可
+    sphinx-build -b html -d build/doctrees . build/html
