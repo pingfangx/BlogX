@@ -1,0 +1,4 @@
+# asyncpg
+A fast PostgreSQL Database Client Library for Python/asyncio.
+
+[MagicStack/asyncpg](https://github.com/MagicStack/asyncpg)
