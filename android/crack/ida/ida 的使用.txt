@@ -1,0 +1,35 @@
+# F5 是干啥的
+F5 位于 View > Open subviews > Generate pseudocode  
+生成伪代码
+
+
+# F5提示
+
+> The decompiler assumes that the segment '.got' is read-only because of its NAME. 
+All data references to the segment will be replaced by constant values. 
+This may lead to drastic changes in the decompiler output. 
+If the segment is not read-only, please change the segment NAME. 
+In general, the decompiler checks the segment permissions, class, and name 
+to determine if it is read-only. 
+
+> 反编译器假定段“.got”由于其名称而是只读的。
+对段的所有数据引用将被常量值替换。
+这可能会导致反编译器输出的剧烈变化。
+如果段不是只读的，请更改段名称。
+通常，反编译器检查段的权限，类和名称
+以确定它是否是只读的。
+
+# 
+>ARM AND THUMB MODE SWITCH INSTRUCTIONS 
+This processor has two instruction encodings: ARM and THUMB. 
+IDA allows to specify the encoding mode for every single instruction. 
+For this IDA uses a virtual register T. If its value is zero, then the ARM mode is used, otherwise the THUMB mode is used. 
+You can change the value of the register T using the 'change segment register value' command 
+(the canonical hotkey is Alt-G) 
+
+> ARM 和 THUMB 模式切换指令  
+该处理器有两种指令编码：ARM 和 THUMB。  
+IDA 允许为每条指令指定编码模式。  
+为此 IDA 使用虚拟寄存器 T.如果其值为零，则使用 ARM 模式，否则使用 THUMB 模式。  
+您可以使用 '更改段寄存器值' 命令来更改寄存器 T 的值  
+(标准热键是 Alt-G)
