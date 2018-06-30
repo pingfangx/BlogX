@@ -1,0 +1,90 @@
+项目内使用了 ViewPager 嵌套 ViewPager  
+首先禁用内部的 ViewPager 的滑动，代码如下
+    
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        if (mIsCanScroll) {
+            return super.onTouchEvent(ev);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if (mIsCanScroll) {
+            return super.onInterceptTouchEvent(ev);
+        } else {
+            return false;
+        }
+    }
+    
+但是禁用滑动后，滑动事件无法传递到上一层的 ViewPager，  
+也就是说内部的 ViewPager 无法滑动了，但外部的 ViewPager 也无法滑动了  
+调试如下
+
+## android.support.v4.view.ViewPager#onInterceptTouchEvent
+            // canScroll 返回 true，此处直接返回了 false，不拦截事件，也就不滑动
+            case MotionEvent.ACTION_MOVE: {
+                if (dx != 0 && !isGutterDrag(mLastMotionX, dx)
+                        && canScroll(this, false, (int) dx, (int) x, (int) y)) {
+                    // Nested view has scrollable area under this point. Let it be handled there.
+                    mLastMotionX = x;
+                    mLastMotionY = y;
+                    mIsUnableToDrag = true;
+                    return false;
+                }
+
+## android.support.v4.view.ViewPager#canScroll
+    
+    //遍历 child，如果 child 可以滑动，则返回 true，父类就不拦截
+    //调试发现内部的 ScrollControllableViewPager 返回了 true
+    //再调试发现 ScrollControllableViewPager 的 canScroll 因为 v.canScrollHorizontally(-dx) 返回了 true
+    protected boolean canScroll(View v, boolean checkV, int dx, int x, int y) {
+        if (v instanceof ViewGroup) {
+            final ViewGroup group = (ViewGroup) v;
+            final int scrollX = v.getScrollX();
+            final int scrollY = v.getScrollY();
+            final int count = group.getChildCount();
+            // Count backwards - let topmost views consume scroll distance first.
+            for (int i = count - 1; i >= 0; i--) {
+                // TODO: Add versioned support here for transformed views.
+                // This will not work for transformed views in Honeycomb+
+                final View child = group.getChildAt(i);
+                if (x + scrollX >= child.getLeft() && x + scrollX < child.getRight()
+                        && y + scrollY >= child.getTop() && y + scrollY < child.getBottom()
+                        && canScroll(child, true, dx, x + scrollX - child.getLeft(),
+                                y + scrollY - child.getTop())) {
+                    return true;
+                }
+            }
+        }
+
+        return checkV && v.canScrollHorizontally(-dx);
+    }
+    
+## android.view.View#canScrollHorizontally
+### android.support.v4.view.ViewPager#canScrollHorizontally
+
+    //可以看到 Viewpager 重写了此方法，判断 scrollX < 宽度 * mLastOffset 即返回 true
+    public boolean canScrollHorizontally(int direction) {
+        if (mAdapter == null) {
+            return false;
+        }
+
+        final int width = getClientWidth();
+        final int scrollX = getScrollX();
+        if (direction < 0) {
+            return (scrollX > (int) (width * mFirstOffset));
+        } else if (direction > 0) {
+            return (scrollX < (int) (width * mLastOffset));
+        } else {
+            return false;
+        }
+    }
+    
+## 修改
+    //既然不可以滑动，则不应该返回可以水平滑动，问题解决
+    public boolean canScrollHorizontally(int direction) {
+        return mIsCanScroll && super.canScrollHorizontally(direction);
+    }
