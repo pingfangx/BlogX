@@ -10,10 +10,31 @@
 > PostgreSQL不寻常的名字导致一些读者停下来尝试拼读它，特别是那些把SQL拼读为"sequel"的人。PostgreSQL开发者把它拼读为"post-gress-Q-L"。（Audio sample，5.6k MP3）。它也经常被简略念为"postgres"。
 
 # 安装
-[https://www.enterprisedb.com/downloads/postgres-postgresql-downloads](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
+https://www.postgresql.org/download/windows/
 
 真难下载啊，
 INTERACTIVE INSTALLER BY ENTERPRISEDB 的半天不可以，使用 GRAPHICAL INSTALLER BY BIGSQL 才行。
 
 # 文档
 [postgres-cn/pgdoc-cn](https://github.com/postgres-cn/pgdoc-cn)
+
+
+# ON CONFLICT(ip) DO UPDATE SET
+        crawled_times=EXCLUDED.crawled_times+1,
+        
+要改为 表名.crawled_times+1
+
+来至
+[PostgreSQL Upsert Using INSERT ON CONFLICT statement](http://www.postgresqltutorial.com/postgresql-upsert/)  
+还是基础不行啊。
+
+    INSERT INTO customers (name, email)
+    VALUES
+     (
+     'Microsoft',
+     'hotline@microsoft.com'
+     ) 
+    ON CONFLICT (name) 
+    DO
+     UPDATE
+       SET email = EXCLUDED.email || ';' || customers.email;

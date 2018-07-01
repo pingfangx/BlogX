@@ -1,0 +1,11 @@
+想使用 f''，必须升到 3.6 以上，于是升级。
+
+# 复用库
+在 \Lib\site-packages
+
+# PyCharm 设置 Python Interpreter
+注意添加时默认是 New environment ，新建了 venv  
+应该选 Existing
+
+# 运行 scrapy
+升级后运行出错，报错的库（好多，一个接一个）需要重新安装一下。

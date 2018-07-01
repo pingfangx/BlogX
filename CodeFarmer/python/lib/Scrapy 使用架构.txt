@@ -1,0 +1,13 @@
+item
+    base_item'用来保存 item，同时生成 sql 语句
+        get_head_fields
+        get_tail_fields
+        get_on_conflict_suffix_sql
+middleware
+    agent_manager'生成随机 agent
+    proxy_manager'生成随机代理
+    middlewares'提供给 spider 使用
+pipeline
+    postgresql_manager'用来操作 sql
+    postgresql_pipelines'提供给 spider 使用
+

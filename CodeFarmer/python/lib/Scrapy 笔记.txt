@@ -25,16 +25,20 @@ feature → Programming Languages → Visual C++ Common Tools for Visual C++ 201
     sphinx-build -b html -d build/doctrees . build/html
 
 # 3 使用
+scrapy startproject tutorial
 scrapy crawl <spider>
 ## Forbidden by robots.txt
     # Obey robots.txt rules
     ROBOTSTXT_OBEY = True 改为 False
     
-## 在 spider 下新建包的问题
+## 在 spiders 下新建包的问题
 新建后找不到 setting module 了，后来发现是新的 spider 中，引用了外层的模块。
 而外层模块因为在 PyCharm 一个项目中，外面又多了一个文件夹，导致认为是多了一个包，不正确的 import  
 最后改了 import，然后 spider 要指名全名成功。
 
+## 在 spiders 下新建子包内使用 spider
+SPIDER_MODULES 指定了查找 spider 的模块，  
+cmd 中使用时直接=一个模块即可，不需要用数组指定
 
 # 4 其他 
 ## Settings 
@@ -48,3 +52,8 @@ DOWNLOAD_DELAY=2
 
     cmdline.execute("scrapy crawl dmoz".split())
 ## 并发
+
+# 组织多个 spider
+scrapy.cfg 限制了根目录。  
+多个 spider 可以放到 spiders 目录中，但是 items 、pipelines 却只能放到一个文件中。  
+于是决定单独新建一个 proxy 目录，相关的 spider,item,pipeline 都放到该目录中。
