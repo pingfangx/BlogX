@@ -1,0 +1,6 @@
+输入 git help add
+
+打开了文档 file:///C:/Program%20Files/Git/mingw64/share/doc/git-doc/git-add.html
+
+官网抓下来的文档包括 assets,docs,images，在 docs 中大部分文件名是匹配的。  
+于是直接将汉化后的文档复制过去，将 docs 改名为 git-doc 即可。

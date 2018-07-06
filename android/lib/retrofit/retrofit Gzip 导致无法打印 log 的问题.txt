@@ -1,0 +1,69 @@
+HttpLoggingInterceptor 的添加，将 addNetworkInterceptor 改为 addInterceptor 即可。
+# okhttp3.internal.http.BridgeInterceptor#intercept 自动添加了 gzip
+
+  @Override public Response intercept(Chain chain) throws IOException {
+    ...
+    //添加
+    // If we add an "Accept-Encoding: gzip" header field we're responsible for also decompressing
+    // the transfer stream.
+    boolean transparentGzip = false;
+    if (userRequest.header("Accept-Encoding") == null) {
+      transparentGzip = true;
+      requestBuilder.header("Accept-Encoding", "gzip");
+    }
+    
+    ...
+    // chain 处理
+    Response networkResponse = chain.proceed(requestBuilder.build());
+
+    HttpHeaders.receiveHeaders(cookieJar, userRequest.url(), networkResponse.headers());
+
+    Response.Builder responseBuilder = networkResponse.newBuilder()
+        .request(userRequest);
+
+    //移除
+    if (transparentGzip
+        && "gzip".equalsIgnoreCase(networkResponse.header("Content-Encoding"))
+        && HttpHeaders.hasBody(networkResponse)) {
+      GzipSource responseBody = new GzipSource(networkResponse.body().source());
+      Headers strippedHeaders = networkResponse.headers().newBuilder()
+          .removeAll("Content-Encoding")
+          .removeAll("Content-Length")
+          .build();
+      responseBuilder.headers(strippedHeaders);
+      responseBuilder.body(new RealResponseBody(strippedHeaders, Okio.buffer(responseBody)));
+    }
+
+    return responseBuilder.build();
+  }
+# 添加 interceptors 的逻辑
+
+    retrofit2.adapter.rxjava.RxJavaCallAdapterFactory.RequestArbiter#request
+    retrofit2.Call#execute
+    retrofit2.OkHttpCall#parseResponse
+    okhttp3.RealCall#getResponseWithInterceptorChain
+    Response getResponseWithInterceptorChain() throws IOException {
+        // Build a full stack of interceptors.
+        List<Interceptor> interceptors = new ArrayList<>();
+        interceptors.addAll(client.interceptors());
+        interceptors.add(retryAndFollowUpInterceptor);
+        interceptors.add(new BridgeInterceptor(client.cookieJar()));
+        interceptors.add(new CacheInterceptor(client.internalCache()));
+        interceptors.add(new ConnectInterceptor(client));
+        if (!forWebSocket) {
+          interceptors.addAll(client.networkInterceptors());
+        }
+        interceptors.add(new CallServerInterceptor(forWebSocket));
+
+        Interceptor.Chain chain = new RealInterceptorChain(
+            interceptors, null, null, null, 0, originalRequest);
+        return chain.proceed(originalRequest);
+      }
+
+
+可以看到，新添加了 client.interceptors()  
+最后添加了 client.networkInterceptors()  
+于是，如果是使用 addNetworkInterceptor，那么会在 BridgeInterceptor 添加 header("Accept-Encoding", "gzip") 后之后调用  
+返回的结果 Content-Encoding 为 gzip 于是触发了 okhttp3.logging.HttpLoggingInterceptor#bodyEncoded 判断，不输出。
+
+如果是使用 addInterceptor，则会添加到 BridgeInterceptor 之前，于是正常处理。

@@ -1,0 +1,48 @@
+# 需求
+升级后需要
+>Use outputFileName instead of output.outputFile if you change only file name (that is your case)
+
+但是改了之后只能指定文件名了，生成时输出的文件在  
+app/b_test/debug  
+而运行时的 apk 却在  
+app/build/outputs/apk/b_test/debug
+
+# 参考
+[android studio 3.1: build:gradle:3.1.0 - Absolute path are not supported when setting an output file name](https://stackoverflow.com/a/50862140)
+
+> I think using "./../../../" is bad solution... I use common gradle script for several projects and I want to make code to be independency from depth of output dir.
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def relativeRootDir = output.packageApplication.outputDirectory.toPath()
+                     .relativize(rootDir.toPath()).toFile()
+            output.outputFileName = new File( "$relativeRootDir/release", newOutputName)
+        }
+    }
+# 解读
+    com.android.build.gradle.AppExtension#getApplicationVariants->DomainObjectSet<ApplicationVariant>
+    com.android.build.gradle.api.BaseVariant#getOutputs->DomainObjectCollection<BaseVariantOutput>
+    com.android.build.gradle.api.ApkVariant#getPackageApplication->PackageAndroidArtifact
+    com.android.build.gradle.tasks.PackageAndroidArtifact#getOutputDirectory->File
+    java.io.File#toPath->Path
+    java.nio.file.Path#relativize->Path
+
+此时获取到的目录为 app 的上一级。
+
+# 解决
+
+            applicationVariants.all { variant ->
+                variant.outputs.all { output ->
+                    def outputFile = output.outputFile
+                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                        //取相对路径
+                        def relativeRootDir = output.packageApplication.outputDirectory.toPath().relativize(rootDir.toPath()).toFile()
+                        //目录
+                        def apkDirectory = "$relativeRootDir/${output.packageApplication.projectBaseName}/build/outputs/apk"
+                        //文件
+                        def apkFileName = "linglingbang_${defaultConfig.versionName}_${releaseTime()}_${variant.productFlavors[0].name}.apk"
+                        outputFileName = new File(apkDirectory, apkFileName)
+                    }
+                }
+            }
+最终修改为 app/build/outputs/apk

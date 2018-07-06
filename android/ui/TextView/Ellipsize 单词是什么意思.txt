@@ -1,0 +1,10 @@
+为什么只有 ellipsis 没有 ellipsize 这个单词呢?
+
+[What does ellipsize mean in android?](https://stackoverflow.com/questions/13313996)
+
+Michael Edenfield 评论
+> btw: the actual word "ellipsized" is made-up. It's called "verbing a noun" and is a common way to form computer jargon. The noun is "ellipse" which I assume you know, and it's made into a verb by adding the "-ize" ending which means "to make into", so you can infer that to "ellipsize" is "to add an ellipse to something".   
+
+
+[文档](https://developer.android.com/reference/android/widget/TextView#attr_android:ellipsize) 中也说明
+>If set, causes words that are longer than the view is wide to be **ellipsized** instead of broken in the middle.

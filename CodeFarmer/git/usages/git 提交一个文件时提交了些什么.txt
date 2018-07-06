@@ -1,0 +1,32 @@
+```
+$ git push
+Counting objects: 3, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (3/3), 256 bytes | 256.00 KiB/s, done.
+Total 3 (delta 1), reused 0 (delta 0)
+remote: Resolving deltas: 100% (1/1), completed with 1 local object.
+To https://github.com/pingfangx/test.git
+   22c0f79..d8cce05  master -> master
+
+```
+添加一个文件的时候，以下文件发生了变化
+1. 索引  
+index  
+2. 日志  
+log/HEAD  
+log/refs/heads/master  
+3. head  
+ref/heads/master
+4. objects  
+blob  
+tree  
+commit
+5. COMMIT_EDITMSG
+
+执行 gc
+
+    $ git gc
+    Counting objects: 3, done.
+    Writing objects: 100% (3/3), done.
+    Total 3 (delta 0), reused 0 (delta 0)

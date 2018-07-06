@@ -1,0 +1,15 @@
+# 常量
+如果将基本类型或字符串定义为常量并且该值在编译时已知，则编译器会将代码中的常量名称替换为其值。这称为 编译时常量。
+
+# 静态初始化块
+一个类可以有任意数量的静态初始化块，它们可以出现在类体中的任何位置。
+
+# 类
+
+    nested class 嵌套类
+        static nested class 静态嵌套类
+        non-static nested class （innder class 内部类）
+            local calss 局部类
+            anoymous class 匿名类
+
+内部类的创建 new A().B() 让我想起了曾经的时光。

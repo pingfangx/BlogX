@@ -1,0 +1,44 @@
+[10.2 Git 内部原理 - Git 对象](https://git-scm.com/book/zh/v2/Git-%E5%86%85%E9%83%A8%E5%8E%9F%E7%90%86-Git-%E5%AF%B9%E8%B1%A1)
+
+# 写入 blob
+    $ echo 'test content' | git hash-object -w --stdin
+    d670460b4b4aece5915caf5c68d12f560a9fe3e4
+    
+    $ find .git/objects -type f
+    .git/objects/d6/70460b4b4aece5915caf5c68d12f560a9fe3e4
+    
+    $ git cat-file -p d670460b4b4aece5915caf5c68d12f560a9fe3e4
+    test content
+    
+    $ echo 'version 1' > test.txt
+    $ git hash-object -w test.txt
+    83baae61804e65cc73a7201a7252750c76066a30
+    
+    $ echo 'version 2' > test.txt
+    $ git hash-object -w test.txt
+    1f7a7a472abf3dd9643fd615f6da379c4acb3e3a
+    
+    $ git cat-file -t 1f7a7a472abf3dd9643fd615f6da379c4acb3e3a
+    blob
+# 创建 tree
+    $ git update-index --add --cacheinfo 100644 \
+    83baae61804e65cc73a7201a7252750c76066a30 test.txt
+    
+    $ git write-tree
+    d8329fc1cc938780ffdd9f94e0d364e0ea74f579
+    $ git cat-file -p d8329fc1cc938780ffdd9f94e0d364e0ea74f579
+    100644 blob 83baae61804e65cc73a7201a7252750c76066a30      test.txt
+    
+    $ git cat-file -t d8329fc1cc938780ffdd9f94e0d364e0ea74f579
+    tree
+
+# 创建 commit
+    $ echo 'first commit' | git commit-tree d8329f
+    fdf4fc3344e67ab068f836878b6c4951e3b15f3d
+    
+> 这就是每次我们运行 git add 和 git commit 命令时， Git 所做的实质工作——将被改写的文件保存为数据对象，更新暂存区，记录树对象，最后创建一个指明了顶层树对象和父提交的提交对象。
+
+
+前面提到了 blob,tree,commit 3 种对象，再加 tag 共 4 种对象类型。
+
+指定 -a 会创建标签对象，否则，将创建提交对象的 SHA-1对象名称的标签引用(即轻量级标记)。
