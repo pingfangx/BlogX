@@ -1,4 +1,11 @@
 因为 git 使用的 vim ，想简单了解一下，了解一下之后，发现是我想得太简单了。
+
+# git 常用的
+r 和 R
+u 和 U
+d
+
+
 # 相关背景
 [Vim-维基百科](https://zh.wikipedia.org/wiki/Vim)  
 

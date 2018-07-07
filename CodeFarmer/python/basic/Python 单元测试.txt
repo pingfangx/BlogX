@@ -6,3 +6,18 @@
 
 后来发现，如果有运行过，就会保存运行配置，再 test 方法上点运行也会运行该运行配置。  
 因此将运行配置删除，再在 test 方法上点击运行即可。
+
+# 命名
+[PEP8 naming convention on test classes](https://stackoverflow.com/a/20820675)
+
+[documentation for unittest](https://docs.python.org/2/library/unittest.html#basic-example)
+
+> The three individual tests are defined with methods whose names start with the letters test. This naming convention informs the test runner about which methods represent tests.
+
+于是决定遵守规范，方法以 test_ 开头
+类以 Test 开头，模块以 test_ 开头
+
+## 模块以 test_ 开头
+后来发现，只要模块以 test_ 开头，PyCharm 就会认为是测试用例，运行时动测试  
+即使内部是 main 方法，没有写为测试用例  
+因此，测试用例一律以 test_ 开头，非测试用例不以 test_ 开头

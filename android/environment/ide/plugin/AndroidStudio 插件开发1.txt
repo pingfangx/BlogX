@@ -24,6 +24,10 @@ Q:
 * 在 xml 中注册
 * 运行 runIdea
 
+## 整理
+sdk 需要设为插件，选一个 IC  
+运行配置添加为插件
+
 # 0x02 学习插件 activate-power-mode
 [ViceFantasyPlace/activate-power-mode](https://github.com/ViceFantasyPlace/activate-power-mode)  
 震动和粒子散发效果

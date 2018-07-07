@@ -57,3 +57,7 @@ DOWNLOAD_DELAY=2
 scrapy.cfg 限制了根目录。  
 多个 spider 可以放到 spiders 目录中，但是 items 、pipelines 却只能放到一个文件中。  
 于是决定单独新建一个 proxy 目录，相关的 spider,item,pipeline 都放到该目录中。
+
+
+
+# 实践经验(Common Practices)

@@ -1,0 +1,37 @@
+[shadowsocks-android](https://github.com/shadowsocks/shadowsocks-android)  
+
+# 0x00 广告
+下载之后，居然有默认的配置，而且是带广告的，不会上传的我的配置吧。  
+于是想自己编译一下。
+
+# 0x01 编译
+根据说明
+* Set environment variable `ANDROID_HOME` to `/path/to/android-sdk`
+* (optional) Set environment variable `ANDROID_NDK_HOME` to `/path/to/android-ndk` (default: `$ANDROID_HOME/ndk-bundle`)
+* Set environment variable `GOROOT_BOOTSTRAP` to `/path/to/go`
+* Clone the repo using `git clone --recurse-submodules <repo>` or update submodules using `git submodule update --init --recursive`
+* Build it using Android Studio or gradle script
+
+## 安装 go
+## 更新 submodules
+执行`git submodule update --init --recursive`
+
+卡在了 pcre ，它的地址是
+
+https://android.googlesource.com/platform/external/pcre
+
+设了代理也不行，最后换用  https://aosp.tuna.tsinghua.edu.cn/ 镜像  
+然后再执行  git submodule update --init --recursive  
+会 checkout 并再 clone 缺少的 module
+
+但是构建失败，后来发现有 submodule 发生了更改，于是
+`git submodule update --checkout --force` 检出 submodule
+
+## 编译
+最后再编译就成功了，第一次花了十多分钟。  
+运行成功后就可以查看源码了。
+
+# 0x02 查看源码
+com.github.shadowsocks.ProfilesFragment.ProfileViewHolder#bind
+
+看到进行了判断，host 等于默认的才加载广告的。

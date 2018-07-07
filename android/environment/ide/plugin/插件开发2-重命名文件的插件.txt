@@ -42,6 +42,8 @@ JProgressBar
 ## 如何输出 EventLog
 
 # 发布
+> Right-click the plugin module in the Project view and select Prepare Plugin Module <module-name> For Deployment in the context menu.
+
 写完之后发现找不到发布的选项。  
 后来发现使用 Gradle 和使用 DevKit 是不一样的。
 使用 DevKit 才有 Prepare Plugin Module
