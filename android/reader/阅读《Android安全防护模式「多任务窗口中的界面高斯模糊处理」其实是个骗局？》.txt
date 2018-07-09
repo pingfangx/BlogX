@@ -1,0 +1,25 @@
+[Android安全防护模式「多任务窗口中的界面高斯模糊处理」其实是个骗局？](http://www.520monkey.com/archives/1259)
+
+* oppo 是否模糊
+* 模糊代码是否一致
+* 自实现基本思路
+
+
+# oppo 是否模糊
+下载招商银行 app，安装到 OPPO 云手机,未重现模糊。
+
+试了好机个机型都未重现，一定是我打开的方式不对。
+
+## 查看 oppo 源码
+本来想下载镜象解包的，后来简单试了一下没成功。
+
+# 模糊代码是否一致
+GaussianBlur.getInstance().generateGaussianBitmp()
+
+# 判断是否为安全 app
+简单检查文件名
+
+# 其他设置
+    getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
+    
+    android:excludeFromRecents="true"

@@ -1,0 +1,24 @@
+* 协程
+* 生成器
+
+# 调用流程
+    scrapy.commands.crawl.Command#run
+        self.crawler_process.crawl(spname, **opts.spargs)
+        self.crawler_process.start()
+    scrapy.crawler.CrawlerRunner#crawl
+    scrapy.crawler.CrawlerRunner#_crawl
+    scrapy.crawler.Crawler#crawl
+        yield self.engine.open_spider(self.spider, start_requests)
+        yield defer.maybeDeferred(self.engine.start)
+    scrapy.core.engine.ExecutionEngine#open_spider
+        nextcall = CallLaterOnce(self._next_request, spider)
+    scrapy.core.engine.ExecutionEngine#_next_request
+        request = next(slot.start_requests)
+    scrapy.spiders.Spider#start_requests
+        ...
+        for url in self.start_urls:
+            yield Request(url, dont_filter=True)
+# start_requests()
+>This method must return an iterable with the first Requests to crawl for this spider. It is called by Scrapy when the spider is opened for scraping. Scrapy calls it only once, so it is safe to implement start_requests() as a generator.
+
+>The default implementation generates Request(url, dont_filter=True) for each url in start_urls.

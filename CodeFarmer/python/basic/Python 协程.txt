@@ -1,0 +1,45 @@
+* 什么是协程
+* async 与 await
+* yield 
+
+# 多线程、多进程、协程
+[17.1. threading — Thread-based parallelism](https://docs.python.org/3/library/threading.html)
+
+[17.2. multiprocessing — Process-based parallelism](https://docs.python.org/3/library/multiprocessing.html)
+
+[19.5.3. Tasks and coroutines](https://docs.python.org/3/library/asyncio-task.html)
+
+# 协程 Coroutine
+[Python协程](https://thief.one/2017/02/20/Python%E5%8D%8F%E7%A8%8B/)
+
+[19.5.3. Tasks and coroutines](https://docs.python.org/3/library/asyncio-task.html)
+
+
+# 协程可以用来做什么
+>我们需要编写并发爬虫等IO密集型的程序时，应该选用多线程或者协程（亲测差距不是特别明显）；当我们需要科学计算，设计CPU密集型程序，应该选用多进程。当然以上结论的前提是，不做分布式，只在一台服务器上测试。
+
+
+[【Multiprocessing系列】Multiprocessing基础](https://thief.one/2016/11/23/Python-multiprocessing/)  
+文章指出 windows 系统下，想要启动一个子进程，要放在 if __name__ == '__main__': 之后
+
+# 理解多线程与协程
+协程可以理解为在单线程内切换上下文。
+
+    多线程每个线程单独执算起，start 之后，后面的 sleep 也是同时发生，交替输出
+    def work(self, num):
+        print(f'work-{num} start')
+        time.sleep(1)
+        for i in range(3):
+            print(f'work-{num} sleep {i}')
+            time.sleep(1)
+        print(f'work-{num} finish')
+        
+    协程遇到 await 会切换上下文，于是 start 交替输出。  
+    但是 await 执行之后，执行后面的 sleep ，因为是在单线程，要等所有 sleep 结束后，才会切换执行其他的 sleep
+    async def work2(self, num):
+        print(f'work-{num} start')
+        await asyncio.sleep(1)
+        for i in range(3):
+            print(f'work-{num} sleep {i}')
+            time.sleep(1)
+        print(f'work-{num} finish')
