@@ -1,0 +1,36 @@
+# 如何对字段进行类型提示
+声明字段 conn ，如何指明其类型？
+
+[PEP 484 -- Type Hints](https://www.python.org/dev/peps/pep-0484/)  
+[27.1. typing — Support for type hints](https://docs.python.org/3/library/typing.html)  
+
+    def greeting(name: str) -> str:
+        return 'Hello ' + name
+
+但是只有方法与参数的类型提示，有没有针对字段的呢。  
+想到可以初始化时用方法赋值，但太傻了  
+于是搜索“python type hint for field”  
+
+找到[PEP 526 -- Syntax for Variable Annotations](https://www.python.org/dev/peps/pep-0526/)  
+
+>PEP 484 introduced type hints, a.k.a. type annotations. While its main focus was function annotations, it also introduced the notion of type comments to annotate variables:
+
+Type annotation can be added to an assignment statement or to a single expression indicating the desired type of the annotation target to a third party type checker:
+
+    my_var: int
+    my_var = 5  # Passes type check.
+    other_var: int  = 'a'  # Flagged as error by type checker,
+                           # but OK at runtime.
+This syntax does not introduce any new semantics beyond PEP 484, so that the following three statements are equivalent:
+
+    var = value # type: annotation
+    var: annotation; var = value
+    var: annotation = value
+    
+# 如何查看 asyncpg 的相关方法
+进入原码包，查看相关方法
+
+# 如果获取协程方法的返回值
+asyncio.events.AbstractEventLoop#run_until_complete
+>Run the event loop until a Future is done.  
+Return the Future's result, or raise its exception.
