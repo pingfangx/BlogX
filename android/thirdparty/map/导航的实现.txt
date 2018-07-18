@@ -1,0 +1,61 @@
+查看微信的实现，点击后查看 ActivityManager 日志  
+
+    百度
+    START u0 {act=android.intent.action.VIEW dat=bdapp://map/direction?origin=name:北京市昌平区文华东路|latlng:40.080173,116.348846&destination=name:昆明长水国际机场|latlng:25.098145,102.929909&mode=driving&coord_type=gcj02&referer=tencent|weixin
+    
+    微信
+    START u0 {act=android.intent.action.VIEW dat=wechatnav://type=nav&fromcoord=40.080204,116.348892&tocoord=25.098145,102.929909&from=北京市昌平区文华东路&to=云南省昆明市官渡区长水村附近 pkg=com.autonavi.minimap cmp=com.autonavi.minimap/com.autonavi
+    
+    原来的
+    START u0 {act=android.intent.action.VIEW dat=baidumap://map/direction?origin=40.085818,116.355548&destination=39.915291,116.403857&mode=driving&target=1&src=sdk_[com.pingfangx.demo.navigator] flg=0x10000000 cmp=com.baidu.BaiduMap/com.baidu
+    
+    dat=androidamap://navi?sourceApplication=导航Demo&poiname=&lat=39.915291&lon=116.403857&dev=1&style=2 pkg=com.autonavi.minimap cmp=com.autonavi.minimap/com.autonavi.map.activity.SplashActivity} from uid
+    
+    public static void openApplicationMarket(Context context, String packageName) {
+        try {
+            String str = "market://details?id=" + packageName;
+            Intent localIntent = new Intent(Intent.ACTION_VIEW);
+            localIntent.setData(Uri.parse(str));
+            context.startActivity(localIntent);
+        } catch (Exception e) {
+            // 打开应用商店失败 可能是没有手机没有安装应用市场
+            e.printStackTrace();
+            Toast.makeText(context, "打开应用商店失败", Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+最后找到各地图的文档实现
+    
+        /**
+         * 百度
+         * 规划 http://lbsyun.baidu.com/index.php?title=uri/api/android#service-page-anchor9
+         * 导航 http://lbsyun.baidu.com/index.php?title=uri/api/android#service-page-anchor10
+         */
+        return if (useRoutePlan) {
+            "baidumap://map/direction?destination=latlng:${location.latitude},${location.longitude}|name:${location.name}&mode=driving"
+        } else {
+            "baidumap://map/navi?location=${location.latitude},${location.longitude}"
+        }
+        
+        /**
+         * 高德
+         * 规划 https://lbs.amap.com/api/amap-mobile/guide/android/route
+         * 导航 https://lbs.amap.com/api/amap-mobile/guide/android/navigation
+         */
+         return if (useRoutePlan) {
+            "amapuri://route/plan/?sourceApplication=$appName&dlat=${location.latitude}&dlon=${location.longitude}&dname=${location.name}&dev=1&t=0"
+        } else {
+            "androidamap://navi?sourceApplication=$appName&lat=${location.latitude}&lon=${location.longitude}&dev=1&style=2"
+        }
+        
+        /**
+         * 谷歌地图
+         * https://developers.google.com/maps/documentation/urls/guide#directions-action
+         */
+         return "google.navigation:q=${location.latitude},${location.longitude}&mode=d"
+         
+         /**
+         * 腾讯地图
+         * http://lbs.qq.com/uri_v1/guide-mobile-navAndRoute.html
+         */
+         return "qqmap://map/routeplan?type=drive&fromcoord=CurrentLocation&tocoord=${location.latitude},${location.longitude}&to=${location.name}"

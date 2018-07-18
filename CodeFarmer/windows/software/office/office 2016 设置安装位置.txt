@@ -1,0 +1,20 @@
+[Windows 10 change Office 2016 installation directory](https://superuser.com/questions/1034222/windows-10-change-office-2016-installation-directory)
+  
+有两个收获，一是官方不建议修改注册表，我修改后就无法安装  
+[Microsoft does not support changing the location of the Program Files folder by modifying the ProgramFilesDir registry value](https://support.microsoft.com/en-us/help/933700/microsoft-does-not-support-changing-the-location-of-the-program-files)
+
+二是 mklink 的使用
+
+
+# MKLINK
+    mklink /J "C:\Program Files (x86)\Microsoft Office\" "D:\xx\software\programs_x86\Microsoft Office\"
+    mklink /J "C:\Program Files\Microsoft Office\" "D:\xx\software\programs_64\Microsoft Office\"
+
+要注意，新建的链接文件的最后一层目录（Microsoft Office）不能存在，但其父目录必须存在。  
+猜想可能类似是在其父目录创建一个链接文件。  
+
+要链接的文件可以不存在，但是打开会提示不存在。  
+而要保证安装，必须保证要链接的 Microsoft Office 存在。
+
+# 卸载
+有一些问题可以直接点帮助，从官网下载 o15-ctrremove.diagcab 然后运行执可。

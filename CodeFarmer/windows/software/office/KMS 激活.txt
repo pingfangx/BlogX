@@ -1,0 +1,15 @@
+网上各上二次包装的，那原版在哪里呢？  
+[lixuy/KMS_VL_ALL](https://github.com/lixuy/KMS_VL_ALL)
+
+[KMS-VL-ALL](https://forums.mydigitallife.net/threads/kms_vl_all-online-offline-kms-activator.63471/)
+
+## 如何使用 ?
+#### 如何转换 Office 2016 C2R为批量许可:
+1. 右键管理员运行 Convert-Office2016C2R.cmd.   
+2. 完事了.  
+#### 对于激活批量许可的产品（VL）:
+1. 右键管理员运行 KMS-VL-ALL.cmd.  
+2. 完事了.  
+
+## 我怎么知道它工作正不正常 ?
+编辑 KMS-VL-ALL.cmd , 更改Debug参数改为 1, 右键管理员运行之后观察目录下的日志文件.  

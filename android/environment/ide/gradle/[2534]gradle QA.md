@@ -48,21 +48,6 @@ gradle init
 
 ![](https://pingfangx.github.io/resource/blogx/2534/2.png)
 
-查看 dependencies
-> From the terminal, you can also find out the version of the support-annotations module being used in the project. To do so, first run the dependencies task in the app project, asking for the details of the releaseCompileClasspath configuration only.
-
-    $ ./gradlew :app:dependencies --configuration releaseCompileClasspath
->Another way to see the version required is to use the dependencyInsight task. Run the following command (all on one line).
-
-    $ ./gradlew :app:dependencyInsight --dependency support-annotations --configuration releaseCompileClasspath
->Both the dependency and dependencyInsight tasks are available in any Gradle project. They can help you track down and resolve any issues with library version conflicts
-
-注意使用的配置 releaseCompileClasspath 是由 variant 决定的。  
-可能前面需要加上 flavor 如 prodReleaseCompileClasspath ，如何查看 configurations，这个没有搜到，不太重要。   
-如果不指定，则会列出如
-> prodReleaseCompileClasspath - Resolved configuration for compilation for variant: prodRelease
-
-
 
 ## Gradle Build Language Reference
 ## Improving the Performance of Gradle Builds

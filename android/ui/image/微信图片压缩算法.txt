@@ -1,0 +1,77 @@
+# 相关文章
+[Curzibn/Luban](https://github.com/Curzibn/Luban/blob/master/DESCRIPTION.md)
+
+[hucool/WXImageCompress](https://github.com/hucool/WXImageCompress/blob/master/Pod/Classes/WXImageCompress.swift)
+
+两篇文章中都提到了与微信接近，那微信代码中到底是是什么样的呢。
+
+类太多，搜索“compressPic”、“inSampleSize”、“1280”、“0x500” ，找到一些类，但都无法确定正确的源码。  
+
+后来找到
+
+    com.tencent.mm.plugin.wenote.b.c#fw  
+它计算了宽高，然后交由压缩
+
+    com.tencent.mm.sdk.platformtools.c.c(var0, var7, var9, CompressFormat.JPEG, 95, var3);  
+
+该类名为 MicroMsg.BitmapUtil，相关方法都在这里面。
+
+于是仔细查看。
+
+最后也没找清楚
+
+    
+    public static Bitmap P(Bitmap bm) {
+        float var1 = 2.5F;
+        int srcHeight = 120;
+        int srcWidth;
+        if (bm.getHeight() >= bm.getWidth()) {
+            //高度 > 宽度，高与宽的比
+            float scale = (float) bm.getHeight() / (float) bm.getWidth();
+            if (scale <= 2.0F) {
+                //小于2
+                srcWidth = (int) (120.0D * (double) bm.getWidth() / (double) bm.getHeight());
+            } else {
+                //高比宽大两倍
+                if ((double) scale > 2.5D) {
+                    //高比宽大2.5倍
+                    bm = Bitmap.createBitmap(bm, 0, (bm.getHeight() - (int) (var1 * (float) bm.getWidth())) / 2, bm.getWidth(), (int) (var1 * (float) bm.getWidth()));
+                } else {
+                    var1 = scale;
+                }
+
+                int var8 = (int) (var1 * 56.0F);
+                srcWidth = 56;
+                srcHeight = var8;
+            }
+        } else {
+            //宽度较大
+            float scale = (float) bm.getWidth() / (float) bm.getHeight();
+            if (scale <= 2.0F) {
+                //比值小于2，以较长的为准，短边按比例
+                int var6 = (int) (120.0D * (double) bm.getHeight() / (double) bm.getWidth());
+                srcWidth = 120;
+                srcHeight = var6;
+            } else {
+                if ((double) scale > 2.5D) {
+                    bm = Bitmap.createBitmap(bm, (bm.getWidth() - (int) (var1 * (float) bm.getHeight())) / 2, 0, (int) (var1 * (float) bm.getHeight()), bm.getHeight());
+                } else {
+                    var1 = scale;
+                    //2-2.5 ，短边取56，长边按比例
+                }
+
+                srcWidth = (int) (var1 * 56.0F);
+                srcHeight = 56;
+            }
+        }
+
+        Log.d("MicroMsg.BitmapUtil", "bitmap decoded size=" + bm.getWidth() + "x" + bm.getHeight());
+        Bitmap var5 = Bitmap.createScaledBitmap(bm, srcWidth, srcHeight, true);
+        if (var5 != null && bm != var5) {
+            Log.i("MicroMsg.BitmapUtil", "extractThumeNail bitmap recycle. %s" + bm);
+            bm.recycle();
+            bm = var5;
+        }
+
+        return bm;
+    }

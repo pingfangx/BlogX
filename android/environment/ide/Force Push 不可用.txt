@@ -1,0 +1,5 @@
+在设置中
+Version Control -> Git -> Allow force push  
+同时有 Protected branches
+
+于是决定还是不要更改，强制推送交由命令完成。 

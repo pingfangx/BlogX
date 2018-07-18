@@ -1,0 +1,73 @@
+# %USER_HOME%/.android
+添加环境变量
+
+ANDROID_SDK_HOME
+
+修改完还需要修改 模拟器配置的 ini 文件
+
+# %USER_HOME%/.gradle
+添加环境变量
+
+GRADLE_USER_HOME
+
+# %USER_HOME%/.AndroidStudio
+修改
+
+idea.properties
+
+# .gradle 的修改
+修改之后，因为有的文件文件名过长，导致无法移动，最后决定删除重建  
+但是却遇到了无法解析符号的问题，可以正常运行，但是无法解析符号。  
+尝试了以下方法
+* Gradle -> Refresh All Gradle Projects
+* Remove 'build' directories from project
+* Build -> Clean Project
+* File -> Invalidate Caches / Restart
+* gradlew build --refresh-dependencies 
+* gradle --gradle-user-home=D:/Cache/.gradle -d
+
+都无效，最后把**所有模块**的依赖全部注释掉，构建失败，取消注释，再构建，成功。  
+应该重新导入也可以的。
+
+折腾了好久啊
+
+感谢
+
+[LiuJQ 的回答](https://stackoverflow.com/a/51281293)
+>I would tell what I had done to correct this error:
+
+>Delete this dependency from build.gradle file, and sync, this action will be abort because of missing specified file;
+Now revert the build.gradle file, and sync;
+Done, everything is OK.
+
+[marko 的回答](https://stackoverflow.com/a/49537464)
+> Close the project and import it again. Worked for me today.
+
+[Andrew Glukhoff 的回答](https://stackoverflow.com/a/49551520)
+> Close and reopen project as existing Android Studio project
+
+[Suragch 的回答](https://stackoverflow.com/a/51324829)
+    
+    The support library is out of sync.
+    This error happens because the support library gets out of sync with your project. To get it back in sync you can do the following steps:
+
+    Open your app module's build.gradle file
+    Comment out the implementation lines for the support library. For me it looks like this:
+
+    //implementation 'com.android.support:appcompat-v7:27.1.1'
+    //implementation 'com.android.support:recyclerview-v7:27.1.1'
+    //implementation 'com.android.support.constraint:constraint-la
+    Sync your project with gradle. You will have some errors now. Don't worry about that.
+
+    Uncomment the implementation lines that you previously commented out.
+
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation 'com.android.support.constraint:constraint-la
+    Sync your project with gradle again.
+
+    The "Cannot Resolve Symbol" error should be gone now. This has worked for me several times on different projects.
+
+    Note
+
+    If your project has multiple modules, then you need to follow the directions above for all of the modules at once.
