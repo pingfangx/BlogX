@@ -32,9 +32,9 @@
          * 导航 http://lbsyun.baidu.com/index.php?title=uri/api/android#service-page-anchor10
          */
         return if (useRoutePlan) {
-            "baidumap://map/direction?destination=latlng:${location.latitude},${location.longitude}|name:${location.name}&mode=driving"
+            "baidumap://map/direction?destination=latlng:${location.latitude},${location.longitude}|name:${location.name}&mode=driving&coord_type=gcj02"
         } else {
-            "baidumap://map/navi?location=${location.latitude},${location.longitude}"
+            "baidumap://map/navi?location=${location.latitude},${location.longitude}&coord_type=gcj02"
         }
         
         /**
@@ -42,17 +42,18 @@
          * 规划 https://lbs.amap.com/api/amap-mobile/guide/android/route
          * 导航 https://lbs.amap.com/api/amap-mobile/guide/android/navigation
          */
-         return if (useRoutePlan) {
-            "amapuri://route/plan/?sourceApplication=$appName&dlat=${location.latitude}&dlon=${location.longitude}&dname=${location.name}&dev=1&t=0"
+        return if (useRoutePlan) {
+            "amapuri://route/plan/?sourceApplication=$appName&dlat=${location.latitude}&dlon=${location.longitude}&dname=${location.name}&dev=0&t=0"
         } else {
-            "androidamap://navi?sourceApplication=$appName&lat=${location.latitude}&lon=${location.longitude}&dev=1&style=2"
+            "androidamap://navi?sourceApplication=$appName&lat=${location.latitude}&lon=${location.longitude}&dev=0&style=2"
         }
         
         /**
          * 谷歌地图
          * https://developers.google.com/maps/documentation/urls/guide#directions-action
          */
-         return "google.navigation:q=${location.latitude},${location.longitude}&mode=d"
+         
+        return "https://www.google.com/maps/dir/?api=1&destination=${location.latitude},${location.longitude}&travelmode=driving${if (useRoutePlan) "" else "&dir_action=navigate"}"
          
          /**
          * 腾讯地图

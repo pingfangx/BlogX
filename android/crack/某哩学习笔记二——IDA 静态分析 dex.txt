@@ -1,0 +1,127 @@
+# 0x00 前文回顾
+在上一篇分析中，我们反编译了 dex，找到了相关方法，进行了修改和重新编译。  
+但是由于 dex 不完整，我们利用 multidex 技术，将原始 dex 放到最后加载。  
+但是还有两个问题，一是闪退太多，二是没有共存。
+
+# 0x01 IDA 静态分析
+IDA 非常方便，直接列出了各方法，查找 bge_n 定位。  
+图非常直观，结合之前对代码的分析，判断要跳转的地方。  
+直接在第一个判断处，强行跳转到下载即可。
+
+    CODE:002C2098                 if-nez                          v0, loc_2C20B2 # 第一个 if
+    
+    39 00 0D 00
+    
+    CODE:002C20C6                 if-eqz                          v0, loc_2C20F2 # 第二个 if ，第一个条件
+    38 00 16 00
+    
+    CODE:002C20DA                 if-nez                          v0, loc_2C20F2 # 第二个 if ，第二个条件
+    39 00 0C 00
+    
+    CODE:002C2106                 if-nez                          v0, loc_2C2120 # 第三个if
+    39 00 0C 00
+    
+                                   ↓由此判断
+    0C 00 71 10 E9 49 00 00  0A 00 39 00 0C 00 6E 10 
+    C3 50 04 00 0C 00 13 01  55 00 71 20 9B 4A 10 00 
+    28 C8 6E 10 C3 50 04 00  0C 00 54 41 3B 1F 71 20 
+          ↑跳至此处
+    0C，表示12，实际偏移24
+                             ↓
+    71 10 2B 52 00 00 0A 00  39 00 0D 00 6E 10 C3 50
+    04 00 0C 00 14 01 92 02  0F 7F 71 20 83 D6 10 00
+    28 E8 6E 10 C3 50 04 00  0C 00 54 41 3B 1F 71 20
+          ↑
+    0D，表示13，实际偏移26
+
+为了理解跳转，整理了相关知识
+## 1.1 位
+位数|最大表示|二进制|十六进制
+-|-|-|-
+1|1|0b1|0x1
+2|3|0b11|0x3
+3|7|0b111|0x7
+4|15|0b1111|0xf
+8|255|0b11111111|0xff
+16|65535|-|0xffff
+
+## 1.2 相关资料
+[Dalvik 字节码](https://source.android.com/devices/tech/dalvik/dalvik-bytecode)
+> if-testz vAA, +BBBB  
+> A: 要测试的寄存器（8 位）
+B: 有符号分支偏移量（16 位）
+
+39 00 0C 00  
+有了 1.1 中的整理，我们知道  
+39 表示 if-nez  
+AA 指的 8 位，可以表示 2 个字符，即 39 后面的 00，表示 v0  
+BBBB 指的 16 位，可以表示 4 个字符，即 0C 00，偏移 0C，0C 表示 12，其单位见下述。
+
+[Dalvik opcodes](http://pallergabor.uw.hu/androidblog/dalvik_opcodes.html)
+> 3902 1200 - if-nez v2, 0014 // +0012  
+Jumps to current position+18 words (hex 12) if v2 is nonzero. 0014 is the label of the target instruction.
+
+## 1.3 jump 示例
+    28F0 - goto 0005 // -0010
+    Jumps to current position-16 words (hex 10). 0005 is the label of the target instruction.
+8位可以表示 -128-127，127=0x7f
+
+    2900 0FFE - goto/16 002f // -01f1
+    Jumps to the current position-1F1H words. 002F is the label of the target instruction.
+16位可表示 -32768-32767，32767=0x7ffff
+
+hex(0xf0-0xff-1)=-0x10  
+hex(0xfe0f-0xffff-1)=-0xf1  
+具体的负值根据补码计算。
+
+## 1.4 偏移 word 的含义
+表示偏移的单位为 “word”，这个 “word” 的根据上述分析，表示 4 个字符，16位，那它的定义在哪呢？
+
+在文末有对各个编号的注释
+
+1. Note that double and long values occupy two registers (e.g. the value addressed by vy is located in vy and vy+1 registers)
+2. The offset can be positive or negative and it is calculated from the offset of the starting byte of the instruction.  
+The offset is always interpreted in words (2 bytes per 1 offset value increment/decrement).  
+Negative offset is stored in two's complement format.  
+The current position is the offset of the starting byte of the instruction.
+3. Compare operations returrn positive value if the first operand is greater than the second operand, 0 if they are equal and negative value if the first operand is smaller than the second operand.
+4. Not seen in the wild, interpolated from Dalvik bytecode list.
+5. The invocation parameter list encoding is somewhat weird.  
+Starting if parameter number > 4 and parameter number % 4 == 1, the 5th (9th, etc.) parameter is encoded on the 4 lowest bit of the byte immediately following the instruction.  
+Curiously, this encoding is not used in case of 1 parameter, in this case an entire 16 bit word is added after the method index of which only 4 bit is used to encode the single parameter while the lowest 4 bit of the byte following the instruction byte is left unused.
+6. This is an unsafe instruction and occurs only in ODEX files.
+
+翻译
+1. 请注意，double 和 long 值占用两个寄存器(例如，vy 寻址的值位于 vy 和 vy + 1 寄存器中)
+2. 偏移量可以是正的或负的，它是根据指令起始字节的偏移量计算的。  
+偏移量始终用 “words” 解释(每 1 个偏移表示增/减 2 个字节)。  
+负偏移以二进制补码格式存储。  
+当前位置是指令起始字节的偏移量。
+3. 如果第一个操作数的大于第二个操作数，比较操作返回正值，如果它们相等则返回 0，如果第一个操作数小于第二个操作数则返​​回负值。
+4. 在野外看不到，从 Dalvik 字节码列表插值。
+5. 调用参数列表编码有点奇怪。  
+如果参数编号> 4 且参数编号％4 == 1，则第 5 个(第 9 个等)参数在紧跟在指令之后的字节的最低 4 位编码。  
+奇怪的是，在 1 个参数的情况下不使用这种编码，在这种情况下，在方法索引之后添加整个 16 位字，其中只有 4 位用于编码单个参数，而在指令之后的字节的最低 4 位字节未使用。
+6. 这是一个不安全的指令，仅在 ODEX 文件中出现。
+
+# 0x02 修改
+要跳到 002C2120，从 002C2098 跳转  
+hex(int((0x002C2120-0x002C2098)/2))=0x44  
+跳转指令有 goto target 和 goto/16 target
+
+由于将原来的 
+
+    39 00 0D 00
+    改为
+    29 00 44 00
+    注意 44 00 而不是 00 44
+    
+    或者在分支另一侧也跳转
+    28 E8    
+    hex(int((0x002C2120-0x002C20B0)/2))=0x38
+    28 38
+    
+    28 b1
+    hex(int((0x002C2120-0x002C211E)/2))=0x01
+     
+最后失败了,Failure to verify dex file,可能是编译 dex 的时候是有校验的.

@@ -1,0 +1,242 @@
+# 0x00 需求
+某哩有些视频只可以在线观看，不可以下载  
+先从网上找了一下，是有破解版，但是安装后在下载的时候，还是提示无法下载  
+于是想自己简单动手学习一下，如果太费时间就不学习了。
+
+# 0x01 定位
+根据布局，找到  
+com.bilibili.bangumi.ui.detail.BangumiDetailActivity  
+其在 onCreate 中添加了 Fragment   
+this.E = new bge();
+
+点击下载布局为 download_layout
+
+搜索定位到 bl.bgz.onClick
+
+调用 n()，即 BangumiDetailActivity.n()
+
+    public void n() {
+        if (this.E != null) {
+            this.E.n();
+        }
+    }
+转到 bl.bge.n()
+
+
+    public void n() {
+        if (this.k != null) {
+            bda.b(this.k);
+            if (!bgy.e(this.k)) {
+                esu.b(getContext(), (int) R.string.bangumi_not_allow_download);
+            } else if (bgy.b(getContext(), this.k) && !bbx.a(getContext())) {
+                bcc.e(getContext(), 85);
+            } else if (!bgy.b(getContext(), this.k)) {
+                esu.a(getContext(), (int) R.string.bangumi_pay_watch_download_toast);
+            } else if (this.l == null) {
+                this.l = bcc.n(getActivity());
+                if (this.l instanceof bgx) {
+                    ((bgx) this.l).a(this.k, this.k.episodes);
+                    ((bgx) this.l).setSupportFullHDQuality(bgy.a(getActivity(), this.k));
+                    this.l.setBottomSheetViewListenerCallback(this);
+                    this.l.a(getActivity().getWindow(), VERSION.SDK_INT >= 19);
+                }
+            }
+        }
+    }
+
+# 0x02 修改 smali
+搜索后发现在第一个 dex 中
+
+是简单的 if 跳转，在判断前添加 1!=0 跳转即可  
+也可以修改 :cond 语句让所有分支都跳转到最后
+
+    const/4 v0, 0x1
+
+    if-nez v0, :cond_54
+
+修改后如下，直接走最后的 else if，
+
+    public void n() {
+        if (this.k != null) {
+            if (1 == 0) {
+                bda.b(this.k);
+                if (!bgy.e(this.k)) {
+                    esu.b(getContext(), 2131690130);
+                    return;
+                }
+            }
+            if (1 == 0 && bgy.b(getContext(), this.k) && !bbx.a(getContext())) {
+                bcc.e(getContext(), 85);
+            } else if (1 == 0 && !bgy.b(getContext(), this.k)) {
+                esu.a(getContext(), 2131690172);
+            } else if (this.l == null) {
+                this.l = bcc.n(getActivity());
+                if (this.l instanceof bgx) {
+                    ((bgx) this.l).a(this.k, this.k.episodes);
+                    ((bgx) this.l).setSupportFullHDQuality(bgy.a(getActivity(), this.k));
+                    this.l.setBottomSheetViewListenerCallback(this);
+                    this.l.a(getActivity().getWindow(), VERSION.SDK_INT >= 19);
+                }
+            }
+        }
+    }
+
+# 0x03 v2 签名
+因为使用的签名为 APK Signature Scheme v2  
+找到 "\sdk\build-tools\27.0.3\apksigner.bat"  
+命令 apksigner sign --ks release.jks app.apk  
+keystore 可以使用自带的 "\.android\debug.keystore"，密码为 android  
+签名后安装成功
+
+# 0x04 dex 不完整
+（后来更新了新版的 backsmali.jar 成功）  
+在反编译 dex 的时候，提示 Unable to create file ...\dex\classes\bl\aux.smali - skipping class  
+跳过了两个文件，于是在编译后，打开下载页面总是报缺少类，闪退。  
+
+然后我灵光一闪，将系统原来的 classes.dex 命名为 classes5.dex，让其最后一个加载。  
+我想着，系统在加载时，先加载前面的 classes.dex 缺少的类在最后从 classes5.dex 加载。  
+没有任何依据，只是猜想，没想到试了之后居然成功了。  
+
+以后有时间可以学习一下 multidex 的加载，来解释这里的为什么。
+
+# 0x04 multidex 原理
+[Android MultiDex实现原理解析](http://allenfeng.com/2016/11/17/principle-analysis-on-multidex/)
+
+    android.support.multidex.MultiDex#install
+    android.support.multidex.MultiDex#doInstallation
+    提取出所有 dex 文件，然后安装
+                    List<? extends File> files = MultiDexExtractor.load(mainContext, sourceApk, dexDir, prefsKeyPrefix, false);
+                    installSecondaryDexes(loader, dexDir, files);
+## 提取
+    android.support.multidex.MultiDexExtractor#load
+    android.support.multidex.MultiDexExtractor#performExtractions
+    可以看到从 2 开始，遍历提取 "classes" + secondaryNumber + ".dex"
+    private static List<MultiDexExtractor.ExtractedDex> performExtractions(File sourceApk, File dexDir) throws IOException {
+        String extractedFilePrefix = sourceApk.getName() + ".classes";
+        prepareDexDir(dexDir, extractedFilePrefix);
+        List<MultiDexExtractor.ExtractedDex> files = new ArrayList();
+        ZipFile apk = new ZipFile(sourceApk);
+
+        try {
+            int secondaryNumber = 2;
+
+            for(ZipEntry dexFile = apk.getEntry("classes" + secondaryNumber + ".dex"); dexFile != null; dexFile = apk.getEntry("classes" + secondaryNumber + ".dex")) {
+                String fileName = extractedFilePrefix + secondaryNumber + ".zip";
+                MultiDexExtractor.ExtractedDex extractedFile = new MultiDexExtractor.ExtractedDex(dexDir, fileName);
+                files.add(extractedFile);
+                Log.i("MultiDex", "Extraction is needed for file " + extractedFile);
+                int numAttempts = 0;
+                boolean isExtractionSuccessful = false;
+
+                while(numAttempts < 3 && !isExtractionSuccessful) {
+                    ++numAttempts;
+                    extract(apk, dexFile, extractedFile, extractedFilePrefix);
+
+                    try {
+                        extractedFile.crc = getZipCrc(extractedFile);
+                        isExtractionSuccessful = true;
+                    } catch (IOException var19) {
+                        isExtractionSuccessful = false;
+                        Log.w("MultiDex", "Failed to read crc from " + extractedFile.getAbsolutePath(), var19);
+                    }
+
+                    Log.i("MultiDex", "Extraction " + (isExtractionSuccessful ? "succeeded" : "failed") + " - length " + extractedFile.getAbsolutePath() + ": " + extractedFile.length() + " - crc: " + extractedFile.crc);
+                    if (!isExtractionSuccessful) {
+                        extractedFile.delete();
+                        if (extractedFile.exists()) {
+                            Log.w("MultiDex", "Failed to delete corrupted secondary dex '" + extractedFile.getPath() + "'");
+                        }
+                    }
+                }
+
+                if (!isExtractionSuccessful) {
+                    throw new IOException("Could not create zip file " + extractedFile.getAbsolutePath() + " for secondary dex (" + secondaryNumber + ")");
+                }
+
+                ++secondaryNumber;
+            }
+        } finally {
+            try {
+                apk.close();
+            } catch (IOException var18) {
+                Log.w("MultiDex", "Failed to close resource", var18);
+            }
+
+        }
+
+        return files;
+    }
+## 安装
+    通过反射修改 pathList 字段
+    android.support.multidex.MultiDex#installSecondaryDexes
+    android.support.multidex.MultiDex.V19#install
+    
+        private static void install(ClassLoader loader, List<? extends File> additionalClassPathEntries, File optimizedDirectory) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, InvocationTargetException, NoSuchMethodException {
+            Field pathListField = MultiDex.findField(loader, "pathList");
+            Object dexPathList = pathListField.get(loader);
+            ArrayList<IOException> suppressedExceptions = new ArrayList();
+            MultiDex.expandFieldArray(dexPathList, "dexElements", makeDexElements(dexPathList, new ArrayList(additionalClassPathEntries), optimizedDirectory, suppressedExceptions));
+            if (suppressedExceptions.size() > 0) {
+                Iterator var6 = suppressedExceptions.iterator();
+
+                while(var6.hasNext()) {
+                    IOException e = (IOException)var6.next();
+                    Log.w("MultiDex", "Exception in makeDexElement", e);
+                }
+
+                Field suppressedExceptionsField = MultiDex.findField(dexPathList, "dexElementsSuppressedExceptions");
+                IOException[] dexElementsSuppressedExceptions = (IOException[])((IOException[])suppressedExceptionsField.get(dexPathList));
+                if (dexElementsSuppressedExceptions == null) {
+                    dexElementsSuppressedExceptions = (IOException[])suppressedExceptions.toArray(new IOException[suppressedExceptions.size()]);
+                } else {
+                    IOException[] combined = new IOException[suppressedExceptions.size() + dexElementsSuppressedExceptions.length];
+                    suppressedExceptions.toArray(combined);
+                    System.arraycopy(dexElementsSuppressedExceptions, 0, combined, suppressedExceptions.size(), dexElementsSuppressedExceptions.length);
+                    dexElementsSuppressedExceptions = combined;
+                }
+
+                suppressedExceptionsField.set(dexPathList, dexElementsSuppressedExceptions);
+            }
+
+        }
+        
+# 会员下载
+在 classes2 中
+
+                this.l = bcc.n(getActivity());
+                if (this.l instanceof bgx) {
+                    ((bgx) this.l).a(this.k, this.k.episodes);
+                    ((bgx) this.l).setSupportFullHDQuality(bgy.a(getActivity(), this.k));
+                    this.l.setBottomSheetViewListenerCallback(this);
+                    this.l.a(getActivity().getWindow(), VERSION.SDK_INT >= 19);
+                }
+bcc.n 返回 fkz  
+但却不是 bgx 接口，搜索 setSupportFullHDQuality 找到 lch 继承 fkz 并实现 bgx
+
+onClick 方法
+
+            boolean a = this.s.a(fnd.a(getContext()));
+            
+转到 lcg 的 a(Activity activity)，lcg 是 adapter，其中有点击事件
+
+                if (bangumiDetailActivity.b(bangumiUniformEpisode)) {
+转到 b
+
+    public boolean b(BangumiUniformEpisode bangumiUniformEpisode) {
+        boolean a = bgy.a(this, this.A, bangumiUniformEpisode);
+        if (!a) {
+            esu.b(this, hae.a(new byte[]{(byte) -23, (byte) -107, (byte) -115, (byte) -23, (byte) -104, (byte) -81, (byte) -23, (byte) -110, (byte) -116, (byte) -26, (byte) -106, (byte) -97, (byte) -24, (byte) -77, (byte) -100, (byte) -22, (byte) -94, (byte) -105, (byte) -21, (byte) -76, (byte) -105, (byte) -25, (byte) -69, (byte) -74, (byte) -22, (byte) -119, (byte) -118, (byte) -22, (byte) -95, (byte) -74, (byte) -22, (byte) -100, (byte) -87, (byte) -32, (byte) -78, (byte) -111}));
+        }
+        return a;
+    }
+esu.b 是一个 toast 方法，于是修改此处
+    
+    const/4 v0, 0x1
+    
+    return v0
+效果是可以下载，但是下载时显示 -9，可能是服务器作了校验。
+
+
+android:.*="@.*"
+android:.*="-?\d"
+android:.*="0x.*"

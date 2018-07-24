@@ -1,0 +1,10 @@
+netstat /?查看帮助
+
+netstat -ano 列出
+
+    netstat -ano | findstr 1080
+看到是 pid 为 732 服务的占用了
+
+    tasklist | findstr 732
+看到是 services.exe 占用了 1080端口，不可结束  
+于是修改 ss 的配置，修改代理端口为其他，成功。

@@ -1,0 +1,9 @@
+
+# 修改 cfg/idagui.cfg
+
+    "ApplyPatches"          =       1            // apply patches to input file
+# Edit > Patch Program > Apply patches to input file
+
+[20.IDA-修改二进制文件、显示修改点](https://blog.csdn.net/hgy413/article/details/50650232)
+
+[[求助][原创]用IDA修改指令之后如何保存.so文件](https://bbs.pediy.com/thread-224787.htm)
