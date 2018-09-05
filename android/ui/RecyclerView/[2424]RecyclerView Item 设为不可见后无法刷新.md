@@ -114,7 +114,7 @@ android.support.v7.widget.ScrollbarHelper#computeScrollOffset
 
 
 设置了 decoration ，使得①中第0个隐藏的 headerView 可见，②③得出的 itemsBefore 为0，返回到④为0，⑤返回 false，到⑥返回 false 可以刷新。
-示设置 decoration , 使得①中第0个隐藏的 headerView 不可见，②③得出的 itemsBefore 为1，返回到④有值，⑤返回 true，到⑥返回 false 不可以刷新。
+未设置 decoration , 使得①中第0个隐藏的 headerView 不可见，②③得出的 itemsBefore 为1，返回到④有值，⑤返回 true，到⑥返回 false 不可以刷新。
 ```
 
 到此处，就和之前研初过的 item 设置为 GONE 时仍占用高度的问题连起来了。

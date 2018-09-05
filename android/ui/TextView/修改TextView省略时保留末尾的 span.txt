@@ -1,0 +1,212 @@
+不想再使用一个布局，改为直接修改 TextView
+
+[Android控件TextView的实现原理分析](https://blog.csdn.net/Luoshengyang/article/details/8636153)
+
+[TextView源码解析-----绘制过程](https://blog.csdn.net/wz249863091/article/details/51872113)
+
+# 了解省略的流程
+## setText
+    android.widget.TextView#setText(java.lang.CharSequence, android.widget.TextView.BufferType)
+    android.widget.TextView#setText(java.lang.CharSequence, android.widget.TextView.BufferType, boolean, int)
+        if (mLayout != null) {
+            checkForRelayout();
+        }
+## android.widget.TextView#checkForRelayout
+    
+        if ((mLayoutParams.width != LayoutParams.WRAP_CONTENT
+                || (mMaxWidthMode == mMinWidthMode && mMaxWidth == mMinWidth))
+                && (mHint == null || mHintLayout != null)
+                && (mRight - mLeft - getCompoundPaddingLeft() - getCompoundPaddingRight() > 0)) {
+            // Static width, so try making a new text layout.
+
+            int oldht = mLayout.getHeight();
+            int want = mLayout.getWidth();
+            int hintWant = mHintLayout == null ? 0 : mHintLayout.getWidth();
+
+            /*
+             * No need to bring the text into view, since the size is not
+             * changing (unless we do the requestLayout(), in which case it
+             * will happen at measure).
+             */
+            makeNewLayout(want, hintWant, UNKNOWN_BORING, UNKNOWN_BORING,
+                          mRight - mLeft - getCompoundPaddingLeft() - getCompoundPaddingRight(),
+                          false);
+
+            if (mEllipsize != TextUtils.TruncateAt.MARQUEE) {
+                // In a fixed-height view, so use our new text layout.
+                if (mLayoutParams.height != LayoutParams.WRAP_CONTENT
+                        && mLayoutParams.height != LayoutParams.MATCH_PARENT) {
+                    autoSizeText();
+                    invalidate();
+                    return;
+                }
+
+                // Dynamic height, but height has stayed the same,
+                // so use our new text layout.
+                if (mLayout.getHeight() == oldht
+                        && (mHintLayout == null || mHintLayout.getHeight() == oldht)) {
+                    autoSizeText();
+                    invalidate();
+                    return;
+                }
+            }
+
+            // We lose: the height has changed and we have a dynamic height.
+            // Request a new view layout using our new text layout.
+            requestLayout();
+            invalidate();
+        } else {
+            // Dynamic width, so we have no choice but to request a new
+            // view layout with a new text layout.
+            nullLayouts();
+            requestLayout();
+            invalidate();
+        }
+### android.widget.TextView#nullLayouts
+    //将相关 layout 清空
+    private void nullLayouts() {
+        if (mLayout instanceof BoringLayout && mSavedLayout == null) {
+            mSavedLayout = (BoringLayout) mLayout;
+        }
+        if (mHintLayout instanceof BoringLayout && mSavedHintLayout == null) {
+            mSavedHintLayout = (BoringLayout) mHintLayout;
+        }
+
+        mSavedMarqueeModeLayout = mLayout = mHintLayout = null;
+
+        mBoring = mHintBoring = null;
+
+        // Since it depends on the value of mLayout
+        if (mEditor != null) mEditor.prepareCursorControllers();
+    }
+## onMeasure 
+因为在 checkForRelayout 中调用 nullLayouts 置空了 mLayout  
+在 onMeasure 中重新创建
+
+    ...
+    if (mLayout == null) {
+            makeNewLayout(want, hintWant, boring, hintBoring,
+                          width - getCompoundPaddingLeft() - getCompoundPaddingRight(), false);
+        }
+        
+    android.widget.TextView#makeNewLayout
+        mLayout = makeSingleLayout(wantWidth, boring, ellipsisWidth, alignment, shouldEllipsize,
+                effectiveEllipsize, effectiveEllipsize == mEllipsize);
+    
+    android.widget.TextView#makeSingleLayout
+    
+    protected Layout makeSingleLayout(int wantWidth, BoringLayout.Metrics boring, int ellipsisWidth,
+            Layout.Alignment alignment, boolean shouldEllipsize, TruncateAt effectiveEllipsize,
+            boolean useSaved) {
+        Layout result = null;
+        if (mText instanceof Spannable) {
+            result = new DynamicLayout(mText, mTransformed, mTextPaint, wantWidth,
+                    alignment, mTextDir, mSpacingMult, mSpacingAdd, mIncludePad,
+                    mBreakStrategy, mHyphenationFrequency, mJustificationMode,
+                    getKeyListener() == null ? effectiveEllipsize : null, ellipsisWidth);
+        } else {
+            if (boring == UNKNOWN_BORING) {
+                boring = BoringLayout.isBoring(mTransformed, mTextPaint, mTextDir, mBoring);
+                if (boring != null) {
+                    mBoring = boring;
+                }
+            }
+
+            if (boring != null) {
+                if (boring.width <= wantWidth
+                        && (effectiveEllipsize == null || boring.width <= ellipsisWidth)) {
+                    if (useSaved && mSavedLayout != null) {
+                        result = mSavedLayout.replaceOrMake(mTransformed, mTextPaint,
+                                wantWidth, alignment, mSpacingMult, mSpacingAdd,
+                                boring, mIncludePad);
+                    } else {
+                        result = BoringLayout.make(mTransformed, mTextPaint,
+                                wantWidth, alignment, mSpacingMult, mSpacingAdd,
+                                boring, mIncludePad);
+                    }
+
+                    if (useSaved) {
+                        mSavedLayout = (BoringLayout) result;
+                    }
+                } else if (shouldEllipsize && boring.width <= wantWidth) {
+                    if (useSaved && mSavedLayout != null) {
+                        result = mSavedLayout.replaceOrMake(mTransformed, mTextPaint,
+                                wantWidth, alignment, mSpacingMult, mSpacingAdd,
+                                boring, mIncludePad, effectiveEllipsize,
+                                ellipsisWidth);
+                    } else {
+                        result = BoringLayout.make(mTransformed, mTextPaint,
+                                wantWidth, alignment, mSpacingMult, mSpacingAdd,
+                                boring, mIncludePad, effectiveEllipsize,
+                                ellipsisWidth);
+                    }
+                }
+            }
+        }
+        if (result == null) {
+            StaticLayout.Builder builder = StaticLayout.Builder.obtain(mTransformed,
+                    0, mTransformed.length(), mTextPaint, wantWidth)
+                    .setAlignment(alignment)
+                    .setTextDirection(mTextDir)
+                    .setLineSpacing(mSpacingAdd, mSpacingMult)
+                    .setIncludePad(mIncludePad)
+                    .setBreakStrategy(mBreakStrategy)
+                    .setHyphenationFrequency(mHyphenationFrequency)
+                    .setJustificationMode(mJustificationMode)
+                    .setMaxLines(mMaxMode == LINES ? mMaximum : Integer.MAX_VALUE);
+            if (shouldEllipsize) {
+                builder.setEllipsize(effectiveEllipsize)
+                        .setEllipsizedWidth(ellipsisWidth);
+            }
+            // TODO: explore always setting maxLines
+            result = builder.build();
+        }
+        return result;
+    }
+    
+    android.text.BoringLayout#replaceOrMake(java.lang.CharSequence, android.text.TextPaint, int, android.text.Layout.Alignment, float, float, android.text.BoringLayout.Metrics, boolean, android.text.TextUtils.TruncateAt, int)
+    
+    public BoringLayout replaceOrMake(CharSequence source, TextPaint paint,
+                                      int outerwidth, Alignment align,
+                                      float spacingmult, float spacingadd,
+                                      BoringLayout.Metrics metrics,
+                                      boolean includepad,
+                                      TextUtils.TruncateAt ellipsize,
+                                      int ellipsizedWidth) {
+        boolean trust;
+
+        if (ellipsize == null || ellipsize == TextUtils.TruncateAt.MARQUEE) {
+            replaceWith(source, paint, outerwidth, align, spacingmult,
+                        spacingadd);
+
+            mEllipsizedWidth = outerwidth;
+            mEllipsizedStart = 0;
+            mEllipsizedCount = 0;
+            trust = true;
+        } else {
+            replaceWith(TextUtils.ellipsize(source, paint, ellipsizedWidth,
+                                           ellipsize, true, this),
+                        paint, outerwidth, align, spacingmult,
+                        spacingadd);
+
+            mEllipsizedWidth = ellipsizedWidth;
+            trust = false;
+        }
+
+        init(getText(), paint, outerwidth, align, spacingmult, spacingadd,
+             metrics, includepad, trust);
+        return this;
+    }
+    
+    android.text.TextUtils#ellipsize(java.lang.CharSequence, android.text.TextPaint, float, android.text.TextUtils.TruncateAt, boolean, android.text.TextUtils.EllipsizeCallback)
+    android.text.TextUtils#ellipsize(java.lang.CharSequence, android.text.TextPaint, float, android.text.TextUtils.TruncateAt, boolean, android.text.TextUtils.EllipsizeCallback, android.text.TextDirectionHeuristic, java.lang.String)
+    
+# 思路
+经过分析，省略的操作在 Layout 中处理。  
+想要重写 TextView 新建一个 Layout ，但是相关方法都标记了 @hide  
+在 setText 之后，如有必要，会将 lanyout 置空  
+然后，在 onMeasure 重建了 layout
+
+
+# 最终方案
+最终放弃了重写 TextView 的方案，因为省略还是决定使用 TextView 的逻辑，决定使用重写 ViewGroup 来解决。

@@ -1,0 +1,15 @@
+重写事件
+不能下拉刷新
+
+设置header
+下拉后会从底部回弹
+
+设置背景，要求item 全白
+
+
+想要展示背景，就要透明，但是透明会导致 RecyclerView 的 item 以及内容不足时透明。
+
+于是将 item 设为白色，同时不足时补上 item，但是 item 高度会 match_parent，
+想要改 LayoutManager
+
+后来想到，可以在 RecyclerView 与 背景之间加一层白色，问题解决。

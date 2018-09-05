@@ -1,0 +1,139 @@
+# 问题
+* 价格，在使用 BigDecimal 时，用 String 接收，IOS 中 6.6 可以正常展示，8.8 却不行
+* 71.49 的展示
+* 1.1+0.1 的结果展示
+# 0x01 符点数的表示
+[IEEE 754](https://en.wikipedia.org/wiki/IEEE_754)
+>(−1)^sign × significand × base^exponent
+
+[IEEE 754-中文](https://zh.wikipedia.org/wiki/IEEE_754)
+
+[Float.floatToIntBits](https://docs.oracle.com/javase/10/docs/api/java/lang/Float.html#floatToIntBits(float))  
+> Bit 31 (the bit that is selected by the mask 0x80000000) represents the sign of the floating-point number. Bits 30-23 (the bits that are selected by the mask 0x7f800000) represent the exponent. Bits 22-0 (the bits that are selected by the mask 0x007fffff) represent the significand (sometimes called the mantissa) of the floating-point number.
+
+分为 3 个部分
+* 符号（sign）
+* 指数（exponent）
+* 尾数（significand）或叫系数（coefficient）
+
+有理数还包括
+* 基数（base、radix）
+> Finite numbers described by three integers: s = a sign (zero or one), c = a significand (or coefficient), q = an exponent. Finite numbers also have a base (also called radix), b = base 2 (binary) or base 10 (decimal). The numerical value of a finite number is (−1)s × c × bq For example, if the base is 10, the sign is 1 (indicating negative), the significand is 12345, and the exponent is −3, then the value of the number is (−1)1 × 12345 × 10−3 = −1 × 12345 × .001 = −12.345.
+
+下面简述规约数的 32 位二进制表示
+
+## 符号
+最高位为符号位，0 表示正数，1 表示负数
+
+## 指数（含偏移值）
+接下来的 8 位表示指数，偏移为 2^7-1=127  
+使用偏移值可以使最小表示的指数为 1，而 0 用于表示非规约数。  
+同时使用偏移值还便于比较大小。
+
+> 浮点数基本上可以按照符号位、指数域、尾数域的顺序作字典比较。显然，所有正数大于负数；正负号相同时，指数的二进制表示法更大的其浮点数值更大。
+
+> For the binary formats, the representation is made unique by choosing the smallest representable exponent allowing the value to be represented exactly. Further, the exponent is not represented directly, but a bias is added so that the smallest representable exponent is represented as 1, with 0 used for subnormal numbers.
+
+## 有效值
+后 23 位表示有效位。  
+去除开头的 1. 后，后面按序排出，末尾补 0  
+如果有效位容纳不下，则四舍五入（0 舍 1 入）到最后一位
+> For numbers with an exponent in the normal range (the exponent field being not all ones or all zeros), the leading bit of the significand will always be 1. Consequently, a leading 1 can be implied rather than explicitly present in the memory encoding, and under the standard the explicitly represented part of the significand will lie between 0 and 1. This rule is called leading bit convention, implicit bit convention, or hidden bit convention. This rule allows the memory format to have one more bit of precision. The leading bit convention cannot be used for the subnormal numbers: they have an exponent outside the normal exponent range and scale by the smallest represented exponent as used for the smallest normal numbers.
+
+## 展示示例
+    数值为	6.6
+    转为二进制表示	110.100110011001100110011001100110011
+    转为科学计数法表示	1.10100110011001100110011001100110011 *2^2
+    截取 23 位	1.101 0011 0011 0011 0011 0011 *2^2
+    实际存储	0|1000 0001|101 0011 0011 0011 0011 0011|指数（带偏移）  129|实际表示指数    2
+    转回二进制	110.100110011001100110011
+    再转回十进制	6.599999904632568359375
+    BigDecimal 表示	6.599999904632568359375
+    先转为 String，再用 BigDecimal 表示	6.6
+
+    数值为	8.8
+    转为二进制表示	1000.110011001100110011001100110011001
+    转为科学计数法表示	1.000110011001100110011001100110011001 *2^3
+    截取 23 位	1.000 1100 1100 1100 1100 1101 *2^3
+    实际存储	0|1000 0010|000 1100 1100 1100 1100 1101|指数（带偏移）  130|实际表示指数    3
+    转回二进制	1000.11001100110011001101
+    再转回十进制	8.80000019073486328125
+    BigDecimal 表示	8.80000019073486328125
+    先转为 String，再用 BigDecimal 表示	8.8
+
+# 排查
+根据上面的展示示例可以看到，二进制表示似乎并不是问题的关键，错误可能是由 BigDecimal 的精度丢失造成的。  
+查看服务器返回的数据，发现是正常的 6.6 与 8.8 所以与 BigDecimal 无关，是客户端解析错误造成的。
+
+    //使用如下测试代码
+    void testFloat(NSString *value){
+        NSString *result=[NSString stringWithFormat:@"\nnumber is %@\n",value];
+        NSString *jsonStr=[NSString stringWithFormat:@"{\"price\":%@}",value];
+        result=[result stringByAppendingFormat:@"json str is %@\n",jsonStr];
+        NSData *jsonData=[jsonStr dataUsingEncoding:NSUTF8StringEncoding];
+        NSDictionary *dict=[NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:nil];
+        result=[result stringByAppendingFormat:@"dict is %@\n",dict];
+        id price=dict[@"price"];
+        result=[result stringByAppendingFormat:@"转为 float,price is %f\n",[price floatValue]];
+        result=[result stringByAppendingFormat:@"取为 double，再取 stringValue,price is %@\n",[@([price doubleValue])stringValue]];
+        NSLog(@"%@",result);
+    }
+    //生成结果
+    number is 6.6
+    json str is {"price":6.6}
+    dict is {
+        price = "6.6";
+    }
+    value is 6.6
+    floatValue  is 6.600000
+    doubleValue  is 6.600000
+    doubleValue stringValue is 6.6
+    
+    number is 8.8
+    json str is {"price":8.8}
+    dict is {
+        price = "8.800000000000001";
+    }
+    value is 8.800000000000001
+    floatValue  is 8.800000
+    doubleValue  is 8.800000
+    doubleValue stringValue is 8.800000000000001
+    
+    number is 8.88
+    json str is {"price":8.88}
+    dict is {
+        price = "8.880000000000001";
+    }
+    value is 8.880000000000001
+    floatValue  is 8.880000
+    doubleValue  is 8.880000
+    doubleValue stringValue is 8.880000000000001
+    
+    number is 71.49
+    json str is {"price":71.49}
+    dict is {
+        price = "71.48999999999999";
+    }
+    value is 71.48999999999999
+    floatValue  is 71.489998
+    doubleValue  is 71.490000
+    doubleValue stringValue is 71.48999999999999
+    Program ended with exit code: 0
+
+可以看到精度丢失发生于，将 jsonStr 转为 NSData 再转为 NSDictionary 的过程中。  
+为什么它的精度与上面的分析不一致呢？这可能是 OC 中 NSNumber 的精度问题吧，没有进一步深究。  
+[iOS开发可能遇到的坑（一）——浮点数的转化显示问题](https://www.jianshu.com/p/330c571c3e06)
+
+# 1.1+0.1 的结果
+    二进制相加
+    a=1.0001100110011001100110011001100110011001100110011010
+    b=0.00011001100110011001100110011001100110011001100110011010
+    c=1.00110011001100110011001100110011001100110011001100111010
+    科学计数法表示
+    1.00110011001100110011001100110011001100110011001100111010 * 2^0
+    截取 52 位
+    1.0011001100110011001100110011001100110011001100110100 * 2^0
+    转为十进制
+    1.20000000000000017763568394002504646778106689453125
+    
+可以看到，因为二进制时科学计数法表示后，小数点后的部分没有办法表示完整，需要进行截取，所以精度丢失。

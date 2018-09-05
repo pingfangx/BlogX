@@ -1,0 +1,36 @@
+[Plugin Development Guidelines](https://www.jetbrains.com/help/idea/plugin-development-guidelines.html)
+
+# 0x01 安装一个的社区版的 IntelliJIDEA 并配置为插件 SDK  
+Project>Project SDK>New>IntelliJ Platform Plugin SDK  
+然后可选地在 SDKs>Sourcepath> 添加源码。
+
+# 0x02 创建一个插件项目
+IntelliJ Platform Plugin  
+或 Gradle > IntelliJ Platform Plugin
+
+## 两者的差别
+使用 Gradle 和使用 DevKit 是不一样的。  
+使用 DevKit 才有 Prepare Plugin Module，生成了插件 jar 包才能发布  
+而 Gradle 集成了提交（官方那么写的，没有实测过）
+
+# 0x3 编码
+## 新建一个 Action 
+## 实现 actionPerformed
+## 在 xml 中注册 Action
+
+
+## 修改 plugin.xml 
+resources/META-INF/plugin.xml  
+这一步骤在哪一步都行，但一定要做。
+### depends
+这个依赖是一定要写的。
+
+[Plugin Compatibility with IntelliJ Platform Products](http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html)
+> If a plugin does not include any module dependency tags in its plugin.xml, it’s assumed to be a legacy plugin and is loaded only in IntelliJ IDEA.
+
+
+# 0x04 运行并调试插件
+如果没有生成运行配置，添加>plugin 即可
+
+# 0x05 发布插件
+修改 plugin.xml 后，build > Prepare Plugin Module

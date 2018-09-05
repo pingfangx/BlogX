@@ -1,0 +1,134 @@
+android.graphics.color
+* 颜色是怎么表示（存储的）
+* HSV 是啥
+* 颜色解析是怎么实现的
+
+# 0x01 颜色的表示
+    (alpha << 24) | (red << 16) | (green << 8) | blue
+
+每个组件的范围为 [0,255]  
+共4个组件，32 位，可以用 int 表示。
+
+在源码中表示为各个分量单独存储
+
+    
+    @NonNull
+    @Size(min = 4, max = 5)
+    private final float[] mComponents;
+    
+    public int toArgb() {
+        if (mColorSpace.isSrgb()) {
+            return ((int) (mComponents[3] * 255.0f + 0.5f) << 24) |
+                   ((int) (mComponents[0] * 255.0f + 0.5f) << 16) |
+                   ((int) (mComponents[1] * 255.0f + 0.5f) <<  8) |
+                    (int) (mComponents[2] * 255.0f + 0.5f);
+        }
+
+        float[] color = new float[] {
+                mComponents[0], mComponents[1], mComponents[2], mComponents[3]
+        };
+        // The transformation saturates the output
+        ColorSpace.connect(mColorSpace).transform(color);
+
+        return ((int) (color[3] * 255.0f + 0.5f) << 24) |
+               ((int) (color[0] * 255.0f + 0.5f) << 16) |
+               ((int) (color[1] * 255.0f + 0.5f) <<  8) |
+                (int) (color[2] * 255.0f + 0.5f);
+    }
+## 颜色的正负值
+总共 8 位，1<<7就可以使后面7个0，即 2^7=128=0x80，
+透明度为 0x80 及以上的，就会是负值。
+
+## 各颜色的分量
+
+    /**
+     * Return the alpha component of a color int. This is the same as saying
+     * color >>> 24
+     */
+    @IntRange(from = 0, to = 255)
+    public static int alpha(int color) {
+        return color >>> 24;
+    }
+
+    /**
+     * Return the red component of a color int. This is the same as saying
+     * (color >> 16) & 0xFF
+     */
+    @IntRange(from = 0, to = 255)
+    public static int red(int color) {
+        return (color >> 16) & 0xFF;
+    }
+
+    /**
+     * Return the green component of a color int. This is the same as saying
+     * (color >> 8) & 0xFF
+     */
+    @IntRange(from = 0, to = 255)
+    public static int green(int color) {
+        return (color >> 8) & 0xFF;
+    }
+
+    /**
+     * Return the blue component of a color int. This is the same as saying
+     * color & 0xFF
+     */
+    @IntRange(from = 0, to = 255)
+    public static int blue(int color) {
+        return color & 0xFF;
+    }
+右移后，用 & 将高位去掉
+
+
+    public static int rgb(
+            @IntRange(from = 0, to = 255) int red,
+            @IntRange(from = 0, to = 255) int green,
+            @IntRange(from = 0, to = 255) int blue) {
+        return 0xff000000 | (red << 16) | (green << 8) | blue;
+    }
+    public static int rgb(float red, float green, float blue) {
+        return 0xff000000 |
+               ((int) (red   * 255.0f + 0.5f) << 16) |
+               ((int) (green * 255.0f + 0.5f) <<  8) |
+                (int) (blue  * 255.0f + 0.5f);
+    }
+
+
+
+# 0x02 HSV 是啥
+[HSL和HSV色彩空间](https://zh.wikipedia.org/wiki/HSL%E5%92%8CHSV%E8%89%B2%E5%BD%A9%E7%A9%BA%E9%97%B4)
+
+
+HSL和HSV都是一种将RGB色彩模型中的点在圆柱坐标系中的表示法。这两种表示法试图做到比基于笛卡尔坐标系的几何结构RGB更加直观。
+
+HSL即色相、饱和度、亮度（英语：Hue, Saturation, Lightness）。HSV即色相、饱和度、明度（英语：Hue, Saturation, Value），又称HSB，其中B即英语：Brightness。
+
+色相（H）是色彩的基本属性，就是平常所说的颜色名称，如红色、黄色等。
+饱和度（S）是指色彩的纯度，越高色彩越纯，低则逐渐变灰，取0-100%的数值。
+明度（V），亮度（L），取0-100%。
+
+
+# 0x03 颜色解析
+
+    public static int parseColor(@Size(min=1) String colorString) {
+        if (colorString.charAt(0) == '#') {
+            //包含 #
+            // Use a long to avoid rollovers on #ffXXXXXX
+            long color = Long.parseLong(colorString.substring(1), 16);
+            if (colorString.length() == 7) {
+                //添加透明度
+                // Set the alpha value
+                color |= 0x00000000ff000000;
+            } else if (colorString.length() != 9) {
+                throw new IllegalArgumentException("Unknown color");
+            }
+            //返回 int 值
+            return (int)color;
+        } else {
+            //不包含 # ，按名字取
+            Integer color = sColorNameMap.get(colorString.toLowerCase(Locale.ROOT));
+            if (color != null) {
+                return color;
+            }
+        }
+        throw new IllegalArgumentException("Unknown color");
+    }

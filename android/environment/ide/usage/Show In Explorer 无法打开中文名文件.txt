@@ -1,0 +1,48 @@
+发现生成了个 bat 文件，内容为
+
+    explorer /select,"路径"
+
+但是文件编码是 utf-8 的，导致系统按 ANSI 去读取的时候中文乱码，于是无法打开。  
+不知道是否与我设置了 AS 的编码为 utf-8 有关，需要去查看源码。
+
+# 源码
+    根据操描述“highlights the file”，搜索到 action.RevealIn.description
+    搜索到 com.intellij.ide.actions.RevealFileAction
+    
+      public void actionPerformed(AnActionEvent e) {
+        VirtualFile file = ShowFilePathAction.findLocalFile(CommonDataKeys.VIRTUAL_FILE.getData(e.getDataContext()));
+        if (file != null) {
+          ShowFilePathAction.openFile(new File(file.getPresentableUrl()));
+        }
+      }
+      com.intellij.ide.actions.ShowFilePathAction#openFile
+      com.intellij.ide.actions.ShowFilePathAction#doOpen
+      
+      private static void doOpen(@NotNull File _dir, @Nullable File _toSelect) throws IOException, ExecutionException {
+        String dir = FileUtil.toSystemDependentName(FileUtil.toCanonicalPath(_dir.getPath()));
+        String toSelect = _toSelect != null ? FileUtil.toSystemDependentName(FileUtil.toCanonicalPath(_toSelect.getPath())) : null;
+
+        if (SystemInfo.isWindows) {
+          String call = toSelect != null ? "explorer /select,\"" + toSelect + '"' : "explorer /root,\"" + dir + '"';
+          LOG.debug(call);
+          File script = ExecUtil.createTempExecutableScript("idea_show_file_", ".bat", call);
+          GeneralCommandLine cmd = new GeneralCommandLine(script.getPath());
+          OSProcessHandler.deleteFileOnTermination(cmd, script);
+          ExecUtil.execAndGetOutput(cmd).checkSuccess(LOG);
+        }
+        ...
+      }
+      
+      com.intellij.execution.util.ExecUtil#createTempExecutableScript
+        
+      public static File createTempExecutableScript(@NotNull String prefix, @NotNull String suffix, @NotNull String content) throws IOException, ExecutionException {
+        File tempDir = new File(PathManager.getTempPath());
+        File tempFile = FileUtil.createTempFile(tempDir, prefix, suffix, true, true);
+        FileUtil.writeToFile(tempFile, content.getBytes(CharsetToolkit.UTF8));
+        if (!tempFile.setExecutable(true, true)) {
+          throw new ExecutionException("Failed to make temp file executable: " + tempFile);
+        }
+        return tempFile;
+      }
+      
+      可以看到，在写入内容时，写入了 UTF-8

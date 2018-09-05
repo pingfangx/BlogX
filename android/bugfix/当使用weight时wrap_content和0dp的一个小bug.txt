@@ -1,0 +1,122 @@
+# 当使用weight时wrap_content和0dp的一个小bug
+如下布局
+```
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            tools:text="文字长长长长长长长长长长长长长长长长长长长长长长长长长长工" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_launcher" />
+    </LinearLayout>
+</RelativeLayout>
+```
+需求为，图片跟在文字右边，如果文字过长，则显示省略号。  
+按图中进行布局后，提示
+>Use a layout_width of 0dp instead of wrap_content for better performance
+
+于是修改为0dp，结果修改为0dp以后，当item滚动时，会复用TextView的宽度，在较窄的宽度内放入过多文字时，会不正常地省略。
+代码
+```
+package com.pingfangx.wrap_content_and_0dp_when_use_weight;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        initViews();
+    }
+
+    private void initViews() {
+        RecyclerView recycler_view = (RecyclerView) findViewById(R.id.recycler_view);
+        recycler_view.setLayoutManager(new LinearLayoutManager(this));
+        recycler_view.setAdapter(new TextAdapter(this, getData()));
+    }
+
+    private List<String> getData() {
+        List<String> data = new ArrayList<>();
+        Random random = new Random();
+        for (int i = 0; i < 100; i++) {
+            StringBuilder s = new StringBuilder();
+            int times = random.nextInt(30);
+            for (int t = 0; t < times; t++) {
+                s.append("一");
+            }
+            data.add(s.toString());
+        }
+        return data;
+    }
+
+    class TextAdapter extends RecyclerView.Adapter<TextAdapter.TextViewHolder> {
+        private Context mContext;
+        private List<String> mData;
+
+        public TextAdapter(Context context, List<String> data) {
+            mData = data;
+            mContext = context;
+        }
+
+        @Override
+        public TextViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View itemView = LayoutInflater.from(mContext).inflate(R.layout.item_text_image, parent, false);
+            return new TextViewHolder(itemView);
+        }
+
+        @Override
+        public void onBindViewHolder(TextViewHolder holder, int position) {
+            holder.tv.setText(mData.get(position));
+        }
+
+        @Override
+        public int getItemCount() {
+            return mData.size();
+        }
+
+        class TextViewHolder extends RecyclerView.ViewHolder {
+            TextView tv;
+
+            public TextViewHolder(View itemView) {
+                super(itemView);
+                tv = itemView.findViewById(R.id.tv);
+            }
+        }
+    }
+
+}
+
+```

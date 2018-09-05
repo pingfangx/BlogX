@@ -1,0 +1,31 @@
+RecyclerView 中使用的 item 为分隔线，但是却不展示。  
+关闭硬件加速，加大高度，问题依然存在。  
+调试 draw 方法
+
+    android.view.View#draw(android.graphics.Canvas)
+    android.view.View#drawBackground
+    android.graphics.drawable.ColorDrawable#draw
+    
+    @Override
+    public void draw(Canvas canvas) {
+        final ColorFilter colorFilter = mPaint.getColorFilter();
+        if ((mColorState.mUseColor >>> 24) != 0 || colorFilter != null || mTintFilter != null) {
+            if (colorFilter == null) {
+                mPaint.setColorFilter(mTintFilter);
+            }
+
+            mPaint.setColor(mColorState.mUseColor);
+            canvas.drawRect(getBounds(), mPaint);
+
+            // Restore original color filter.
+            mPaint.setColorFilter(colorFilter);
+        }
+    }
+
+    发现 mColorState.mUseColor >>> 24 ==0
+    想起之前的 Drawable 加载过程，应该是加载 Drawable 加载时复用，
+    然后被设置为透明。定位并解决。
+    
+# >>> 24 表示颜色的怎么计算
+第个颜色组件，最大 255 ，使用一个字节，8 位表示。  
+因此透明度右移 24 位。

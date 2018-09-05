@@ -1,0 +1,17 @@
+https://developer.android.com/studio/write/tool-attributes#toolssample_resources
+
+https://android.jlelse.eu/android-tools-attributes-listitem-sample-data-rocks-bbf49aaa9f07
+# Predefine data
+
+# My own sample data
+
+## 总结一下
+* 可以用纯文本
+* 可以使用 .json 文件
+* 要记得构建项目
+
+## 另外一些注意
+* sampedata 目录有效，子目录无效
+* json 中后缀名必须为 .json 否则无效
+* json 中的中文需要转义为 “\u5929”，否则乱码
+* 最后为了实现多种文本，可以写成 string_long 的形式，也可以进行转义

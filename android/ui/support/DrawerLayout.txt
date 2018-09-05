@@ -1,0 +1,167 @@
+Q:
+* 相关方法
+* 如何使用
+* api
+* 源码
+* 注意事项
+
+# 0x01 基本概念
+drawer [drɔ:(r)] 抽屉
+
+[reference-DrawerLayout](https://developer.android.com/reference/android/support/v4/widget/DrawerLayout)
+
+[guide-创建抽屉式导航栏](https://developer.android.com/training/implementing-navigation/nav-drawer?hl=zh-cn)
+
+[抽屉式导航栏 Material Design 设计指南](https://material.io/design/components/navigation-drawer.html#implementation)
+
+[官方 demo-android-NavigationDrawer](https://github.com/googlesamples/android-NavigationDrawer/)
+
+# 0x02 如何使用
+> To use a DrawerLayout, position your primary content view as the first child with width and height of match_parent and no layout_gravity>. Add drawers as child views after the main content view and set the layout_gravity appropriately. Drawers commonly use match_parent for height with a fixed width.
+
+主视图作为第一个 child，宽高 match_parent，无 layout_gravity
+
+drawer 作为第二个 child，宽固定值，高 match_parent，设置 layout_gravity
+
+
+# 0x03 API
+DrawerLayout.DrawerListener 接口与 DrawerLayout.SimpleDrawerListener 类  
+Simple 类的形式可以便于只重写部分方法。
+
+	addDrawerListener
+    openDrawer
+    closeDrawer
+    setDrawerLockMode
+
+# 0x04 源码
+## addDrawerListener
+
+    /**
+     * Listener for monitoring events about drawers.
+     */
+    public interface DrawerListener {
+        /**
+         * Called when a drawer's position changes.
+         * @param drawerView The child view that was moved
+         * @param slideOffset The new offset of this drawer within its range, from 0-1
+         */
+        void onDrawerSlide(@NonNull View drawerView, float slideOffset);
+
+        /**
+         * Called when a drawer has settled in a completely open state.
+         * The drawer is interactive at this point.
+         *
+         * @param drawerView Drawer view that is now open
+         */
+        void onDrawerOpened(@NonNull View drawerView);
+
+        /**
+         * Called when a drawer has settled in a completely closed state.
+         *
+         * @param drawerView Drawer view that is now closed
+         */
+        void onDrawerClosed(@NonNull View drawerView);
+
+        /**
+         * Called when the drawer motion state changes. The new state will
+         * be one of {@link #STATE_IDLE}, {@link #STATE_DRAGGING} or {@link #STATE_SETTLING}.
+         *
+         * @param newState The new drawer motion state
+         */
+        void onDrawerStateChanged(@State int newState);
+    }
+## openDrawer 与 closeDrawer
+    android.support.v4.widget.DrawerLayout#openDrawer(int, boolean)
+        //所以说 Gravity 是唯一的。
+        final View drawerView = findDrawerWithGravity(gravity);
+    android.support.v4.widget.DrawerLayout#openDrawer(android.view.View, boolean)
+        android.support.v4.widget.ViewDragHelper#smoothSlideViewTo
+
+## setDrawerLockMode
+Enable or disable interaction with the given drawer.
+This allows the application to restrict the user's ability to open or close the given drawer. DrawerLayout will still respond to calls to openDrawer(int), closeDrawer(int) and friends if a drawer is locked.
+Locking a drawer open or closed will implicitly open or close that drawer as appropriate.
+
+## gravity
+    View findDrawerWithGravity(int gravity) {
+        final int absHorizGravity = GravityCompat.getAbsoluteGravity(
+                gravity, ViewCompat.getLayoutDirection(this)) & Gravity.HORIZONTAL_GRAVITY_MASK;
+        final int childCount = getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            final View child = getChildAt(i);
+            final int childAbsGravity = getDrawerViewAbsoluteGravity(child);
+            if ((childAbsGravity & Gravity.HORIZONTAL_GRAVITY_MASK) == absHorizGravity) {
+                return child;
+            }
+        }
+        return null;
+    }
+    
+    boolean isContentView(View child) {
+        return ((LayoutParams) child.getLayoutParams()).gravity == Gravity.NO_GRAVITY;
+    }
+
+    boolean isDrawerView(View child) {
+        final int gravity = ((LayoutParams) child.getLayoutParams()).gravity;
+        final int absGravity = GravityCompat.getAbsoluteGravity(gravity,
+                ViewCompat.getLayoutDirection(child));
+        if ((absGravity & Gravity.LEFT) != 0) {
+            // This child is a left-edge drawer
+            return true;
+        }
+        if ((absGravity & Gravity.RIGHT) != 0) {
+            // This child is a right-edge drawer
+            return true;
+        }
+        return false;
+    }
+## 多个抽屉布局
+>  Note that you can only have one drawer view for each vertical edge of the window. If your layout configures more than one drawer view per vertical edge of the window, an exception will be thrown at runtime.
+
+限制了每个垂直边只可以有一个抽屉 view。  
+在 android.support.v4.widget.DrawerLayout#onMeasure 中抛出异常
+
+                if ((isLeftEdgeDrawer && hasDrawerOnLeftEdge)
+                        || (!isLeftEdgeDrawer && hasDrawerOnRightEdge)) {
+                    throw new IllegalStateException("Child drawer has absolute gravity "
+                            + gravityToString(childGravity) + " but this " + TAG + " already has a "
+                            + "drawer view along that edge");
+                }
+但是其实是可以左右各一个的
+
+
+# ViewDragHelper
+TODO 需要一篇单独的文章学习，串起 ViewGroup、ViewDragHelper、Scroller
+
+在构造时创建，打开关闭、动作拦截都交由 Dragger 处理
+
+    android.support.v4.widget.DrawerLayout#DrawerLayout(android.content.Context, android.util.AttributeSet, int)
+        mLeftCallback = new ViewDragCallback(Gravity.LEFT);
+
+        mLeftDragger = ViewDragHelper.create(this, TOUCH_SLOP_SENSITIVITY, mLeftCallback);
+        mLeftDragger.setEdgeTrackingEnabled(ViewDragHelper.EDGE_LEFT);
+        mLeftDragger.setMinVelocity(minVel);
+        mLeftCallback.setDragger(mLeftDragger);
+        
+    android.support.v4.widget.DrawerLayout#openDrawer(android.view.View, boolean)
+                mLeftDragger.smoothSlideViewTo(drawerView, 0, drawerView.getTop());
+
+    android.support.v4.widget.DrawerLayout#onInterceptTouchEvent
+
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        final int action = ev.getActionMasked();
+
+        // "|" used deliberately here; both methods should be invoked.
+        final boolean interceptForDrag = mLeftDragger.shouldInterceptTouchEvent(ev)
+                | mRightDragger.shouldInterceptTouchEvent(ev);
+        ...
+        return interceptForDrag || interceptForTap || hasPeekingDrawer() || mChildrenCanceledTouch;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        mLeftDragger.processTouchEvent(ev);
+        mRightDragger.processTouchEvent(ev);
+        ...
+        return wantTouchEvents;
+    }
