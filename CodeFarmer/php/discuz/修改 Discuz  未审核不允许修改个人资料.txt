@@ -1,0 +1,34 @@
+有水号通过修改个人信息发放广告。  
+开启了人工认证，但是居然还是可以注册（后来发现验证邮箱后即为待审核用户，可以修改资料）。  
+
+## 添加注册必填字段
+用户>用户栏目  
+[DZX2修改数据库字段为注册必填能有效防止注册机](http://www.discuz.net/thread-2368534-1-1.html)
+
+## 后台>>工具 >> 运行记录>> 系统记录>>后台访问
+
+## 后台 工具 校验文件
+仅创建者可查看
+
+## 删除 Powered by Discuz！
+[【浅见】Discuz网站有效阻止发贴机灌水机的方法](https://www.discuzlab.com/thread-80-1-1.html)
+> 分析了下，发贴机和灌水机有可能是对网页 Powered by Discuz！
+
+## 修改修改资料的接口
+http://localhost.pingfangx.com/home.php?mod=spacecp&ac=profile&op=info
+
+    home.php:41
+        require_once libfile('home/'.$mod, 'module');
+    >source/module/home/home_spacecp.php:60
+        require_once libfile('spacecp/'.$ac, 'include');
+    >source/include/spacecp/spacecp_profile.php:260
+		C::t('common_member_profile')->update($_G['uid'], $setarr);
+    因此直接修改，在提交前判断是否是待审核会员
+    
+	if($setarr) {
+        $space = getuserbyuid($_G['uid']);
+        if ($space['groupid'] == 8) {
+            profile_showsuccess('未审核用户暂不允许修改资料');
+        }
+		C::t('common_member_profile')->update($_G['uid'], $setarr);
+	}

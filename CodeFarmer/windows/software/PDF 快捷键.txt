@@ -1,0 +1,22 @@
+# 0x00 需要
+需要 书签 和 高亮两个工具。
+
+# 高亮
+[你认为PC上最好用的PDF阅读器是哪一种？](https://www.zhihu.com/question/22808564)  
+我们知道，xchange viewer 可以自定义快捷键。  
+[图解PDF-XChange Viewer自定义快捷键](http://cherishlc.iteye.com/blog/1286250)  
+工具栏右边展开即可自定义。
+
+后来又看到
+[adobe reader 高亮的快捷键是什么呢？](https://zhidao.baidu.com/question/416146942.html)  
+
+    Here is one way to do it, in CS4 at least:
+    1) In "Acrobat" - "Preferences", select the "General" category and check the box that says "Use single-key accelerators to access tools"
+    2) Choose "OK" to save the changes
+    3) Now in the document, you just need to press "U" on the keyboard to enable the highlight text tool. Pressing "H" will switch you back to the hand.
+    
+于是按 U 进入高亮，按 B 进入选择，Ctrl B 加入书签。
+[Acrobat 键盘快捷键](https://helpx.adobe.com/cn/acrobat/using/keyboard-shortcuts.html)
+
+# 书签如何分层级
+拖动即可

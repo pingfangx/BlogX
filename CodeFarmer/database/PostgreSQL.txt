@@ -38,3 +38,9 @@ INTERACTIVE INSTALLER BY ENTERPRISEDB 的半天不可以，使用 GRAPHICAL INST
     DO
      UPDATE
        SET email = EXCLUDED.email || ';' || customers.email;
+       
+       
+# 问题
+## id 不连续
+因为 INSERT 失败导致
+[postgresql自增id断层](https://blog.csdn.net/xsgnzb/article/details/78805478)

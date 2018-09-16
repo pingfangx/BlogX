@@ -1,0 +1,21 @@
+[码农代理免费代理ip端口字段js加密破解](https://www.cnblogs.com/cc11001100/p/8606160.html)
+
+[CC11001100](http://www.cnblogs.com/cc11001100)
+
+学习简单的破解操作，作者有很多文章，有时间可以学习。
+
+# ctrl+shift+c
+选择元素
+
+# break on subtree modifications
+右键下方的元素打断点，刷新网页
+
+# 格式化
+点 {} 的标志，pretty print
+
+# 在控制台执行
+右击→ Evaluate in console
+
+# 十六进制转换
+> 十六进制将\x部分去掉，然后使用String.fromCharCode()将剩下的部分转为字符
+

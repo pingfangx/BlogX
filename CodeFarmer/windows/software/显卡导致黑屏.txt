@@ -25,3 +25,8 @@ Oray display mirror driver
 软件
 Gamma Panel
 [dot-osk/monitor_ctrl](https://github.com/dot-osk/monitor_ctrl)
+
+
+
+9.18.10.3220
+驱动精灵，选强制安装，10.18.10.4885 亮度调节生效。
