@@ -3,6 +3,11 @@
 除对 Paint 直接操作外，textStyle，setTypeface，StyleSpan，b 标签这几种方法  
 最后都会使用字体，判断字体如果没有加粗，再设置 Paint#setFakeBoldText
 
+[如何实现 “中间这几个字要加粗，但是不要太粗，比较纤细的那种粗” ？](https://juejin.im/post/597d88f75188257fc2177c36)
+
+[在TextView里面设置字体粗体](https://blog.csdn.net/huntersnail/article/details/48913331)
+提到，如果复用 TextView，使用 paint 则会导致每个 Item 都加粗，应换其他方式。
+
 # 0x01 textStyle 和 android.widget.TextView#setTypeface
 TextView_textStyle 是 TextView 的属性，作用于字体  
 
