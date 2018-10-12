@@ -16,13 +16,13 @@ if "%input%"=="" (
 )
 
 set source_file="C:\Windows\ShellNew\template.txt"
-set target_file=%current_dir%\%input%.md
+set target_file="%current_dir%\%input%.md"
 
 echo 新建文件 %target_file%
 copy %source_file% %target_file%
 
 rem 打开文件
-start %target_file%
+%target_file%
 
 goto exit
 
