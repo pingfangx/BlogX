@@ -1,0 +1,67 @@
+
+TODO 需要时间认真读一读。
+
+## 网络
+[OSI模型](https://zh.wikipedia.org/wiki/OSI%E6%A8%A1%E5%9E%8B)  
+Open System Interconnection Reference Model 开放式系统互联通信参考模型
+
+
+[TCP](https://zh.wikipedia.org/wiki/%E4%BC%A0%E8%BE%93%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE)  
+Transmission Control Protocol 传输控制协议
+
+[HTTP](https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE)  
+HyperText Transfer Protocol 超文本传输协议
+
+[HTTPS](https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%AE%89%E5%85%A8%E5%8D%8F%E8%AE%AE)  
+Hypertext Transfer Protocol Secure 超文本传输安全协议，缩写：HTTPS，常称为HTTP over TLS，HTTP over SSL或HTTP Secure
+
+[TLS](https://zh.wikipedia.org/wiki/%E5%82%B3%E8%BC%B8%E5%B1%A4%E5%AE%89%E5%85%A8%E6%80%A7%E5%8D%94%E5%AE%9A)  
+Transport Layer Security 传输层安全性协议  
+Secure Sockets Layer 安全套接层
+
+[URI](https://zh.wikipedia.org/wiki/%E7%BB%9F%E4%B8%80%E8%B5%84%E6%BA%90%E6%A0%87%E5%BF%97%E7%AC%A6)  
+Uniform Resource Identifier 统一资源标识符
+
+[URL](https://zh.wikipedia.org/wiki/%E7%BB%9F%E4%B8%80%E8%B5%84%E6%BA%90%E5%AE%9A%E4%BD%8D%E7%AC%A6)  
+Uniform Resource Locator 统一资源定位符
+
+《计算机网络·谢希仁》
+
+# 加密
+[DES](https://zh.wikipedia.org/wiki/%E8%B3%87%E6%96%99%E5%8A%A0%E5%AF%86%E6%A8%99%E6%BA%96)  
+Data Encryption Standard 数据加密标准
+
+[AES](https://zh.wikipedia.org/wiki/%E9%AB%98%E7%BA%A7%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86)  
+Advanced Encryption Standard 高级加密标准
+
+[RSA](https://zh.wikipedia.org/wiki/RSA%E5%8A%A0%E5%AF%86%E6%BC%94%E7%AE%97%E6%B3%95)
+
+[ECC](https://zh.wikipedia.org/wiki/%E6%A4%AD%E5%9C%86%E6%9B%B2%E7%BA%BF%E5%AF%86%E7%A0%81%E5%AD%A6)  
+Elliptic curve cryptography 椭圆曲线密码学
+
+[RSA算法原理（一）](http://www.ruanyifeng.com/blog/2013/06/rsa_algorithm_part_one.html)
+
+[RSA算法原理（二）](http://www.ruanyifeng.com/blog/2013/07/rsa_algorithm_part_two.html)
+
+[MD5](https://zh.wikipedia.org/wiki/MD5)  
+MD5 Message-Digest Algorithm MD5消息摘要算法
+
+[SHA-1](https://zh.wikipedia.org/wiki/SHA-1)  
+Secure Hash Algorithm 1 安全散列算法1
+
+[MAC](https://zh.wikipedia.org/wiki/%E8%A8%8A%E6%81%AF%E9%91%91%E5%88%A5%E7%A2%BC)  
+Message authentication code 消息认证码
+
+# https
+[App安全之网络传输安全](https://blog.csdn.net/wangjigaoyi/article/details/51910745)
+
+[图解HTTPS](http://www.cnblogs.com/zhuqil/archive/2012/07/23/2604572.html)
+
+[The First Few Milliseconds of an HTTPS Connection](http://www.moserware.com/2009/06/first-few-milliseconds-of-https.html)
+
+
+通过各基础知识，假设我们已经理解了一些密码学基础。
+* 对称加密与非对称加密
+* RSA 的算法原理
+* SSL 与 TLS 
+* HTTPS 原理

@@ -38,39 +38,52 @@ WelcomeActivity 中处理
 
     如 llb://store.CarStyle?carTypeId=68&shopId=-1
 
+## 2.1 打开通用 web
+    llb://web.CommonWeb/DealerDetail/1
+    
+    web.CommonWeb 指定使用的 Activity
+    DealerDetail 用于指定地址，规则为将驼峰转为大写下划线，然后在 WebUrlConfigConstant 中查找
+    /1 用来指定地址的格式化参数
+    
+    见
+    com.cloudy.linglingbang.activity.welcome.WelcomeActivity#parseIntentUri
+    com.cloudy.linglingbang.constants.WebUrlConfigConstant#getUrlByName
+    
 # 0x03 示例
+    打开通用 Web
+    llb://web.CommonWeb/DealerDetail/1
 
-       打开 app 首页
-       llb://Home
-      
-       1.打开某个帖子页面
-       llb://community.post.PostDetail?postId=10001
-      
-       2.打开某个社区页面
-       llb://community.CommunityDetail?channelId=306
-      
-       3.打开某个车友会页面
-       llb://club.CarClubDetail?channelId=1120
-      
-       4.打开福利社
-       llb://welfare.WelfareHome
-      
-       5.打开某个福利社商品页面
-       llb://welfare.CommodityWeb/17
-      
-       6.打开某个车款详情页
-       llb://store.CarStyle?carTypeId=68&shopId=-1
-      
-       7.原生看直播
-       llb://vhall.watch.WatchActivity2/850949628/type/2
-       type/1 为直播 type/2 为回放
-      
-       8.H5看直播
-       llb://vhall.watch.WatchWebActivity2/850949628
-      
-       9.技师主页
-       llb://user.UserInfo/MTE1MjIzNg==
-       
+    打开 app 首页
+    llb://Home
+
+    1.打开某个帖子页面
+    llb://community.post.PostDetail?postId=10001
+
+    2.打开某个社区页面
+    llb://community.CommunityDetail?channelId=306
+
+    3.打开某个车友会页面
+    llb://club.CarClubDetail?channelId=1120
+
+    4.打开福利社
+    llb://welfare.WelfareHome
+
+    5.打开某个福利社商品页面
+    llb://welfare.CommodityWeb/17
+
+    6.打开某个车款详情页
+    llb://store.CarStyle?carTypeId=68&shopId=-1
+
+    7.原生看直播
+    llb://vhall.watch.WatchActivity2/850949628/type/2
+    type/1 为直播 type/2 为回放
+
+    8.H5看直播
+    llb://vhall.watch.WatchWebActivity2/850949628
+
+    9.技师主页
+    llb://user.UserInfo/MTE1MjIzNg==
+
 
 # 0x04 注意
 传参时，如果只有一个**通用**参数，应该用 path 的形式  
@@ -90,6 +103,7 @@ WelcomeActivity 中处理
             </intent-filter>
             
     activity 解析
+    
     private boolean parseIntentUri() {
         Intent originalIntent = getIntent();
         if (originalIntent == null) {
@@ -110,9 +124,14 @@ WelcomeActivity 中处理
         if (TextUtils.isEmpty(host)) {
             return false;
         }
+
+        //web
+        boolean isWeb = host.startsWith("web.");
+
         //①补全包名
         //补全前面的包名，这里要写死，不能使用 getPackageName()
-        String activityPackage = "com.cloudy.linglingbang.activity.";
+        //web 不在 activity 包内
+        String activityPackage = "com.cloudy.linglingbang." + (isWeb ? "" : "activity.");
         if (!host.startsWith(activityPackage)) {
             host = activityPackage + host;
         }
@@ -151,6 +170,35 @@ WelcomeActivity 中处理
                 startIntent.putExtra(queryParameterName, uri.getQueryParameter(queryParameterName));
             }
         }
+        //忽略前面的处理，单独处理 web
+        if (isWeb) {
+            boolean hasUrl = false;
+            if (pathSegments != null) {
+                int size = pathSegments.size();
+                if (size >= 1) {
+                    String urlName = pathSegments.get(0);
+                    if (!TextUtils.isEmpty(urlName)) {
+                        String url = WebUrlConfigConstant.getUrlByName(urlName);
+                        if (!TextUtils.isEmpty(url)) {
+                            //获取到地址
+                            hasUrl = true;
+                            if (size > 1) {
+                                //参数>1 ，进行格式化
+                                List<String> paramList = pathSegments.subList(1, pathSegments.size());
+                                Object[] paramArray = paramList.toArray();
+                                url = String.format(url, paramArray);
+                            }
+                            CommonWebActivity.IntentExtra intentExtra = new CommonWebActivity.IntentExtra(url, CommonWebActivity.OPEN_WEB_TYPE_NO_BAR);
+                            startIntent.putExtra(IntentUtils.INTENT_EXTRA_COMMON, intentExtra);
+                        }
+                    }
+                }
+            }
+            if (!hasUrl) {
+                //地址不正确，不跳转
+                return false;
+            }
+        }
 
         try {
             //使返回时回到首页
@@ -163,4 +211,52 @@ WelcomeActivity 中处理
             e.printStackTrace();
         }
         return false;
+    }
+
+    /**
+     * 根据字段名获取地址，用于 h5 跳转时，限制声明过的地址才能跳转
+     */
+    public static String getUrlByName(String name) {
+        name = camelToUpperUnderline(name);
+        String url = "";
+
+        Class constantClass = WebUrlConfigConstant.class;
+        Field[] fields = constantClass.getFields();
+        for (Field field : fields) {
+            String fieldName = field.getName();
+            if (fieldName.equals(name)) {
+                try {
+                    Object fieldValue = field.get(null);
+                    if (fieldValue != null && fieldValue instanceof String) {
+                        url = (String) fieldValue;
+                        return url;
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return url;
+    }
+
+    /**
+     * 驼峰转为大写下划线
+     */
+    public static String camelToUpperUnderline(String name) {
+        if (name == null || name.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < name.length(); i++) {
+            char c = name.charAt(i);
+            if (Character.isUpperCase(c)) {
+                if (i != 0) {
+                    sb.append('_');
+                }
+                sb.append(c);
+            } else {
+                sb.append(Character.toUpperCase(c));
+            }
+        }
+        return sb.toString();
     }

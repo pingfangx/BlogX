@@ -1,0 +1,125 @@
+[Gradle系列一 -- Groovy、Gradle和自定义Gradle插件](https://www.jianshu.com/p/804d79415258)
+
+[Chapter 41. Writing Custom Plugins](https://docs.gradle.org/4.3.1/userguide/custom_plugins.html)
+
+以及 demo  
+gradle-4.5.1\samples\customPlugin
+
+
+# 1 新建 Plugin Module
+创建 Module，删除不需要的各文件，公保留 build.gradle
+
+## 1.1 build.gradle
+    apply plugin: 'groovy'
+
+    dependencies {
+        compile gradleApi()
+        compile localGroovy()
+    }
+
+    //应用插件以用来生成包
+    apply plugin: 'maven'
+
+    //组与版本号
+    group = 'com.pingfangx'
+    version = '1.0.0'
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                //发布（生成）包的地址
+                repository(url: uri('../repo'))
+            }
+        }
+    }
+
+## 1.2 编码
+在 src/main/groovy 目录下建包。
+
+    /**
+     * 任务
+     */
+    class GreetingTask extends DefaultTask {
+        /**
+         * 默认值，可根据外部的设置而变化
+         */
+        String greeting = 'hello from GreetingTask'
+
+        /**
+         * 注解为操作
+         */
+        @TaskAction
+        def greet() {
+            println(greeting)
+        }
+    }
+    /**
+     * 插件
+     */
+    class GreetingPlugin implements Plugin<Project> {
+        @Override
+        void apply(Project project) {
+            //应用该插件后，会创建一个任务，名为 'hello'
+            //可在 Gradle 中看到并执行
+            //执行后调用 GreetingTask 中的 Action
+            project.task('hello', type: GreetingTask)
+        }
+    }
+
+## 1.3 设置插件 id
+    在目录 /src/main/resources/META-INF/gradle-plugins/ 下建文件
+    com.pingfangx.greeting.properties
+    com.pingfangx.greeting 即为插件 id，以后发布下载都是该 id
+    其内容为
+    implementation-class=com.pingfangx.plugin.GreetingPlugin
+    指向 Plugin 类
+
+## 1.4 发布
+Gradle 中有任务 upload/uploadArchives，执行即会在配置的 ../repo 中生成 jar 包。  
+可查看 jar 包名及 .properties 是否正确生成。
+
+
+# 2 使用插件
+
+    //可以在项目 build.gradle 中使用，也可以在模块中使用
+    //区别只是仓库的相对地址，以及任务名前面多了模块名
+    buildscript {
+        repositories {
+            maven {
+                //指定仓库地址，相对于当前 gradle 文件
+                url uri('../repo')
+            }
+        }
+        dependencies {
+            //指定依赖的插件
+            //classpath group: 'com.pingfangx', name: 'greetingplugin', version: '1.0.0'
+            classpath 'com.pingfangx:greetingplugin:1.0.0'
+        }
+    }
+    apply plugin: 'com.pingfangx.greeting'
+
+    //新创建一个 task 名为 greeting
+    task greeting(type: com.pingfangx.plugin.GreetingTask) {
+        //配置参数
+        greeting = 'from comsumer'
+    }
+    
+    
+# 3 transform api
+很奇怪为什么文档不多，难道我又学了一个过时的东西？
+
+可以用来执行任务生成类，或者编译过程中修改 class 文件。
+
+[Android动态编译技术:Plugin Transform Javassist操作Class文件](https://blog.csdn.net/yulong0809/article/details/77752098)
+
+[Transform API](http://tools.android.com/tech-docs/new-build-system/transform-api)
+
+[Create a Standalone Gradle plugin for Android - part 4 - the transform api](https://afterecho.uk/blog/create-a-standalone-gradle-plugin-for-android-part-4-the-transform-api.html)
+
+    transform-api 已弃用，
+    transform-api-2.0.0-deprecated-use-gradle-api.jar
+    于是修改为 gradle-api，但是缺少 TransformManager
+    最后直接 compile 'com.android.tools.build:gradle:3.1.4'
+    
+    这里的 AppExtension 是 com.android.build.gradle.AppExtension，不能引错了。
+    def android = project.extensions.getByType(AppExtension)
+   

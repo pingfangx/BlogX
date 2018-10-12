@@ -1,0 +1,6 @@
+[Android 应用性能分析工具 — CPU Profiler](https://www.jianshu.com/p/e664c16bca67)
+
+使用 CPU Profiler 可以跟踪一段时间内的方法，  
+但好像不方便跟踪启动过程，于是使用 Trace
+
+TODO

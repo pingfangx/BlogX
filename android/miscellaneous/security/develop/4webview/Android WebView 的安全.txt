@@ -1,0 +1,95 @@
+Q:
+* 漏洞是如何被利用的
+* 漏洞是如何修复的
+
+[使用 WebView](https://developer.android.com/training/articles/security-tips?hl=zh-cn#WebView)
+
+[Android：你不知道的 WebView 使用漏洞](https://blog.csdn.net/carson_ho/article/details/64904635)
+
+[android WebView详解，常见漏洞详解和安全源码](https://juejin.im/post/58a037df86b599006b3fade4)
+
+android.webkit.WebSettings#setJavaScriptEnabled
+
+android.webkit.WebView#addJavascriptInterface
+
+android.webkit.WebSettings#setSavePassword
+
+# 漏洞
+
+[CVE](https://zh.wikipedia.org/wiki/%E9%80%9A%E7%94%A8%E6%BC%8F%E6%B4%9E%E6%8A%AB%E9%9C%B2)  
+Common Vulnerabilities and Exposures 常见弱点与漏洞
+## WebView 任意代码执行漏洞
+[CVE-2012-6636](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2012-6636)
+> The Android API before 17 does not properly restrict the WebView.addJavascriptInterface method, which allows remote attackers to execute arbitrary methods of Java objects by using the Java Reflection API within crafted JavaScript code that is loaded into the WebView component in an application targeted to API level 16 or earlier, a related issue to CVE-2013-4710.
+
+[Android WebView的Js对象注入漏洞解决方案](https://blog.csdn.net/leehong2005/article/details/11808557)
+
+[CVE-2013-4710](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2013-4710)
+> Android 3.0 through 4.1.x on Disney Mobile, eAccess, KDDI, NTT DOCOMO, SoftBank, and other devices does not properly implement the WebView class, which allows remote attackers to execute arbitrary methods of Java objects or cause a denial of service (reboot) via a crafted web page, as demonstrated by use of the WebView.addJavascriptInterface method, a related issue to CVE-2012-6636.
+
+    
+[CVE-2014-1939](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-1939)
+> java/android/webkit/BrowserFrame.java in Android before 4.4 uses the addJavascriptInterface API in conjunction with creating an object of the SearchBoxImpl class, which allows attackers to execute arbitrary Java code by leveraging access to the searchBoxJavaBridge_ interface at certain Android API levels.
+
+    4.4 以下 android/webkit/BrowserFrame.java searchBoxJavaBridge 
+    切过去没看到，查看历史
+    I8a28eeeec556619abc4a902a3abec2ac52bad319 中被删除，之前的代码为
+    
+        mSearchBox = new SearchBoxImpl(mWebViewCore, mCallbackProxy);
+        mJavaScriptObjects.put(SearchBoxImpl.JS_INTERFACE_NAME, mSearchBox);
+        
+        static final String JS_INTERFACE_NAME = "searchBoxJavaBridge_";
+    
+
+[CVE-2014-7224](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-7224)  
+
+    4.4 以下
+    android-4.3.1_r1
+    android.webkit.AccessibilityInjector
+    
+    // Alias for TTS API exposed to JavaScript.
+    private static final String ALIAS_TTS_JS_INTERFACE = "accessibility";
+
+    // Alias for traversal callback exposed to JavaScript.
+    private static final String ALIAS_TRAVERSAL_JS_INTERFACE = "accessibilityTraversal";
+    
+    android.webkit.AccessibilityInjector#onPageStarted
+    android.webkit.AccessibilityInjector#addAccessibilityApisIfNecessary
+    public void addAccessibilityApisIfNecessary() {
+        if (!isAccessibilityEnabled() || !isJavaScriptEnabled()) {
+            return;
+        }
+
+        addTtsApis();
+        addCallbackApis();
+    }
+    
+    private void addTtsApis() {
+        if (mTextToSpeech == null) {
+            mTextToSpeech = new TextToSpeechWrapper(mContext);
+        }
+
+        mWebView.addJavascriptInterface(mTextToSpeech, ALIAS_TTS_JS_INTERFACE);
+    }
+    private void addCallbackApis() {
+        if (mCallback == null) {
+            mCallback = new CallbackHandler(ALIAS_TRAVERSAL_JS_INTERFACE);
+        }
+
+        mWebView.addJavascriptInterface(mCallback, ALIAS_TRAVERSAL_JS_INTERFACE);
+    }
+
+## WebView 密码明文存储漏洞
+## WebView 域控制不严格漏洞
+
+
+# @JavascriptInterface
+未找到官方介绍，仅为推测
+
+在漏洞中，判断是否有 getClass 并且调用
+    
+        console.log("getClass" in windowObj)
+        console.log("toast" in windowObj)
+        
+修改后，只有添加 @JavascriptInterface 的方法才能调用，
+也就是说，注解后的 toast 方法才可以调用，而 getClass 不再可以调用。

@@ -1,0 +1,26 @@
+独立的 SDK Manager 打不开  
+在 Android Studio 的
+Android SDK > SDK Tools > Document for Android SDK
+
+下载完就载 {SDK_HOME}/docs
+
+但是只能下到
+
+https://dl.google.com/android/repository/docs-24_r01.zip
+
+没有最新的了吗。  
+好像确实没有了，24 以后的只能在官网看到在线的了……
+
+[Documentation for app developers](https://developer.android.google.cn/docs/)
+
+# 手动保存
+手动保存为仅 html  
+需要替换，否则就是 file://  
+但是这样保存的无法进行跳转
+    
+    "//
+    "https://
+    
+# TeleportUltra
+指定要下载的文件，如  
+

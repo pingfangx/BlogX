@@ -1,0 +1,79 @@
+
+[Android安全防护之旅---带你把Apk混淆成中文语言代码](https://blog.csdn.net/jiangwei0910410003/article/details/61618945)
+
+[业界泥石流——将apk混淆成汉字](https://www.jianshu.com/p/d80a26661699)
+
+# 如何修改源码
+在 3 中简单分析过，由 proguard.obfuscate.SimpleNameFactory 产生混淆的名字。
+## 生成 Il 等分不清的字母
+    
+    private static final int CHARACTER_COUNT = 2;
+    
+    private char charAt(int index)
+    {
+        return index==0?'l':'I';
+    }
+    
+## 生成中文
+    
+    private static final int CHARACTER_COUNT = 0x9fa5 - 0x4e00;
+    private static final int CHARACTER_START = 0x4e00;
+    
+    private String getString(int offset) {
+        return new String(new char[]{(char) (CHARACTER_START + offset)});
+    }
+
+# 如何使用自定义的 ProGuard.jar
+## 替换系统使用的 jar
+\sdk\tools\proguard\lib\proguard.jar
+替换了无效
+
+[How to use custom proguard.jar in Gradle build?](https://stackoverflow.com/questions/25771663)
+
+
+根据回答，添加
+flatDir { dirs 'proguard' } 和 classpath 'proguard.io:proguard:5.0'
+
+居然成功了。
+
+    buildscript {
+        ext.kotlin_version = '1.2.50'
+        repositories {
+            flatDir { dirs 'proguard' }
+            google()
+            jcenter()
+        }
+        dependencies {
+            classpath 'proguard.io:proguard:5.0'
+            classpath 'com.android.tools.build:gradle:3.1.4'
+            classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
+            // NOTE: Do not place your application dependencies here; they belong
+            // in the individual module build.gradle files
+        }
+    }
+    
+## 手动对 dex.classes 的结果进行处理
+## 自定义 transform
+
+
+# 遇到的问题
+遇到一个问题，是混淆文件不再导出到  
+build/intermediates/proguard-files
+
+看一下任务
+
+    :app:extractProguardFiles UP-TO-DATE
+
+    public void run() throws IOException {
+        for (String name : ProguardFiles.KNOWN_FILE_NAMES) {
+            File defaultProguardFile = ProguardFiles.getDefaultProguardFile(name, getProject());
+            if (!defaultProguardFile.isFile()) {
+                ProguardFiles.createProguardFile(name, defaultProguardFile);
+            }
+        }
+    }
+    
+    com.android.build.gradle.ProguardFiles#createProguardFile
+    
+可能是因为这个任务总是 UP-TO-DATE，于是我们手动执行就好了。

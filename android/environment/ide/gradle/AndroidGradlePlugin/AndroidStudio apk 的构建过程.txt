@@ -1,0 +1,54 @@
+运行的时候，执行的任务为
+
+    Executing tasks: [:app:assembleDebug] 
+    
+对一些任务进行分析
+
+
+## :app:packageDebug
+    根据 getTaskName("package") 搜索到 com.android.build.gradle.tasks.PackageApplication
+    com.android.build.gradle.tasks.PackageAndroidArtifact
+    com.android.build.gradle.tasks.PackageAndroidArtifact#doFullTaskAction
+    com.android.build.gradle.tasks.PackageAndroidArtifact#splitFullAction
+    com.android.build.gradle.tasks.PackageAndroidArtifact#doTask
+    
+        try (IncrementalPackager packager =
+                new IncrementalPackagerBuilder()
+                        .withOutputFile(outputFile)
+                        .withSigning(signingConfig)
+                        .withCreatedBy(getBuilder().getCreatedBy())
+                        .withMinSdk(getMinSdkVersion())
+                        // TODO: allow extra metadata to be saved in the split scope to avoid
+                        // reparsing
+                        // these manifest files.
+                        .withNativeLibraryPackagingMode(
+                                PackagingUtils.getNativeLibrariesLibrariesPackagingMode(
+                                        manifestForSplit.getOutputFile()))
+                        .withNoCompressPredicate(
+                                PackagingUtils.getNoCompressPredicate(
+                                        aaptOptionsNoCompress, manifestForSplit.getOutputFile()))
+                        .withIntermediateDir(incrementalDirForSplit)
+                        .withProject(getProject())
+                        .withDebuggableBuild(getDebugBuild())
+                        .withAcceptedAbis(filter == null ? abiFilters : ImmutableSet.of(filter))
+                        .withJniDebuggableBuild(getJniDebugBuild())
+                        .build()) {
+            packager.updateDex(dexFilesToPackage);
+            packager.updateJavaResources(changedJavaResources);
+            packager.updateAssets(changedAssets);
+            packager.updateAndroidResources(changedAndroidResources);
+            packager.updateNativeLibraries(changedNLibs);
+            // Only report APK as built if it has actually changed.
+            if (packager.hasPendingChangesWithWait()) {
+                // FIX-ME : below would not work in multi apk situations. There is code somewhere
+                // to ensure we only build ONE multi APK for the target device, make sure it is still
+                // active.
+                instantRunContext.addChangedFile(instantRunFileType, outputFile);
+            }
+        }
+    com.android.builder.internal.packaging.IncrementalPackager#updateAssets
+    com.android.builder.internal.packaging.IncrementalPackager#updateFiles
+    com.android.apkzlib.zfile.ApkZFileCreator#writeFile
+    
+## :app:assembleDebug
+no actions

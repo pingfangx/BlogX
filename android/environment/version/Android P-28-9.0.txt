@@ -1,0 +1,38 @@
+[Android 9 Pie](https://developer.android.google.cn/about/versions/pie/)
+
+# Android 9 功能和 API
+一些关注的点
+* 利用 Wi-Fi RTT 进行室内定位
+* 显示屏缺口支持  
+需要考虑兼容
+* 通知
+* 多摄像头支持和摄像头更新
+* 适用于可绘制对象和位图的 ImageDecoder  
+便于解析图片  
+ImageDecoder 有几个允许您进一步修改图像的函数。 例如，可使用 setPostProcessor() 函数来修改图像的外观，如应用圆形遮罩或圆角。
+* 动画
+* 自动填充框架  
+TODO 是否可用于项目中
+* 具有密钥轮转的 APK 签名方案  
+APK Signature Scheme v3
+* 旋转  
+兼容
+* DEX 文件的 ART 提前转换
+* 设备端系统跟踪  
+TODO 是否可用于分析
+
+# 行为变更：所有应用
+* 对使用非 SDK 接口的限制
+* Android Test 变更
+* 现在强制执行 FLAG_ACTIVITY_NEW_TASK 要求  
+TODO 为什么不能
+* 屏幕旋转变更  
+是否需要修改
+
+# 行为变更：以 API 级别 28+ 为目标的应用
+* 前台服务
+* 隐私权变更  
+Build.SERIAL
+
+
+

@@ -1,0 +1,22 @@
+**已弃用，编码设置不太正确，因为不能很好的支持中文，抓取下来的 css 也会有乱码**  
+**使用 HTTrack**  
+[官网下载](http://www.httrack.com/page/2/en/index.html)
+
+# 下载部分文件
+https://developer.android.google.cn/reference/android/graphics/ImageDecoder
+
+软件会认为 ImageDecoder 是文件，于是下载 graphics 目录下的所有文件。
+
+深度设为 0 会只下载单个文件
+
+# 项目属性
+## 未加载的文件
+连接到本地保存文件的地方
+
+## 摘要>清除项目数据库
+可以用于删除重新下载
+
+## 使用 htm 后缀
+浏览/镜像>使用 MSIE 兼容文件名（如有需要使用 .htm 为 HTML 文件的附加名称）
+
+勾选后相关方件会有后缀，.htm 如果不勾，则如果原地址无后缀就无后缀。

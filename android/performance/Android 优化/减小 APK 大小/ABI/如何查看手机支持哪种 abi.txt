@@ -1,0 +1,44 @@
+有了前面的学习，但具体某款手机支持哪种 abi 如何查看呢？
+
+# vivo X9
+搜索 vivo X9 可在官网看到
+> 平台    MSM8953
+
+搜索 MSM8953 可找到 [高通官网的介绍](https://www.qualcomm.com/products/msm8953)
+> CPU Cores  
+Octa-core CPU  
+8x ARM Cortex A53
+
+[高通处理器规格表](http://www.mydrivers.com/zhuanti/tianti/01/index_gaotong.html)
+也说明是 A53
+
+知道了 A53，接下来只需查看百科 [ARM Cortex-A53](https://en.wikipedia.org/wiki/ARM_Cortex-A53)  
+就知道使用的是 ARMv8-A 架构
+
+
+# OPPO A57
+官网看到 MSM8940
+[MSM8940 Processor](https://www.qualcomm.com/products/msm8940-processor)
+还是 A53
+
+# MI 5
+骁龙820
+[Snapdragon 820 Mobile Platform](https://www.qualcomm.com/products/snapdragon/processors/820)
+
+[Kryo CPU](https://en.wikipedia.org/wiki/Kryo)
+> These CPUs implement the ARMv8-A 64-bit instruction set, and serve as the successor to the older 32-bit Krait core.
+
+
+经过了上面的分析，然后使代码查证
+
+    fun getSupportedAbi(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            //adb shell getprop ro.product.cpu.abilist
+            Build.SUPPORTED_ABIS.joinToString(",")
+        } else {
+            //adb shell getprop ro.product.cpu.abi
+            @Suppress("DEPRECATION")//已经判断版本号
+            Build.CPU_ABI + "," + Build.CPU_ABI2
+        }
+    }
+    

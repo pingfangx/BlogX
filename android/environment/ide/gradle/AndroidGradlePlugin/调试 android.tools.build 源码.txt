@@ -1,0 +1,43 @@
+[Gradle断点调试 - 调试Android Builder源码](https://www.jianshu.com/p/ea3e00c5e66c)
+
+[又掌握了一项新技能 - 断点调试 Gradle 插件](https://fucknmb.com/2017/07/05/%E5%8F%88%E6%8E%8C%E6%8F%A1%E4%BA%86%E4%B8%80%E9%A1%B9%E6%96%B0%E6%8A%80%E8%83%BD-%E6%96%AD%E7%82%B9%E8%B0%83%E8%AF%95Gradle%E6%8F%92%E4%BB%B6/)
+
+# 1 添加调试配置
+    Run > Edit Configurations... > Add New Configuration → Remote
+    name: 自定义
+    socket
+    host: localhost
+    port: 5005
+
+
+# 2 下断点
+两种需求
+## gradle 中写任务
+    apply plugin: DebuggerPlugin
+    class DebuggerPlugin implements Plugin<Project> {
+        void apply(Project project) {
+            ...
+        }
+    }
+## 依赖 gradle 插件源码
+    一开始想直接用源码 jar 包，失败
+    dependencies {
+        //不需要 implementation 否则运行反而报错
+        compileOnly 'com.android.tools.build:gradle:3.1.4'
+        //需要添加 processor
+        annotationProcessor 'com.google.auto.value:auto-value:1.5.2'
+    }
+
+# 3 带参数执行任务
+    gradle :app:clean -Dorg.gradle.debug=true --no-daemon
+
+    命令执行后会显示
+    To honour the JVM settings for this build a new JVM will be forked. Please consider using the daemon: https://docs.gradle.org/4.7/userguide/gradle_daemon.html.
+
+    > Starting Daemon
+    
+    此时运行 1 中添加的配置，就会继续运行，并停留在断点处。
+    
+
+    
+    D:\workspace\AndroidX\demo\ApkStructureDemo\app\build\intermediates\shaders\debug

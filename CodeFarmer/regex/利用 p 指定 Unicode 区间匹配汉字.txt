@@ -1,0 +1,32 @@
+看到一个匹配 @ 人的正则
+
+    @[\w\p{InCJKUnifiedIdeographs}-]{1,26}
+不理解，查了一下，
+
+    \p{name} Unicode中命名为name的字符类，例如\p{IsGreek}
+    
+所以也就是匹配 @后跟 1-26 后字母、汉字或 -
+
+## Unicode 分区
+[正则表达式](https://zh.wikipedia.org/wiki/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F)
+
+    Unicode Block：按照编码区间划分Unicode字符，每个Unicode Block中的字符编码属于一个编码区间。例如Java语言\p{ InCJK_Compatibility_Ideographs }，.NET语言\p{IsCJK_Compatibility_Ideographs}。
+    Unicode Script：按照字符所属的书写系统来划分Unicode字符。PHP和Ruby（版本不低于1.9）支持Unicode Script。例如\p{Han}表示汉字（中文字符）。
+    
+    
+[Unicode 11.0 Character Code Charts](http://www.unicode.org/charts/)
+
+CJK Unified Ideographs (Han) 
+
+[中日韩统一表意文字](https://zh.wikipedia.org/wiki/%E4%B8%AD%E6%97%A5%E9%9F%93%E7%B5%B1%E4%B8%80%E8%A1%A8%E6%84%8F%E6%96%87%E5%AD%97)
+
+CJK 表示中日韩
+
+> 中日韩统一表意文字（英语：CJK Unified Ideographs），也称统一汉字、统汉码（英语：Unihan），目的是要把分别来自中文、日文、韩文、越南文、壮文、琉球文中，起源相同、本义相同、形状一样或稍异的表意文字，在ISO 10646及万国码标准赋予相同编码。
+
+> 所谓“起源相同、本义相同、形状一样或稍异的表意文字”，主要为汉字，包括繁体字、简化字、日本汉字（漢字／かんじ）、韩国汉字（漢字／한자）、琉球汉字 (漢字／ハンジ) 、越南的喃字（𡨸喃／Chữ Nôm）与儒字（𡨸儒／Chữ Nho) 、方块壮字。
+
+也就是说即包括汉字，也包括日本、韩国等自造的汉字，但是不包括一些基本的日语、韩语。
+
+如
+乫

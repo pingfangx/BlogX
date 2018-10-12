@@ -1,0 +1,12 @@
+[与 .so 有关的一个长年大坑](https://zhuanlan.zhihu.com/p/21359984)
+
+这篇文章写得非常详细。
+
+以前是会根据文件匹配并加载，查找到主 abi 可能导致位于辅 abi 目录的 so 未加载。
+
+5.0 修复后，查找支持的文件夹，找到后直接复制整个文件夹
+
+com.android.internal.content.NativeLibraryHelper#copyNativeBinariesWithOverride
+com.android.internal.content.NativeLibraryHelper#copyNativeBinariesForSupportedAbi
+
+如果主 abi 文件夹没有只有辅 abi 文件夹有，还时会报错呀。

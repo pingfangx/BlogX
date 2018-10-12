@@ -1,0 +1,220 @@
+[ProGuard Java Optimizer and Obfuscator](https://sourceforge.net/projects/proguard/)
+
+# 源码
+在原理一节，我们看到了 Gradle 执行时的输出，接下来简单看一下源码的流程，与输出对应。
+
+    proguard.ProGuard#main
+    proguard.ProGuard#execute
+        ...
+        if (configuration.printSeeds != null ||
+            configuration.shrink    ||
+            configuration.optimize  ||
+            configuration.obfuscate ||
+            configuration.preverify ||
+            configuration.backport)
+        {
+            initialize();
+        }
+        ...
+        if (configuration.printSeeds != null)
+        {
+            printSeeds();
+        }
+        if (configuration.preverify ||
+            configuration.android)
+        {
+            inlineSubroutines();
+        }
+
+        if (configuration.shrink)
+        {
+            shrink();
+        }
+
+        if (configuration.optimize)
+        {
+            for (int optimizationPass = 0;
+                 optimizationPass < configuration.optimizationPasses;
+                 optimizationPass++)
+            {
+                if (!optimize(optimizationPass+1, configuration.optimizationPasses))
+                {
+                    // Stop optimizing if the code doesn't improve any further.
+                    break;
+                }
+
+                // Shrink again, if we may.
+                if (configuration.shrink)
+                {
+                    // Don't print any usage this time around.
+                    configuration.printUsage       = null;
+                    configuration.whyAreYouKeeping = null;
+
+                    shrink();
+                }
+            }
+
+            linearizeLineNumbers();
+        }
+
+        if (configuration.obfuscate)
+        {
+            obfuscate();
+        }
+        ...
+        
+        if (configuration.preverify)
+        {
+            preverify();
+        }
+        if (configuration.shrink    ||
+            configuration.optimize  ||
+            configuration.obfuscate ||
+            configuration.preverify)
+        {
+            sortClassElements();
+        }
+
+        if (configuration.programJars.hasOutput())
+        {
+            writeOutput();
+        }
+
+        if (configuration.dump != null)
+        {
+            dump();
+        }
+        
+    整个流程很清晰，接下来看一些输出代码
+    proguard.ProGuard#shrink
+    proguard.shrink.Shrinker#execute
+    
+        if (configuration.printUsage != null)
+        {
+            PrintStream ps =
+                configuration.printUsage == Configuration.STD_OUT ? System.out :
+                    new PrintStream(
+                    new BufferedOutputStream(
+                    new FileOutputStream(configuration.printUsage)));
+
+            // Print out items that will be removed.
+            programClassPool.classesAcceptAlphabetically(
+                new UsagePrinter(usageMarker, true, ps));
+            ...
+        }
+    proguard.shrink.UsagePrinter#visitProgramField
+    
+        if (usageMarker.isUsed(programField) ^ printUnusedItems)
+        {
+            ...
+        }
+    可以看到在 shrinker 中输出，使用的是 UsagePrinter，只是传了 printUnusedItems，其中使用异或判断。  
+    但是还是为什么要使用 usage.txt 呢。
+    
+    这是因为 ProGuard 提供了方法可供配置输出到文件，而 anroid-gradle-plugin 进行了配置
+    com.android.build.gradle.internal.transforms.ProGuardTransform#ProGuardTransform
+    
+    public ProGuardTransform(@NonNull VariantScope variantScope) {
+        super(variantScope);
+        this.variantScope = variantScope;
+
+        GlobalScope globalScope = variantScope.getGlobalScope();
+        proguardOut = new File(Joiner.on(File.separatorChar).join(
+                String.valueOf(globalScope.getBuildDir()),
+                FD_OUTPUTS,
+                "mapping",
+                variantScope.getVariantConfiguration().getDirName()));
+
+        printMapping = new File(proguardOut, "mapping.txt");
+        dump = new File(proguardOut, "dump.txt");
+        printSeeds = new File(proguardOut, "seeds.txt");
+        printUsage = new File(proguardOut, "usage.txt");
+        secondaryFileOutputs = ImmutableList.of(printMapping, dump, printSeeds, printUsage);
+    }
+
+# 如何使用中文混淆
+[Android安全防护之旅---带你把Apk混淆成中文语言代码](https://blog.csdn.net/jiangwei0910410003/article/details/61618945)
+
+[业界泥石流——将apk混淆成汉字](https://www.jianshu.com/p/d80a26661699)
+
+    -obfuscationdictionary proguard_dic.txt
+    Use the words in the given text file as obfuscated field names and method names.
+    
+    源码为
+    proguard.obfuscate.Obfuscator#execute
+    
+        // Come up with new names for all classes.
+        DictionaryNameFactory classNameFactory = configuration.classObfuscationDictionary != null ?
+            new DictionaryNameFactory(configuration.classObfuscationDictionary, null) :
+            null;
+    proguard.classfile.ClassPool#classesAccept
+    proguard.obfuscate.ClassObfuscator#visitProgramClass
+    proguard.obfuscate.ClassObfuscator#generateUniqueClassName(java.lang.String)
+    proguard.obfuscate.ClassObfuscator#generateUniqueClassName(java.lang.String, proguard.obfuscate.NameFactory)
+    proguard.obfuscate.NameFactory#nextName
+    
+    //SimpleNameFactory
+    proguard.obfuscate.SimpleNameFactory#nextName
+    
+    public String nextName()
+    {
+        return name(index++);
+    }
+
+
+    /**
+     * Returns the name at the given index.
+     */
+    private String name(int index)
+    {
+        // Which cache do we need?
+        List cachedNames = generateMixedCaseNames ?
+            cachedMixedCaseNames :
+            cachedLowerCaseNames;
+
+        // Do we have the name in the cache?
+        if (index < cachedNames.size())
+        {
+            return (String)cachedNames.get(index);
+        }
+
+        // Create a new name and cache it.
+        String name = newName(index);
+        cachedNames.add(index, name);
+
+        return name;
+    }
+    
+    
+    //proguard.obfuscate.DictionaryNameFactory
+    //可以看不足就从另一 nameFactory 中获取
+    public String nextName()
+    {
+        String name;
+
+        // Do we still have names?
+        if (index < names.size())
+        {
+            // Return the next name.
+            name = (String)names.get(index++);
+        }
+        else
+        {
+            // Return the next different name from the other name factory.
+            do
+            {
+                name = nameFactory.nextName();
+            }
+            while (names.contains(name));
+        }
+
+        return name;
+    }
+
+使用
+
+    -obfuscationdictionary proguard_dic.txt
+    -classobfuscationdictionary proguard_dic.txt
+    
+结果却是乱码，明明是 utf-8 的呀。
+于是直接生成 jar 来使用，见下一篇。

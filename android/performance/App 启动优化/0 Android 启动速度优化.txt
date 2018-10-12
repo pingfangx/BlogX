@@ -1,0 +1,22 @@
+Q:
+* 当前启动要花多少时间
+* 如何记录耗时
+* 有哪些优化
+* 开发中应注意些什么
+
+R:
+
+[Android 性能优化—— 启动优化提升60%](https://mp.weixin.qq.com/s?__biz=MzAxMTI4MTkwNQ==&mid=2650826203&idx=1&sn=4c83f119ae3a7e818a65357cb78e5df5&chksm=80b7b145b7c038538ef46e7b16d41b6dc5d622b6a3c72ce67ce9735c49709f011d334e1366f9&mpshare=1&scene=23&srcid=0906SJGGqrBCrVwzeMR9H1t0#rd)
+
+[App startup time](https://developer.android.google.cn/topic/performance/vitals/launch-time)
+
+[Android性能优化（一）之启动加速35%](https://juejin.im/post/5874bff0128fe1006b443fa0)
+
+S:
+
+* 统计 App 启动时间
+* Debug.startMethodTracing 生成跟踪日志
+* Application 启动的优化
+* HomeActivity 的优化
+* 优化结果记录
+* Fragment 的懒加载

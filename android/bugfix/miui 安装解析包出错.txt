@@ -1,0 +1,18 @@
+发现浏览器下载、钉钉可以打开安装，自带文件管理器以及我们的软件打开安装，会提示“安装包解析错误”
+
+查看各自的 intent
+
+发现钉钉是
+
+    act=android.intent.action.VIEW dat=file:///storage/emulated/0/DingTalk/...
+
+而自带的是
+
+    act=android.intent.action.VIEW dat=content://com.android.fileexplorer.myprovider/external_files/DingTalk/...
+    
+    
+也就是 7.0 的 fileUri 的问题  
+百度查了一下，发现打开 MIUI 优化就可以了。
+
+关闭 MIUI 优化，安装界面为原生的  
+也就是说有可能 MIUI 只是升级了系统版本号，实际内部可能并不是 7.0 ，于是原生就安装失败了。

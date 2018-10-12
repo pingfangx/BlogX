@@ -1,0 +1,20 @@
+想要滚动的时候展示，想到可不可以分块加载。
+
+[Android 高清加载巨图方案 拒绝压缩图片](https://blog.csdn.net/lmj623565791/article/details/49300989)
+
+[johnnylambada/WorldMap](https://github.com/johnnylambada/WorldMap)
+
+[LuckyJayce/LargeImage](https://github.com/LuckyJayce/LargeImage)
+
+
+最后都是使用的 
+
+[BitmapRegionDecoder](https://developer.android.com/reference/android/graphics/BitmapRegionDecoder)
+
+
+
+
+
+09-28 08:20:50.901 6035-6035/com.cloudy.linglingbang W/OpenGLRenderer: Bitmap too large to be uploaded into a texture (750x6406, max=4096x4096)
+
+LENOVO A399

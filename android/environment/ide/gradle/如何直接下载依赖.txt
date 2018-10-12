@@ -1,0 +1,14 @@
+有时无法下载或是想直接下载旧版本
+
+各仓库是 MavenArtifactRepository 的实例，可以看到它们的地址。
+
+https://dl.google.com/dl/android/maven2/
+
+https://jcenter.bintray.com/
+
+jcenter 可以直接打开，定位并下载即可。
+
+因为要查看 com.android.build.gradle.ProguardFiles#getDefaultProguardFile
+
+最终定位到
+https://jcenter.bintray.com/com/android/tools/build/gradle-core/2.1.3/

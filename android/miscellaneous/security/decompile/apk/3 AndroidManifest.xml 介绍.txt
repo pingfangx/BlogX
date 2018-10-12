@@ -1,0 +1,123 @@
+# 编译过程
+由 aapt 编译并生成，较为复杂……
+
+[[置顶] 浅谈Android的资源编译过程](http://www.cnblogs.com/dyllove98/p/3144950.html)
+
+[Android AAPT详解](https://www.jianshu.com/p/8d691b6bf8b4)
+
+[Android应用程序资源的编译和打包过程分析](https://blog.csdn.net/luoshengyang/article/details/8744683)
+
+    frameworks/base/tools/aapt/
+    
+    Main.cpp
+    
+            case 'M':
+                ...
+                convertPath(argv[0]);
+                bundle.setAndroidManifestFile(argv[0]);
+                break;
+    handleCommand
+    
+        case kCommandPackage:      return doPackage(bundle);
+        
+    Command.cpp doPackage
+        ...
+        //收录资源
+        err = assets->slurpFromArgs(bundle);
+        ...
+        //编译资源
+        // If they asked for any fileAs that need to be compiled, do so.
+        if (bundle->getResourceSourceDirs().size() || bundle->getAndroidManifestFile()) {
+            err = buildResources(bundle, assets, builder);
+            if (err != 0) {
+                goto bail;
+            }
+        }
+    AaptAssets.cpp slurpFromArgs
+    
+        /*
+         * If a package manifest was specified, include that first.
+         */
+        if (bundle->getAndroidManifestFile() != NULL) {
+            // place at root of zip.
+            String8 srcFile(bundle->getAndroidManifestFile());
+            addFile(srcFile.getPathLeaf(), AaptGroupEntry(), srcFile.getPathDir(),
+                    NULL, String8());
+            totalCount++;
+        }
+    
+    //编译资源
+    Resource.cpp buildResources
+    
+        sp<AaptGroup> androidManifestFile =
+                assets->getFiles().valueFor(String8("AndroidManifest.xml"));
+        if (androidManifestFile == NULL) {
+            fprintf(stderr, "ERROR: No AndroidManifest.xml file found.\n");
+            return UNKNOWN_ERROR;
+        }
+
+        status_t err = parsePackage(bundle, assets, androidManifestFile);
+        if (err != NO_ERROR) {
+            return err;
+        }
+    //解析包
+    Resource.cpp parsePackage
+        ...
+        status_t err = parseXMLResource(file, &block);
+        ...
+    XMLNode.cpp parseXMLResource
+    //解析资源
+    status_t parseXMLResource(const sp<AaptFile>& file, ResXMLTree* outTree,
+                              bool stripAll, bool keepComments,
+                              const char** cDataTags)
+    {
+        sp<XMLNode> root = XMLNode::parse(file);
+        if (root == NULL) {
+            return UNKNOWN_ERROR;
+        }
+        root->removeWhitespace(stripAll, cDataTags);
+
+        if (kIsDebug) {
+            printf("Input XML from %s:\n", (const char*)file->getPrintableSource());
+            root->print();
+        }
+        sp<AaptFile> rsc = new AaptFile(String8(), AaptGroupEntry(), String8());
+        status_t err = root->flatten(rsc, !keepComments, false);
+        if (err != NO_ERROR) {
+            return err;
+        }
+        err = outTree->setTo(rsc->getData(), rsc->getSize(), true);
+        if (err != NO_ERROR) {
+            return err;
+        }
+
+        if (kIsDebug) {
+            printf("Output XML:\n");
+            printXMLBlock(outTree);
+        }
+
+        return NO_ERROR;
+    }
+
+# 其他文章及工具
+## 文件格式介绍
+[Android逆向之旅---解析编译之后的AndroidManifest文件格式](https://blog.csdn.net/jiangwei0910410003/article/details/50568487)
+
+## AXMLPrinter.jar
+有多个版本
+
+[android4me](https://code.google.com/archive/p/android4me/downloads)
+可以下载到
+
+    AXMLPrinter.jar
+    AXMLPrinter.zip
+    AXMLPrinter2.jar
+    AXMLPrinter2.jar
+
+[rednaga/axmlprinter](https://github.com/rednaga/axmlprinter)
+可以下载到
+
+    axmlprinter-0.1.7.jar
+
+## aapt    
+    aapt l -a apk名称 > demo.txt

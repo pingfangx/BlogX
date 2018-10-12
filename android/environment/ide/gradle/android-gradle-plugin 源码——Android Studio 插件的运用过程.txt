@@ -1,0 +1,264 @@
+Q:
+* :app:assembleDebug 做了些什么
+
+R:
+
+[android-gradle-plugin3.0.1源码分析](https://www.imooc.com/article/41609)
+
+[Gradle系列二 -- 源码分析](https://www.jianshu.com/p/26352e86fb47)
+
+# 如何查看源码
+通地 gradle 文件可以点过去。  
+之前下载过 aosp，在 \tools\base\build-system\gradle  
+或者直接下 source 包解压。
+
+# 使用插件代码
+    
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.4'
+    }
+    这样就相当于我们为gradle框架引入了android-gradle-plugin插件
+    使用这个插件呢也非常的简单只需要在我们工程的build.gradle文件中如下即可
+    apply plugin: 'com.android.application'
+    
+    这个插件是什么呢，全局搜索，在源码中找到了
+    \android-7.1.2_r33\tools\base\build-system\gradle\src\main\resources\META-INF\gradle-plugins\com.android.application.properties
+    implementation-class=com.android.build.gradle.AppPlugin
+    
+    猜测是注册插件过的声明，搜索到
+[Writing Custom Plugins](https://docs.gradle.org/current/userguide/custom_plugins.html)
+> So how does Gradle find the Plugin implementation? The answer is you need to provide a properties file in the jar’s META-INF/gradle-plugins directory that matches the id of your plugin.
+
+也就是说， apply 实际调用的是 com.android.build.gradle.AppPlugin#apply  
+其继承 com.android.build.gradle.BasePlugin，调用父类方法。
+
+android-gradle-plugin，即插件的 gradle-3.1.4-sources.jar
+
+# apply 方法
+不知道对不对
+
+    com.android.build.gradle.BasePlugin#apply
+    if (!projectOptions.get(BooleanOption.ENABLE_NEW_DSL_AND_API)) {
+            TaskInputHelper.enableBypass();
+
+            threadRecorder.record(
+                    ExecutionType.BASE_PLUGIN_PROJECT_CONFIGURE,
+                    project.getPath(),
+                    null,
+                    this::configureProject);
+
+            threadRecorder.record(
+                    ExecutionType.BASE_PLUGIN_PROJECT_BASE_EXTENSION_CREATION,
+                    project.getPath(),
+                    null,
+                    this::configureExtension);
+
+            threadRecorder.record(
+                    ExecutionType.BASE_PLUGIN_PROJECT_TASKS_CREATION,
+                    project.getPath(),
+                    null,
+                    this::createTasks);
+        } 
+        
+    com.android.build.gradle.BasePlugin#configureExtension
+    com.android.build.gradle.BasePlugin#createExtension
+    com.android.build.gradle.AppPlugin#createExtension
+        return project.getExtensions()
+                .create(
+                        "android",
+                        AppExtension.class,
+                        project,
+                        projectOptions,
+                        androidBuilder,
+                        sdkHandler,
+                        buildTypeContainer,
+                        productFlavorContainer,
+                        signingConfigContainer,
+                        buildOutputs,
+                        sourceSetManager,
+                        extraModelInfo);
+                        
+                        
+## 创建 Extension
+通过 [Mapping extension properties to task properties](https://docs.gradle.org/current/userguide/custom_plugins.html#sec:mapping_extension_properties_to_task_properties) 中的介绍，
+我们知道这里就是将 android{} 中的属性映射到 task 中。
+
+示例为 
+
+    class GreetingPlugin implements Plugin<Project> {
+        void apply(Project project) {
+            def extension = project.extensions.create('greeting', GreetingPluginExtension, project)
+            project.tasks.create('hello', Greeting) {
+                message = extension.message
+                outputFiles = extension.outputFiles
+            }
+        }
+    }
+
+    class GreetingPluginExtension {
+        final Property<String> message
+        final ConfigurableFileCollection outputFiles
+
+        GreetingPluginExtension(Project project) {
+            message = project.objects.property(String)
+            message.set('Hello from GreetingPlugin')
+            outputFiles = project.layout.configurableFiles()
+        }
+
+        void setOutputFiles(FileCollection outputFiles) {
+            this.outputFiles.setFrom(outputFiles)
+        }
+    }
+
+    class Greeting extends DefaultTask {
+        final Property<String> message = project.objects.property(String)
+        final ConfigurableFileCollection outputFiles = project.layout.configurableFiles()
+
+        void setOutputFiles(FileCollection outputFiles) {
+            this.outputFiles.setFrom(outputFiles)
+        }
+
+        @TaskAction
+        void printMessage() {
+            outputFiles.each {
+                logger.quiet "Writing message 'Hi from Gradle' to file"
+                it.text = message.get()
+            }
+        }
+    }
+
+    apply plugin: GreetingPlugin
+
+    greeting {
+        message = 'Hi from Gradle'
+        outputFiles = layout.files('a.txt', 'b.txt')
+    }
+    
+参照示例，我们知道，使用参数 "android"，AppExtension.class 和 project，  
+从 android{} 中读取配置，创建了一个 AppExtension
+
+    AppExtension extends TestedExtension
+    TestedExtension extends BaseExtension
+    BaseExtension implements AndroidConfig
+    所以实际我们可以在 android{} 中配置的属性，实际就是 BaseExtension 中声明的相关字段。
+
+创建出的 extension，在 com.android.build.gradle.BasePlugin#configureExtension 中用来创建其他对象。
+
+
+# 创建 TaskManager
+    还是在 com.android.build.gradle.BasePlugin#configureExtension
+        创建了 taskManager
+        taskManager =
+                createTaskManager(
+                        globalScope,
+                        project,
+                        projectOptions,
+                        androidBuilder,
+                        dataBindingBuilder,
+                        extension,
+                        sdkHandler,
+                        ndkHandler,
+                        registry,
+                        threadRecorder);
+    接下来 apply 中还有
+    
+            threadRecorder.record(
+                    ExecutionType.BASE_PLUGIN_PROJECT_TASKS_CREATION,
+                    project.getPath(),
+                    null,
+                    this::createTasks);
+    com.android.build.gradle.BasePlugin#createTasks
+        com.android.build.gradle.internal.TaskManager#createTasksBeforeEvaluate
+    里面创建了一些任务，但是并没有运行 app 时的任务
+    
+    运行 app 的时候，运行的为 Executing tasks: [:app:assembleDebug]
+    使用 gradle tasks 查看任务
+    assembleDebug - Assembles all Debug builds.
+    通过 “Assembles all” 搜索到该任务创建的位置为
+    com.android.build.gradle.internal.TaskManager#createAssembleTask(com.android.build.gradle.internal.VariantDimensionData)
+    搜索 createAssembleTask 调用处为
+    com.android.build.gradle.internal.VariantManager#createAssembleTaskForVariantData
+    com.android.build.gradle.internal.VariantManager#createTasksForVariantData
+    搜索为
+    com.android.build.gradle.internal.VariantManager#createAndroidTasks
+    
+    回到
+    com.android.build.gradle.BasePlugin#createTasks
+    com.android.build.gradle.BasePlugin#createAndroidTasks
+    com.android.build.gradle.internal.VariantManager#createAndroidTasks
+    com.android.build.gradle.internal.VariantManager#createTasksForVariantData
+    com.android.build.gradle.internal.TaskManager#createAssembleTask(com.android.build.gradle.internal.VariantDimensionData)
+    到此走通，分析完了才看到另一篇博文《Gradle系列二 -- 源码分析》中已经有分析了，自己又折腾了一遍……
+
+总结如下
+
+    引入插件 
+    com.android.tools.build:gradle:3.1.4
+    
+    运用插件
+    apply plugin: 'com.android.application'
+    调用
+    com.android.build.gradle.AppPlugin#apply
+    com.android.build.gradle.BasePlugin#apply
+    然后 threadRecorder.record
+    com.android.build.gradle.BasePlugin#createTasks
+    com.android.build.gradle.BasePlugin#createAndroidTasks
+    com.android.build.gradle.internal.VariantManager#createAndroidTasks
+    
+    
+# 创建 task    
+如何建建混淆任务的
+:app:transformClassesAndResourcesWithProguardForDebug
+    
+    
+    com.android.build.gradle.BasePlugin#createTasks
+    com.android.build.gradle.BasePlugin#createAndroidTasks
+    com.android.build.gradle.internal.VariantManager#createAndroidTasks
+    com.android.build.gradle.internal.VariantManager#createTasksForVariantData
+    com.android.build.gradle.internal.ApplicationTaskManager#createTasksForVariantScope
+    com.android.build.gradle.internal.ApplicationTaskManager#addCompileTask
+    com.android.build.gradle.internal.TaskManager#createPostCompilationTasks
+    com.android.build.gradle.internal.TaskManager#maybeCreateJavaCodeShrinkerTransform
+    com.android.build.gradle.internal.TaskManager#doCreateJavaCodeShrinkerTransform
+    com.android.build.gradle.internal.TaskManager#createProguardTransform
+        
+        ProGuardTransform transform = new ProGuardTransform(variantScope);
+        ...
+        Optional<TransformTask> task =
+                variantScope
+                        .getTransformManager()
+                        .addTransform(taskFactory, variantScope, transform);
+    
+    添加了 ProGuardTransform，那名字呢，
+    com.android.build.gradle.internal.pipeline.TransformManager#getTaskNamePrefix
+    com.android.build.gradle.internal.pipeline.TransformManager#addTransform(TaskFactory, TransformVariantScope, T, TransformTask.ConfigActionCallback<T>)
+    static String getTaskNamePrefix(@NonNull Transform transform) {
+        StringBuilder sb = new StringBuilder(100);
+        sb.append("transform");
+
+        sb.append(
+                transform
+                        .getInputTypes()
+                        .stream()
+                        .map(
+                                inputType ->
+                                        CaseFormat.UPPER_UNDERSCORE.to(
+                                                CaseFormat.UPPER_CAMEL, inputType.name()))
+                        .sorted() // Keep the order stable.
+                        .collect(Collectors.joining("And")));
+        sb.append("With");
+        StringHelper.appendCapitalized(sb, transform.getName());
+        sb.append("For");
+
+        return sb.toString();
+    }
+到些我们知首字混淆任务是如何添加的，在 ProGuardTransform 中，设置的 
+printUsage = new File(proguardOut, "usage.txt");
+因此 usage.txt 的命名知道来源了。
+
+
+
+# 运行 task
+
+相关的 task 定义于com.android.build.gradle.internal.tasks
+

@@ -1,0 +1,15 @@
+# 删除无用的类
+根据之前 ProGruad 的学习，我们知道
+> ProGuard 可以对 Java 文件进行压缩（Shrink）、优化（Optimize）、混淆（Obfuscate）和预检（Preverify）
+
+> 压缩步骤检测并删除未使用的类，字段，方法和属性。 
+
+在 Shrink 步骤会输出未使用的到 usage.txt
+
+但是结果并没有自带的检查好。
+
+有部分未使用的类，ProGuard 无法显示出来。
+
+# 确定是否被删除
+启用 shrink，在 usage.txt 确定某个没使用的类。
+-dontshrink，在 mapping.txt 中查看混淆。

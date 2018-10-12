@@ -1,0 +1,231 @@
+Q:
+* 默认是什么
+* 各自区别
+* 如何生效的
+
+# 1 默认是 fitCenter
+    android.widget.ImageView#initImageView
+    
+    private void initImageView() {
+        mMatrix = new Matrix();
+        mScaleType = ScaleType.FIT_CENTER;
+        ...
+    }
+    
+# 2 各自区别 
+## 2.1 文档
+    /**
+     * 用于将图像边界缩放到 view 边界的选项。
+     */
+    public enum ScaleType {
+        /**
+         * 绘图时使用图像矩阵缩放。可以使用 setImageMatrix(Matrix) 设置图像矩阵。
+         */
+        MATRIX(0),
+        /**
+         * Matrix.ScaleToFit#FILL
+         * 独立地在 X 和 Y 中缩放，以便 src 完全匹配 dst。这可能会改变 src 的宽高比。
+         */
+        FIT_XY(1),
+        /**
+         * Matrix.ScaleToFit#START
+         * 计算将保持原始 src 宽高比的比例，但也将确保 src 完全适合 dst。至少一个轴(X 或 Y)将精确匹配。START 将结果与 dst 的左边和上边对齐。
+         */
+        FIT_START(2),
+        /**
+         * Matrix.ScaleToFit#CENTER
+         * 计算将保持原始 src 宽高比的比例，但也将确保 src 完全适合 dst。至少一个轴(X 或 Y)将精确匹配。结果在 dst 内的中间。
+         */
+        FIT_CENTER(3),
+        /**
+         * Matrix.ScaleToFit#END
+         * 计算将保持原始 src 宽高比的比例，但也将确保 src 完全适合 dst。至少一个轴(X 或 Y)将精确匹配。END 将结果与 dst 的右边和底边对齐。
+         */
+        FIT_END(4),
+        /**
+         * 使图像在 view 中居中，但不执行缩放。
+         */
+        CENTER(5),
+        /**
+         * 均匀缩放图像(保持图像的纵横比)，使图像的尺寸(宽度和高度)等于或大于 view 的相应尺寸(减去 padding)。然后图像在 view 中居中。
+         */
+        CENTER_CROP(6),
+        /**
+         * 均匀缩放图像(保持图像的纵横比)，使图像的尺寸(宽度和高度)等于或小于 view 的相应尺寸(减去 padding)。然后图像在 view 中居中。
+         */
+        CENTER_INSIDE(7);
+
+        ScaleType(int ni) {
+            nativeInt = ni;
+        }
+
+        final int nativeInt;
+    }
+    
+## 2.2 表格
+ScaleType|图片宽高者小于 view 时|一边大于一边小于时|图片宽高都大于 view 时
+-|-|-|-
+MATRIX|-|-|-
+FIT_XY|两边各自缩放以适应|两边各自缩放以适应|两边各自缩放以适应
+FIT_START|放大至小边相等|缩小至小边相等|缩小至小边相等
+FIT_CENTER|同上
+FIT_END|同上
+CENTER|不缩放，居中|不缩放，小边被裁切|不缩放，两边被裁切
+CENTER_CROP|放大至大边相等，小边被截切|放大至大边相等，小边被截切|缩小至大边相等，小边被截切
+CENTER_INSIDE|不缩放|缩小至小边相等|缩小至小边相等
+
+## 2.3 FIT_CENTER 与 CENTER_INSIDE
+CENTER_INSIDE 是允许都小于的，而 FIT_CENTER 为了 FIT，在都小于时，会进放大
+
+## 2.4 CENTER_CROP 与 CENTER_INSIDE
+可以看到 CENTER_INSIDE 允许都小于，但是 CENTER_CROP 却不允许都大于（都大于时会缩小至一边等于，即与 FIT 一样，至少一个轴(X 或 Y)将精确匹配。）  
+这和文档不一致啊。代码中是如何实现的的呢？
+
+
+# 3 如何生效
+    相关方法调至
+    android.widget.ImageView#configureBounds
+    会对 mDrawMatrix 进行赋值，其中如果是 android.graphics.Matrix.ScaleToFit
+
+    private void configureBounds() {
+        if (mDrawable == null || !mHaveFrame) {
+            return;
+        }
+
+        final int dwidth = mDrawableWidth;
+        final int dheight = mDrawableHeight;
+
+        //减去 padding
+        final int vwidth = getWidth() - mPaddingLeft - mPaddingRight;
+        final int vheight = getHeight() - mPaddingTop - mPaddingBottom;
+
+        final boolean fits = (dwidth < 0 || vwidth == dwidth)
+                && (dheight < 0 || vheight == dheight);
+
+        if (dwidth <= 0 || dheight <= 0 || ScaleType.FIT_XY == mScaleType) {
+            /* If the drawable has no intrinsic size, or we're told to
+                scaletofit, then we just fill our entire view.
+            */
+            mDrawable.setBounds(0, 0, vwidth, vheight);
+            mDrawMatrix = null;
+        } else {
+            // We need to do the scaling ourself, so have the drawable
+            // use its native size.
+            mDrawable.setBounds(0, 0, dwidth, dheight);
+
+            if (ScaleType.MATRIX == mScaleType) {
+                // Use the specified matrix as-is.
+                //按原样使用指定的矩阵
+                if (mMatrix.isIdentity()) {
+                    mDrawMatrix = null;
+                } else {
+                    mDrawMatrix = mMatrix;
+                }
+            } else if (fits) {
+                // The bitmap fits exactly, no transform needed.
+                //恰好适应，无需转变
+                mDrawMatrix = null;
+            } else if (ScaleType.CENTER == mScaleType) {
+                // Center bitmap in view, no scaling.
+                // 不缩放，只是移动到中间
+                mDrawMatrix = mMatrix;
+                mDrawMatrix.setTranslate(Math.round((vwidth - dwidth) * 0.5f),
+                                         Math.round((vheight - dheight) * 0.5f));
+            } else if (ScaleType.CENTER_CROP == mScaleType) {
+                mDrawMatrix = mMatrix;
+
+                float scale;
+                float dx = 0, dy = 0;
+                
+                /*
+                dw/dh>vw/vh
+                dw*vh>vw*dh
+                */
+                if (dwidth * vheight > vwidth * dheight) {
+                    //以高为准
+                    scale = (float) vheight / (float) dheight;
+                    dx = (vwidth - dwidth * scale) * 0.5f;
+                } else {
+                    //以宽为准
+                    scale = (float) vwidth / (float) dwidth;
+                    dy = (vheight - dheight * scale) * 0.5f;
+                }
+
+                mDrawMatrix.setScale(scale, scale);
+                mDrawMatrix.postTranslate(Math.round(dx), Math.round(dy));
+            } else if (ScaleType.CENTER_INSIDE == mScaleType) {
+                mDrawMatrix = mMatrix;
+                float scale;
+                float dx;
+                float dy;
+
+                if (dwidth <= vwidth && dheight <= vheight) {
+                    //如果都小于，就不放大了
+                    scale = 1.0f;
+                } else {
+                    //放大至小边相等
+                    scale = Math.min((float) vwidth / (float) dwidth,
+                            (float) vheight / (float) dheight);
+                }
+
+                dx = Math.round((vwidth - dwidth * scale) * 0.5f);
+                dy = Math.round((vheight - dheight * scale) * 0.5f);
+
+                mDrawMatrix.setScale(scale, scale);
+                mDrawMatrix.postTranslate(dx, dy);
+            } else {
+                // Generate the required transform.
+                mTempSrc.set(0, 0, dwidth, dheight);
+                mTempDst.set(0, 0, vwidth, vheight);
+
+                mDrawMatrix = mMatrix;
+                mDrawMatrix.setRectToRect(mTempSrc, mTempDst, scaleTypeToScaleToFit(mScaleType));
+            }
+        }
+    }
+    
+    有了 mDrawMatrix，接下来在 onDraw 方法
+            final int saveCount = canvas.getSaveCount();
+            canvas.save();
+            ...
+            canvas.translate(mPaddingLeft, mPaddingTop);
+
+            if (mDrawMatrix != null) {
+                canvas.concat(mDrawMatrix);
+            }
+            mDrawable.draw(canvas);
+            canvas.restoreToCount(saveCount);
+    
+## 3.1 scale 计算示例
+
+    private fun cal(dw: Int = 100, dh: Int = 100, vw: Int = 100, vh: Int = 100) {
+        println("dw=$dw\ndh=$dh\nvw=$vw\nvh=$vh")
+        val rw = vw / dw
+        val rh = vh / dh
+        println("vw/dw=$rw\nvh/dh=$rh")
+        println("在 fitCenter 时")
+        if (rw < rh) {
+            println("w 比值较小，以 w 为准，scale = $rw")
+        } else {
+            println("h 比值较小，以 h 为准，scale = $rh")
+        }
+
+        println("在 centerCrop 时")
+        println("dw*vh=${dw * vh}\nvw*dh=${vw * dh}")
+        /*
+        dw*vh>vw*dh
+        dw/vw>dh/vh
+        vw/dw<vh/dh
+        正好与 fitCenter 反着
+        也就是说比较 vw/dw 与 vh/dh，fitCenter 取较小者（如果两者都大于1，不缩放）
+        centerCrop 取较大者
+         */
+        if (dw * vh > vw * dh) {
+            println("以 h 为准，scale = $rh")
+        } else {
+            println("以 w 为准，scale = $rw")
+        }
+    }
+
+## android.graphics.Matrix#setRectToRect
+## android.graphics.Canvas#concat

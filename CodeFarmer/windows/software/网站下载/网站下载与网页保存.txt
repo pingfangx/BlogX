@@ -1,0 +1,10 @@
+# 单个网页
+如何完整离线保存网页，包括网页完整特效？ - 鸟人的回答 - 知乎
+https://www.zhihu.com/question/22263777/answer/111807670
+
+> 在 Chrome 地址栏中键入“chrome://flags”，回车，这是一个 Chrome 的功能配置页面，项目比较多，我们通过 Ctrl+F 来搜索“mhtml”，找到“将网页另存为 MHTML”这一项，然后点击下方的“启用”即可。　　此时打开任一网页，右击“另存为”，将默认保存为.mhtml文件，即mht文件。
+
+# 整站
+httrack
+
+[xroche/httrack](https://github.com/xroche/httrack)

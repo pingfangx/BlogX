@@ -1,0 +1,88 @@
+[压缩代码和资源](https://developer.android.com/studio/build/shrink-code)
+
+[Android 混淆那些事儿](https://mp.weixin.qq.com/s/WmJyiA3fDNriw5qXuoA9MA)
+
+# 0x01 配置规则文件 proguardFiles
+官方已经说的很详细了，以下为复制粘贴。
+
+
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        
+除了 minifyEnabled 属性外，还有用于定义 ProGuard 规则的 proguardFiles 属性：
+
+* getDefaultProguardFile('proguard-android.txt') 方法可从 Android SDK tools/proguard/ 文件夹获取默认的 ProGuard 设置。  
+提示：要想做进一步的代码压缩，请尝试使用位于同一位置的 proguard-android-optimize.txt 文件。它包括相同的 ProGuard 规则，但还包括其他在字节码一级（方法内和方法间）执行分析的优化，以进一步减小 APK 大小和帮助提高其运行速度。
+* proguard-rules.pro 文件用于添加自定义 ProGuard 规则。默认情况下，该文件位于模块根目录（build.gradle 文件旁）。
+
+要添加更多各构建变体专用的 ProGuard 规则，请在相应的 productFlavor 代码块中再添加一个 proguardFiles 属性。例如，以下 Gradle 文件会向 flavor2 产品定制添加 flavor2-rules.pro。现在 flavor2 使用所有三个 ProGuard 规则，因为还应用了来自 release 代码块的规则。
+## bugly 提到
+> 通过试验，gradle 2.2之后，defaultProguardFile没有使用sdk目录下的proguard-android.txt，而是使用了gradle自带的proguard-android.txt，不同的gradle版本带有不同的默认混淆文件
+
+## getDefaultProguardFile
+
+    com.android.build.gradle.BaseExtension#getDefaultProguardFile
+    public File getDefaultProguardFile(String name) {
+        if (!ProguardFiles.KNOWN_FILE_NAMES.contains(name)) {
+            extraModelInfo
+                    .getSyncIssueHandler()
+                    .reportError(
+                            EvalIssueReporter.Type.GENERIC, ProguardFiles.UNKNOWN_FILENAME_MESSAGE);
+        }
+        return ProguardFiles.getDefaultProguardFile(name, project);
+    }
+    可以看到文件名有限制
+    com.android.build.gradle.ProguardFiles.ProguardFile
+        
+        /** Default when not using the "postProcessing" DSL block. */
+        DONT_OPTIMIZE("proguard-android.txt"),
+
+        /** Variant of the above which does not disable optimizations. */
+        OPTIMIZE("proguard-android-optimize.txt"),
+
+        /**
+         * Does not disable any actions, includes optimizations config. To be used with the new
+         * "postProcessing" DSL block.
+         */
+        NO_ACTIONS("proguard-defaults.txt"),
+        
+    com.android.build.gradle.ProguardFiles#getDefaultProguardFile
+    
+    public static File getDefaultProguardFile(@NonNull String name, @NonNull Project project) {
+        if (!KNOWN_FILE_NAMES.contains(name)) {
+            throw new IllegalArgumentException(UNKNOWN_FILENAME_MESSAGE);
+        }
+
+        return FileUtils.join(
+                project.getRootProject().getBuildDir(),
+                AndroidProject.FD_INTERMEDIATES,
+                "proguard-files",
+                name + "-" + Version.ANDROID_GRADLE_PLUGIN_VERSION);
+    }
+    可以看到，确实是使用的文件名为 build,intermediates,proguard-files,"-"，version 拼接
+    
+    build/intermediates/proguard-files/proguard-android.txt-3.1.4
+    注意不是 app/build
+## 为了验证，继续探究
+[插件更新记录 2.2.0 (September 2016)](https://developer.android.com/studio/releases/gradle-plugin#2-2-0)
+> getDefaultProguardFile now returns the default ProGuard files that Android plugin for Gradle provides and no longer uses the ones in the Android SDK.
+
+于是我们下载 gradle-2.1.3-sources.jar
+
+    在 com.android.build.gradle.BaseExtension#getDefaultProguardFile
+    public File getDefaultProguardFile(String name) {
+        File sdkDir = sdkHandler.getAndCheckSdkFolder();
+        return new File(sdkDir,
+                SdkConstants.FD_TOOLS + File.separatorChar
+                        + SdkConstants.FD_PROGUARD + File.separatorChar
+                        + name);
+    }
+    
+而到了 gradle-2.2.0-alpha1-sources.jar，就变成了
+    
+    public File getDefaultProguardFile(String name) {
+        return ProguardFiles.getDefaultProguardFile(name, project);
+    }
+破案。

@@ -1,0 +1,44 @@
+Q: 
+ProGuard 不使用的类、方法是否会被删除
+ReDex
+resConfigs 去除引用的第三方包
+
+R:
+
+[美团技术团队-Android App包瘦身优化实践](https://tech.meituan.com/android_shrink_overall_solution.html)
+
+[android APK体积大小优化](https://blog.csdn.net/cchp1234/article/details/77750428)
+
+[Android开发如何有效减小APK的体积](https://juejin.im/post/596d59c75188254b7877e12a)
+
+[[Android 之美] 那些你不知道的APK 瘦身，让你的APK更小](https://blog.csdn.net/vfush/article/details/52266843)
+
+[Android APK 瘦身 - JOOX Music项目实战](https://mp.weixin.qq.com/s/9IGYG6hNKL1V7N_p16p2Hg?)
+
+[【腾讯Bugly干货分享】Android减包 － 减少APK大小](https://blog.csdn.net/Tencent_Bugly/article/details/71165675)
+
+
+S:
+
+# lib 共 12.9 M
+理解并处理 so 包
+
+# res 共 6.1 M
+清除无用资源
+图片优化 
+图片查重
+
+# Assets 共 4.7 M
+删除不必要的
+
+文件|大小|来源|介绍
+-|-|-|-
+AliyunDemo/filter.zip|1.6M|阿里短视频|滤镜
+cfg/|1.5M|百度地图|
+unicorn_emoji/|1.1M|七鱼客服
+area.db|457.8K|地区选择
+
+# classes.dex 共 3.1+3.2+1
+ProGuard
+删除不需要的方法及类，但要谨慎
+清除无用文件

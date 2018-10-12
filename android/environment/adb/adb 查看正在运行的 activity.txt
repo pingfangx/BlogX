@@ -1,0 +1,13 @@
+adb shell dumpsys activity activities
+
+
+对于”Running activitie”s的内容在dumpsys activity中就有，并不需要dumpsys activity activities，也可以用下边的指令来限制仅输出”Running activities”列表：
+
+adb shell dumpsys activtiy activities | sed -En -e '/Running activities/,Run #0/p'
+
+adb shell dumpsys activity activities | findstr "Run"
+
+查看广播
+adb shell dumpsys activity broadcasts > D:/sys.txt
+
+adb shell dumpsys | findstr "BroadcastRecord"

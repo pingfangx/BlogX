@@ -1,0 +1,12 @@
+java.lang.Runtime#doLoad
+
+        String librarySearchPath = null;
+        if (loader != null && loader instanceof BaseDexClassLoader) {
+            BaseDexClassLoader dexClassLoader = (BaseDexClassLoader) loader;
+            librarySearchPath = dexClassLoader.getLdLibraryPath();
+        }
+
+实际是不需要判 null 的，涉及到 instanceof 的却又比较深，
+
+[Java instanceof 关键字是如何实现的？](https://www.zhihu.com/question/21574535)
+

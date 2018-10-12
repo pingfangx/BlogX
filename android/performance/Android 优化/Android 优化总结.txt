@@ -1,0 +1,18 @@
+首先我们理一下经常看到的优化
+
+## 启动优化
+
+## 视图优化
+减少布局层次
+
+## 减小文件大小
+
+## 内存优化
+OOM
+
+## 性能优化
+卡顿
+ANR
+
+
+[Android 性能优化之内存检测、卡顿优化、耗电优化、APK瘦身](https://blog.csdn.net/csdn_aiyang/article/details/74989318)

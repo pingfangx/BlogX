@@ -1,0 +1,16 @@
+Q:
+* 相关基础概念
+* 如何查看 App 的数据传输
+* 如何保障传输安全
+
+[App安全之网络传输安全](http://mrpeak.cn/blog/encrypt/)
+
+[App安全之网络传输安全](https://blog.csdn.net/wangjigaoyi/article/details/51910745)
+
+
+S:
+# 1 基本概念
+# 2 App 中的部分运用
+## HTTPS
+## MAC/sign
+

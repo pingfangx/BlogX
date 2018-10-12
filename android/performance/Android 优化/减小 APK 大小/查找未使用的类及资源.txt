@@ -1,0 +1,27 @@
+[如何有效的清除Android中无用的资源（静态代码分析）](https://juejin.im/post/57bd6f79efa631005a916096)
+
+[How to use IntelliJ IDEA to find all unused code?](https://stackoverflow.com/questions/6587729)
+
+lint 可以检查一些问题，而 lint 属于 分析|检查代码 的一部分。
+
+分析 > 检查代码  
+Analyze | Inspect Code
+
+Analyze > Run Inspection by Name ... （Ctrl+Shift+Alt+I）
+
+# 资源
+UnusedResources   
+这是检查的子集 Android Lint:Performance > Unused resources
+
+# Java 类
+Unused declaration
+可以筛选类、字段等，相当方便
+
+## UCDetector
+## ProGuard
+启用 shrink ，但看输出的 usage.txt
+
+Gradle Task 位于 :app > Tasks > other > transformClassedAndResourcesWithProguardFor...
+
+输出位于 app/build/outputs/mapping
+

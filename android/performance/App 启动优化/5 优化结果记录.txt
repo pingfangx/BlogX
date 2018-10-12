@@ -1,0 +1,81 @@
+## App 启动响应时间
+即 adb shell am start 输出的 TotalTime
+
+优化前
+
+    第 1/10 次时间 1518，当前平均时间 1518.00
+    第 2/10 次时间 1605，当前平均时间 1561.50
+    第 3/10 次时间 1794，当前平均时间 1639.00
+    第 4/10 次时间 1712，当前平均时间 1657.25
+    第 5/10 次时间 1738，当前平均时间 1673.40
+    第 6/10 次时间 1763，当前平均时间 1688.33
+    第 7/10 次时间 2136，当前平均时间 1752.29
+    第 8/10 次时间 1598，当前平均时间 1733.00
+    第 9/10 次时间 1588，当前平均时间 1716.89
+    第 10/10 次时间 1912，当前平均时间 1736.40
+    
+优化后
+
+    第 1/10 次时间 749，当前平均时间 749.00
+    第 2/10 次时间 675，当前平均时间 712.00
+    第 3/10 次时间 740，当前平均时间 721.33
+    第 4/10 次时间 733，当前平均时间 724.25
+    第 5/10 次时间 813，当前平均时间 742.00
+    第 6/10 次时间 772，当前平均时间 747.00
+    第 7/10 次时间 746，当前平均时间 746.86
+    第 8/10 次时间 752，当前平均时间 747.50
+    第 9/10 次时间 753，当前平均时间 748.11
+    第 10/10 次时间 810，当前平均时间 754.30
+## 启动第一个 Activity 的耗时
+优化前
+
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +787ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +782ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +799ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +766ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +780ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +825ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +814ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +873ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +892ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +860ms
+
+优化后
+
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +412ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +385ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +382ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +429ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +412ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +405ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +437ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +378ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +410ms
+    Displayed com.cloudy.linglingbang/.activity.HomeActivity: +410ms
+
+## 第三方对比
+
+微信的
+
+    C:\Users\Admin>adb shell am start -S -W com.tencent.mm/.ui.LauncherUI
+    Stopping: com.tencent.mm
+    Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] cmp=com.tencent.mm/.ui.LauncherUI }
+    Status: ok
+    Activity: com.tencent.mm/.app.WeChatSplashActivity
+    ThisTime: 499
+    TotalTime: 1586
+    WaitTime: 1634
+    Complete
+    
+QQ 的
+
+    C:\Users\Admin>adb shell am start -S -W com.tencent.mobileqq/.activity.SplashActivity
+    Stopping: com.tencent.mobileqq
+    Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] cmp=com.tencent.mobileqq/.activity.SplashActivity }
+    Status: ok
+    Activity: com.tencent.mobileqq/.activity.SplashActivity
+    ThisTime: 342
+    TotalTime: 342
+    WaitTime: 376
+    Complete
+    

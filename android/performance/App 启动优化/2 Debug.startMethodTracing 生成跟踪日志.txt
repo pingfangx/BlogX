@@ -1,0 +1,33 @@
+[使用 CPU Profiler 检查 CPU Activity 和函数跟踪](https://developer.android.com/studio/profile/cpu-profiler?hl=zh-cn)
+
+[设置您的应用生成跟踪日志](https://developer.android.com/studio/profile/generate-trace-logs?hl=zh-cn)  
+
+[Perform on-device system tracing](https://developer.android.com/studio/profile/systrace-on-device?hl=zh-cn)
+
+[Inspect trace logs with Traceview](https://developer.android.com/studio/profile/traceview)
+
+[Trace](https://developer.android.google.cn/reference/android/os/Trace)
+
+[systrace](https://developer.android.google.cn/studio/command-line/systrace)
+
+
+# 记录
+    
+    public static void startMethodTracing() {
+        if (DRY_RUN) {
+            return;
+        }
+        SimpleDateFormat date = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault());
+        String logDate = date.format(new Date());
+        // 如果放于一个目录中，可以方便 adb pull ，但需要手动创建该目录
+        // bufferSize 单位为字节，默认为 8M 太小不够保存，但是如果太大了也会分配失败（测试时 1024 M 失败）
+        Debug.startMethodTracing("trace-" + logDate, 1024 * 1024 * 100);
+    }
+
+    public static void stopMethodTracing() {
+        if (DRY_RUN) {
+            return;
+        }
+        Debug.stopMethodTracing();
+        d("trace 保存完成");
+    }

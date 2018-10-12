@@ -272,7 +272,14 @@ subprocess 比 os 的相关方法更强大。
         print(subprocess.call(cmd,shell=True))  # 1
         print(subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                universal_newlines=True).stdout.readlines())  # []
+                               
+                               
+
+        # subprocess 的使用
+        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        output = process.stdout.read()                               
 ```
+
 
 # 0x06 python 调用 os.system 输出乱码
 感谢[Wensent_H.《pycharm下 os.system执行命令返回有中文乱码》](http://blog.csdn.net/Wensent_H/article/details/77088623)

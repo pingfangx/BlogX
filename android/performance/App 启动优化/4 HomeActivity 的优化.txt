@@ -1,0 +1,27 @@
+打开第一个 Activity 时感觉较慢。
+
+# 诊断问题
+## 记录时间
+首先写个工具记录时间，在各个方法前后记录。
+最后发现，super.onStart(); 耗时较长
+
+## 使用 startMethodTracing
+可以看到，是各 Fragment 的加载  
+具体是 inflate 和 initViews 方法耗时
+
+于是不再加载各 Fragment，而是点击的时候才加载。  
+# 抽屉布局
+接下来看到抽屉布局也耗时，于是也修改为滑出时为空再加载。
+
+但是因为有一些监听，所以延时初始化
+
+## initViews
+部分初始化进行延时
+
+## 直播 Fragment
+懒加载
+
+# 处理方式总结
+* 不需要展示的 Fragment，暂不加载，点击 tab 时才加载
+* ViewPager 使用的 Fragment，使用懒加载，以减少 inflate 的时间
+* 部分需要初始化的内容，延时初始化，延时后绝大多数情况会在显示 view 后再初始化

@@ -1,0 +1,26 @@
+# 原始作用
+[JAR File Specification](https://docs.oracle.com/javase/7/docs/technotes/guides/jar/jar.html)
+
+## MANIFEST.MF
+>The manifest file that is used to define extension and package related data.
+
+[清单文件](https://zh.wikipedia.org/wiki/%E6%B8%85%E5%8D%95%E6%96%87%E4%BB%B6)
+
+## CERT.SF
+> The signature file for the JAR file.  'x' stands for the base file name.
+
+.SF Signature File
+
+
+## CERT.RSA
+> The signature block file associated with the signature file with the same base file name. This file stores the digital signature of the corresponding signature file.
+
+    Name: AndroidManifest.xml
+    SHA1-Digest: 5J8PsZiHsGElfBkyQ5R4tdNP4CI=
+    
+# 扩展
+[美团Android自动化之旅—生成渠道包](https://www.mtyun.com/library/mt-apk-packaging)
+> 如果在META-INF目录内添加空文件，可以不用重新签名应用。因此，通过为不同渠道的应用添加不同的空文件，可以唯一标识一个渠道。
+
+虽然失效了.
+[新一代开源Android渠道包生成工具Walle](https://zhuanlan.zhihu.com/p/24920734)

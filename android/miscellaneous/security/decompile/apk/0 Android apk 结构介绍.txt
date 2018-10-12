@@ -1,0 +1,54 @@
+[Android构建过程分析](https://mp.weixin.qq.com/s?__biz=MzI1NjEwMTM4OA==&mid=2651232113&idx=1&sn=02f413999ab0865e23d272e69b9e6196&scene=1&srcid=0831gT4p6M0NFG5HTTeRHTUC#wechat_redirect)
+
+[APK文件结构和安装过程](https://blog.csdn.net/bupt073114/article/details/42298337)
+
+[Android反编译技术总结](http://unclechen.github.io/2016/09/07/Android%E5%8F%8D%E7%BC%96%E8%AF%91%E6%8A%80%E6%9C%AF%E6%80%BB%E7%BB%93/)
+
+TODO 值得学习
+[Inside the Android Application Framework](https://sites.google.com/site/io/inside-the-android-application-framework)
+
+
+Q:
+* 了解知道 Apk 的各个部分
+* apk 的各个部分是如何生成的
+* apk 的各个部分在安装和运行过程中是如何生效的
+
+# 安卓结构总览
+[Android Application/Package APK Structure Part 1](http://www.ryantzj.com/android-applicationpackage-apk-structure-part-1.html)
+
+[Understand the APK structure](https://developer.android.com/topic/performance/reduce-apk-size#apk-structure)
+
+我们创建一个包含 kotlin 和 c++ 的项目，添加 assets，  
+运行后生成一个 apk ，解压到 apk 目录，使用 tree 列出部分文件如下
+
+    tree apk /F >apk.txt
+    
+    apk
+    │  AndroidManifest.xml
+    │  classes.dex
+    │  resources.arsc
+    ├─assets
+    │      demo.txt
+    ├─kotlin
+    ├─lib
+    │  └─x86
+    │          libnative-lib.so
+    ├─META-INF
+    │      CERT.RSA
+    │      CERT.SF
+    │      MANIFEST.MF
+    └─res
+    
+
+文件或目录|简介|备注
+-|-|-
+assets|应用资源|AssetManager
+kotlin|kotlin 相关|
+lib|已编译的原生代码|System.loadLibrary
+META-INF|元数据、签名等|
+res|未编译进 resources.arsc 的资源|
+AndroidManifest.xml|清单文件|
+classes.dex|编译的代码|
+resources.arsc|编译的资源|
+
+接下来，将分为各部分依次介绍。

@@ -1,0 +1,19 @@
+# fsutil 创建文件
+依次输入
+
+    fsutil
+    fsutil file
+    fsutil file createnew
+    可得到帮助
+    用法 : fsutil file createnew <filename> <length>
+    例如 : fsutil file createnew C:\testfile.txt 1000
+    
+    fsutil file createnew 1000.txt 1000
+    
+通过之前的学习，我们知道  
+utf-8 的文件，BOM 为
+
+    ef bb bf
+    
+    后面再接上对应文字的的编码写入十六进制即可。
+    

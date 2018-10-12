@@ -1,0 +1,38 @@
+获取签名
+
+    fun getAppSignature(context: Context, packageName: String): String {
+        val signatures = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val packageInfo = context.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES)
+            val signingInfo = packageInfo.signingInfo
+            if (signingInfo.hasMultipleSigners()) {
+                signingInfo.apkContentsSigners
+            } else {
+                signingInfo.signingCertificateHistory
+            }
+        } else {
+            val packageInfo = context.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+            packageInfo.signatures
+        }
+        return if (signatures != null && signatures.isNotEmpty()) {
+            val md5 = MessageDigest.getInstance("MD5")
+            md5.update(signatures[0].toByteArray())
+            toHexString(md5.digest())
+        } else {
+            ""
+        }
+    }
+
+# android.content.pm.PackageInfo#signatures 弃用
+
+要求使用 signingInfo代替
+
+# 提醒
+
+Reading app signatures from getPackageInfo: The app signatures could be exploited if not validated properly; see issue explanation for details.
+
+Improper validation of app signatures could lead to issues where a malicious app submits itself to the Play Store with both its real certificate and a fake certificate and gains access to functionality or information it shouldn't have due to another application only checking for the fake certificate and ignoring the rest. Please make sure to validate all signatures returned by this method.
+
+More info:
+https://bluebox.com/technical/android-fake-id-vulnerability/
+
+也就是要求验证签名

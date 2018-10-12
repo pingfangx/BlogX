@@ -1,0 +1,18 @@
+[How to directly jump to any Registry key in Registry Editor with just one click](https://www.thewindowsclub.com/jump-to-any-registry-key-windows)
+
+里面提到
+> Now, you might have noticed that whenever you open registry editor, it automatically lands on the registry key that was last viewed. That’s because the Registry Editor saves the last key at a separate location and it refers that location while launching the editor. When you want to open Registry Editor to any desired key path, the idea is to save this path in the value field of LastKey so that next time you open Registry Editor, it launches at your desired key path.
+
+并给出了脚本
+
+    @ECHO OFF & setlocal
+    SET /P "showkey=Please enter the path of the registry key: "
+    REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" /v "LastKey" /d "%showkey%" /f 
+    start "" regedit
+    
+    
+以及小工具
+
+[RegJump v1.1](https://docs.microsoft.com/zh-cn/sysinternals/downloads/regjump)
+
+放到某一目录，然后添加到 path 即可。

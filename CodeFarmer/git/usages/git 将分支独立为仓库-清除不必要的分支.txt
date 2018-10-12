@@ -1,0 +1,17 @@
+需求是我从一个仓库中独立出一个分支，又想保留该分支的所有的提交。
+
+[pingfangx/TranslatorX-other](https://github.com/pingfangx/TranslatorX-other)  
+原来的 TranslatorX 更改为仅发布 JetBrains，所以单独出一个仓库处理自己平常的翻译。
+
+新建一个仓库，将整个 git 文件夹复制覆盖，只保留 config 中对远程的跟踪  
+然后把 master reset，再 rebase --onto 到目标分支上。
+
+git branch --list 然后全部删除  
+git tag --list 然后全部删除  
+git stash clear  
+git remote prune origin --dry-run  
+预览然后清除远程分支的跟踪。
+
+git gc
+
+git push -f

@@ -1,0 +1,48 @@
+[APK安装流程详解0——前言](https://www.jianshu.com/p/4f16421d5c7f)
+
+[APK安装过程及原理详解](https://blog.csdn.net/hdhd588/article/details/6739281)
+
+[Android Apk安装过程分析](https://www.jianshu.com/p/953475cea991)
+
+[Android8.0 PackageManagerService相关 -- APK安装和install 的变更和源码浅析](http://www.voidcn.com/article/p-ncbpwlzy-bpq.html)
+
+比较复杂
+我们以安装 Activity 为入口
+
+    com.android.packageinstaller.PackageInstallerActivity
+    com.android.packageinstaller.PackageInstallerActivity#startInstall
+    com.android.packageinstaller.InstallInstalling#onResume
+    com.android.packageinstaller.InstallInstalling.InstallingAsyncTask#onPostExecute
+    com.android.server.pm.PackageInstallerSession#commit
+    com.android.server.pm.PackageInstallerSession#commitLocked
+    com.android.server.pm.PackageManagerService#installStage
+    com.android.server.pm.PackageManagerService.PackageHandler#doHandleMessage
+    
+    //复制 apk
+    com.android.server.pm.PackageManagerService.HandlerParams#startCopy
+        ...
+                    handleStartCopy();
+        ...
+            handleReturnCode();
+    com.android.server.pm.PackageManagerService.HandlerParams#handleStartCopy
+    com.android.server.pm.PackageManagerService.InstallParams#handleStartCopy
+    com.android.server.pm.PackageManagerService.InstallArgs#copyApk
+    com.android.server.pm.PackageManagerService.FileInstallArgs#copyApk
+    com.android.server.pm.PackageManagerService.FileInstallArgs#doCopyApk
+    
+    //安装
+    com.android.server.pm.PackageManagerService.InstallParams#handleReturnCode
+    com.android.server.pm.PackageManagerService#processPendingInstall
+    com.android.server.pm.PackageManagerService#installPackageTracedLI
+    com.android.server.pm.PackageManagerService#installPackageLI
+    
+            PackageParser.Package newPackage = scanPackageTracedLI(pkg, policyFlags, scanFlags,
+                    System.currentTimeMillis(), user);
+
+            updateSettingsLI(newPackage, installerPackageName, null, res, user, installReason);
+    com.android.server.pm.PackageManagerService#installNewPackageLIF
+    com.android.server.pm.PackageManagerService#scanPackageTracedLI(PackageParser.Package, int, int, long, UserHandle)
+    com.android.server.pm.PackageManagerService#scanPackageLI(PackageParser.Package, int, int, long, UserHandle)
+    com.android.server.pm.PackageManagerService#scanPackageDirtyLI
+    
+    

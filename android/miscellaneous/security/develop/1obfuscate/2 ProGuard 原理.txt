@@ -1,0 +1,96 @@
+# 四个步骤
+[ProGuard 介绍](https://www.guardsquare.com/en/products/proguard/manual/introduction)
+
+> ProGuard is a Java class file shrinker, optimizer, obfuscator, and preverifier. The shrinking step detects and removes unused classes, fields, methods and attributes. The optimization step analyzes and optimizes the bytecode of the methods. The obfuscation step renames the remaining classes, fields, and methods using short meaningless names. These first steps make the code base smaller, more efficient, and harder to reverse-engineer. The final preverification step adds preverification information to the classes, which is required for Java Micro Edition and for Java 6 and higher.
+
+> Each of these steps is optional. For instance, ProGuard can also be used to just list dead code in an application, or to preverify class files for efficient use in Java 6.
+
+> ProGuard 可以对 Java 文件进行压缩（Shrink）、优化（Optimize）、混淆（Obfuscate）和预检（Preverify）  
+> 压缩步骤检测并删除未使用的类，字段，方法和属性。  
+> 优化步骤分析并优化方法的字节码。  
+> 混淆步骤使用简短的无意义名称重命名剩余的类，字段和方法。  
+> 这些开始步骤使代码库更小，更高效，并且更难以进行逆向工程。  
+> 最后的预验证步骤会向类添加预验证信息，这是 Java Micro Edition 和 Java 6 及更高版本所必需的。  
+
+> 每个步骤都是可选的。例如，ProGuard 还可用于在应用程序中列出 dead 代码，或预先验证类文件以便在 Java 6 中有效使用。
+
+# Gradle 输出
+
+    :app:transformClassesAndResourcesWithProguardForDebug
+    ProGuard, version 5.3.3
+    Reading input...
+    Reading program jar [D:\xx\.gradle\caches\modules-2\files-2.1\org.jetbrains.kotlin\kotlin-stdlib-jdk7\1.2.50\3811b225f9a22abf4f9d8a6f81adef0ba78a3c5\kotlin-stdlib-jdk7-1.2.50.jar] (filtered)
+    ...
+    Reading program directory [D:\workspace\AndroidX\demo\ProGuardDemo\app\build\intermediates\classes\debug] (filtered)
+    ...
+    Note: duplicate definition of library class [android.net.http.HttpResponseCache]
+    ...
+    Note: there were 11 duplicate class definitions.
+          (http://proguard.sourceforge.net/manual/troubleshooting.html#duplicateclass)
+    Initializing...
+    Note: kotlin.internal.PlatformImplementationsKt: can't find dynamically referenced class kotlin.internal.jdk8.JDK8PlatformImplementations
+    Note: kotlin.internal.PlatformImplementationsKt: can't find dynamically referenced class kotlin.internal.JRE8PlatformImplementations
+    Note: kotlin.internal.PlatformImplementationsKt: can't find dynamically referenced class kotlin.internal.JRE7PlatformImplementations
+    Note: kotlin.jvm.internal.Reflection: can't find dynamically referenced class kotlin.reflect.jvm.internal.ReflectionFactoryImpl
+    Note: the configuration keeps the entry point 'androidx.core.graphics.drawable.IconCompatParcelizer { android.support.v4.graphics.drawable.IconCompat read(androidx.versionedparcelable.VersionedParcel); }', but not the descriptor class 'androidx.versionedparcelable.VersionedParcel'
+    Note: the configuration keeps the entry point 'androidx.core.graphics.drawable.IconCompatParcelizer { void write(android.support.v4.graphics.drawable.IconCompat,androidx.versionedparcelable.VersionedParcel); }', but not the descriptor class 'androidx.versionedparcelable.VersionedParcel'
+    Note: there were 2 unkept descriptor classes in kept class members.
+          You should consider explicitly keeping the mentioned classes
+          (using '-keep').
+          (http://proguard.sourceforge.net/manual/troubleshooting.html#descriptorclass)
+    Note: there were 4 unresolved dynamic references to classes or interfaces.
+          You should check if you need to specify additional program jars.
+          (http://proguard.sourceforge.net/manual/troubleshooting.html#dynamicalclass)
+    Ignoring unused library classes...
+      Original number of library classes: 4801
+      Final number of library classes:    1264
+    Printing kept classes, fields, and methods...
+    Shrinking...
+    Printing usage to [D:\workspace\AndroidX\demo\ProGuardDemo\app\build\outputs\mapping\debug\usage.txt]...
+    Removing unused program classes and class elements...
+      Original number of program classes: 2062
+      Final number of program classes:    676
+    Inlining subroutines...
+    Obfuscating...
+    Printing mapping to [D:\workspace\AndroidX\demo\ProGuardDemo\app\build\outputs\mapping\debug\mapping.txt]...
+    Preverifying...
+    Writing output...
+    Preparing output jar [D:\workspace\AndroidX\demo\ProGuardDemo\app\build\intermediates\transforms\proguard\debug\0.jar]
+      Copying resources from program jar [D:\xx\.gradle\caches\modules-2\files-2.1\org.jetbrains.kotlin\kotlin-stdlib-jdk7\1.2.50\3811b225f9a22abf4f9d8a6f81adef0ba78a3c5\kotlin-stdlib-jdk7-1.2.50.jar] (filtered)
+      ...
+    Printing classes to [D:\workspace\AndroidX\demo\ProGuardDemo\app\build\outputs\mapping\debug\dump.txt]...
+    
+通过输出，我们看到
+Shrink 输出到 usage.txt  
+Obfuscate 输出到 mapping.txt
+最后输出到 dump.txt
+
+# 输出文件
+[（译）理解混淆的输出](https://www.jianshu.com/p/a106e8c72eed)
+
+app/build/outputs/mapping/debug
+
+* seeds.txt
+* usage.txt
+* mapping.txt
+* dump.txt
+
+混淆的第一件事情就是读取配置的所有文件，然后读取所有的java字节码（.class文件）创建class池。
+
+## seeds.txt
+然后
+> Printing kept classes, fields, and methods
+
+将匹配所有keep规则的每个类和成员的列表输出到seeds.txt。  
+这对于调试你写的keep规则是否匹配到了尝试keep的类很有帮助。
+
+## usage.txt
+执行 shrink
+知道了哪些代码是keep的，混淆将继续在class池查看不需要keep的代码。这是代码压缩阶段，混淆会从应用中移除未使用的代码。正如它所做的这个，它会输出未使用的代码——将会被移除的代码到usage.txt。这对我来说有点不解；我认为它应该叫ununed.txt 或 shrinkage.txt 或者其它什么的。  
+这对于理解为什么一个类在运行时不存在很有帮助。你可以检查它是否被移除到了这里，或在下一步中被重命名了。
+
+## mapping.txt
+混淆下一步需要做的是混淆尽可能多的代码，它会重命名类和成员为无意义的名称如“a”，“b”等等。混淆会输出每个类和成员的原名和新名到 mapping.txt。并不是所有的代码被重命名，但所有的代码会被列在mapping.txt。
+
+## dump.txt
+然后混淆就完成了它所有的工作（压缩代码和混淆），它输出了最后一个很重要的文件——所有代码被处理后的完整列表。就是所有的class文件，格式并不是最优的，所以它是个巨大的文件。

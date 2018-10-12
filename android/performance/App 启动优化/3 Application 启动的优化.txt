@@ -1,0 +1,21 @@
+# 处理方式
+* 对于一般初始化，可在线程中初始化
+* 对于一定要在主线程初始化的内容，延时到第一个 Activity 启动才初始化
+# 实际处理
+方法|耗时|处理|备注|文档
+-|-|-|-|-
+com.cloudy.linglingbang.db.GreenDaoManager#initDB|0.75%|删除|在调用时会判空并初始化
+com.cloudy.linglingbang.db.DBCopy#copyDBToDatabases|2.83%|放于子线程|应优化为有变化才复制
+com.cloudy.linglingbang.ApplicationLLB#initializeShare|2.73%|放于子线程|需要测试友盟分享|[文档](https://developer.umeng.com/docs/66632/detail/66639#h2-u521Du59CBu5316u8BBEu7F6E8)
+com.cloudy.linglingbang.ApplicationLLB#initImageLoader|0.29%|放于 Welcome|因为要等待初始化完成加载图片|[文档](https://github.com/nostra13/Android-Universal-Image-Loader/wiki/Quick-Setup)
+cn.jpush.android.api.JPushInterface.<clinit>|1%|放于子线程||[文档](https://docs.jiguang.cn/jpush/client/Android/android_guide/#_6)
+cn.jpush.android.api.JPushInterface#init|29.01%|放于子线程|需要测试极光推送|[文档](https://docs.jiguang.cn/jpush/client/Android/android_guide/#_6)
+com.cloudy.linglingbang.ApplicationLLB#prepareForFileCreate|1.47%|放于 Welcome
+com.baidu.mapapi.SDKInitializer#initialize|3.46%|放于 Welcome|需要测试百度定位|[文档](http://lbsyun.baidu.com/index.php?title=android-locsdk/guide/get-location/address)
+com.umeng.commonsdk.UMConfigure#init|1.59%|放于子线程|需要测试友盟统计|[文档](https://developer.umeng.com/docs/66632/detail/66889#h2-u521Du59CBu5316u53CAu901Au7528u63A5u53E37)
+com.tencent.smtt.sdk.QbSdk#initX5Environment|25.81%|放于子线程|需要测试 X5 内核|[文档](https://x5.tencent.com/tbs/guide/sdkInit.html)
+com.cloudy.linglingbang.constants.WebUrlConfigConstant#initConstant|0.35%|放于 Welcome|需要使用地址
+com.qiyukf.unicorn.api.Unicorn#init|12.58%|放于子线程|需要测试七鱼客服|[文档](https://qiyukf.com/newdoc/html/Android_SDK_Guide.html)
+com.vhall.business.VhallSDK#init|0.75%|放于子线程|需要测试微吼直播|[文档](http://www.vhall.com/saas/doc/261.html)
+com.aliyun.common.httpfinal.QupaiHttpFinal#initOkHttpFinal|1.83%|放于子线程|需要测试阿里短视频|[文档](https://help.aliyun.com/document_detail/53421.html?spm=a2c4g.11186623.6.765.6b0e4310dfHHOM)
+com.cloudy.linglingbang.app.im.ImConfig#init|14.4%|放于 Welcom|需要测试融云聊天|[文档](https://www.rongcloud.cn/docs/android_imlib.html)

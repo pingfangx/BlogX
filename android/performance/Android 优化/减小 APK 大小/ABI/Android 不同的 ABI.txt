@@ -1,0 +1,75 @@
+Q:
+* 什么是架构
+* 有哪些架构
+* 代码中是如何选择的
+
+
+> lib/: Contains the compiled code that is specific to the software layer of a processor. This directory contains a subdirectory for each platform type, like armeabi, armeabi-v7a, arm64-v8a, x86, x86_64, and mips.
+
+
+[Android中的ABI](https://www.jianshu.com/p/170f65439844)
+
+[CPU 和架构](https://developer.android.com/ndk/guides/arch?hl=zh-cn)  
+官方文档
+
+[Android的.so文件、ABI和CPU的关系](https://blog.csdn.net/xx326664162/article/details/51163905)
+
+[Android jniLibs下目录详解（.so文件）](https://www.jianshu.com/p/b758e36ae9b5)
+
+[Android NDK 1 - 指令集、CPU架构与汇编](https://blog.csdn.net/u010278882/article/details/49685521)
+
+[Determining Supported Processor Types (ABIs) for an Android Device](https://handstandsam.com/2016/01/28/determining-supported-processor-types-abis-for-an-android-device/)
+
+[与 .so 有关的一个长年大坑](https://zhuanlan.zhihu.com/p/21359984)  
+提到加载顺序以及
+> 注：运行 4.0.3 或更早版本、基于 ARMv7 的 Android 设备从 armeabi 目录（而非 armeabi-v7a 目录，如果两个目录都存在）安装原生库。 这是因为在 APK 中，/lib/armeabi/ 在 /lib/armeabi-v7a/ 后面。 从 4.0.4 开始，此问题已修复。
+
+以及建议
+> 为了减小 apk 体积，只保留 armeabi 和 armeabi-v7a 两个文件夹，并保证这两个文件夹中 .so 数量一致
+对只提供 armeabi 版本的第三方 .so，原样复制一份到 armeabi-v7a 文件夹
+
+# 我们应该支持哪些 ABI
+[ABI Management](https://developer.android.com/ndk/guides/abis)
+> Note: Historically the NDK supported 32-bit and 64-bit MIPS, but support was removed in NDK r17.
+
+Android 平台 ABI 支持
+
+Android 系统在运行时知道它支持哪些 ABI，因为版本特定的系统属性会指示：
+
+设备的主要 ABI，与系统映像本身使用的机器代码对应。
+可选的辅助 ABI，与系统映像也支持的另一个 ABI 对应。
+此机制确保系统在安装时从软件包提取最佳机器代码。
+
+为实现最佳性能，应直接针对主要 ABI 进行编译。例如，基于 ARMv5TE 的典型设备只会定义主要 ABI：armeabi。 相反，基于 ARMv7 的典型设备将主要 ABI 定义为 armeabi-v7a，而将辅助 ABI 定义为 armeabi，因为它可以运行为每个 ABI 生成的应用原生二进制文件。
+
+许多基于 x86 的设备也可运行 armeabi-v7a 和 armeabi NDK 二进制文件。对于这些设备，主要 ABI 将是 x86，辅助 ABI 是 armeabi-v7a。
+
+基于 MIPS 的典型设备只定义主要 ABI：mips。
+
+
+
+# 如何查看当前手机支持的 ABI
+[Determining Supported Processor Types (ABIs) for an Android Device](https://handstandsam.com/2016/01/28/determining-supported-processor-types-abis-for-an-android-device/)
+
+> To figure out what type of ABI your Android device has, you have two methods.  You can do it with an ADB (Android Debug Bridge) command, or programmatically through code.
+
+Pre-Lollipop devices:
+* ADB command:  
+`adb shell getprop ro.product.cpu.abi`
+* Programmatically:  
+`android.os.Build.CPU_ABI and android.os.Build.CPU_ABI2`
+
+Lollipop and higher:
+* ADB command:  
+`adb shell getprop ro.product.cpu.abilist`
+* Programatically:  
+`android.os.Build.SUPPORTED_ABIS`
+
+相关源码位于
+
+    com.android.internal.content.NativeLibraryHelper#copyNativeBinariesWithOverride
+    com.android.internal.content.NativeLibraryHelper#copyNativeBinariesForSupportedAbi
+    可以看到取的 
+    Build.SUPPORTED_32_BIT_ABIS
+    Build.SUPPORTED_64_BIT_ABIS
+    Build.SUPPORTED_ABIS

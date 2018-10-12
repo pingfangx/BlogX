@@ -1,0 +1,20 @@
+* 构建的时候，下载失败。（因为要代理）
+* 浏览器直接打开，无法下载（因为 PAC 模式未识别，需要配置为全局模式）
+* 配置为全局模式，浏览器可正常下载。
+* 给 AndroidStudio 设置代理，下载失败（AndroidStudio 设置代理无效，要给 Gradle 设置代理）
+* AndroidStudio 提示可以给 Gradle 配置代理，确认后无效（因为修改了系统级的 gradle.properties，因该修改项目级的）
+* 新建项目级的 gradle.properties，并配置代理，成功。
+
+[Gradle Manual-Build Environment](https://docs.gradle.org/current/userguide/build_environment.html)
+>Setting up a consistent environment for your build is as simple as placing these settings into a gradle.properties file. The configuration is applied in following order (if an option is configured in multiple locations the last one wins):
+* gradle.properties in project root directory.
+* gradle.properties in GRADLE_USER_HOME directory.
+* system properties, e.g. when -Dgradle.user.home is set on the command line.
+
+
+注意包括 http 与 https
+
+    systemProp.http.proxyHost=127.0.0.1
+    systemProp.http.proxyPort=1082
+    systemProp.https.proxyHost=127.0.0.1
+    systemProp.https.proxyPort=1082

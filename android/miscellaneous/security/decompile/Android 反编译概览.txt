@@ -1,0 +1,13 @@
+* 反编译资源
+* 反编译代码
+* 反编译 manifest
+* 重新打包
+
+
+[安全和逆向](http://www.520monkey.com/archives/category/%E5%AE%89%E5%85%A8%E5%92%8C%E9%80%86%E5%90%91)
+
+S:
+* apk 结构介绍
+* app 安装过程介绍
+* 各部分的逆向
+* 多 dex 的使用，重复的不处理

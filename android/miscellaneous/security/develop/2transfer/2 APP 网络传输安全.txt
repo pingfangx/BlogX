@@ -1,0 +1,65 @@
+* 使用 HTTPS
+* 密码使用摘要
+* 请求带上 MAC
+* Certificate Pinning
+
+# 安卓使用 HTTPS
+
+[App安全之网络传输安全](https://blog.csdn.net/wangjigaoyi/article/details/51910745)
+
+[聊聊 Android HTTPS 的使用姿势](https://juejin.im/entry/58cf9034a22b9d0064374dd9)
+
+[通过 HTTPS 和 SSL 确保安全](https://developer.android.com/training/articles/security-ssl?hl=zh-cn)
+
+这一点其实没有其他可讲的，额外可加上证书固定等。
+
+## 抓包工具原理和中间人攻击
+[深入HTTPS系列四（中间人攻击）](https://www.jianshu.com/p/9c52693a09dc)
+
+# 安卓 HTTPS 可能会遇到的问题
+## android.webkit.WebViewClient#onReceivedSslError
+要想显示，需要 handler.proceed(); 但是这个明显不安全的呀。
+解决方法见
+
+[Webview avoid security alert from google play upon implementation of onReceivedSslError](https://stackoverflow.com/questions/36050741)
+
+## networkSecurityConfig
+配置以用于 debug 时抓包。  
+[配置文件格式](https://developer.android.com/training/articles/security-config?hl=zh-cn#FileFormat)
+
+    
+    <application
+        android:networkSecurityConfig="@xml/network_security_config"
+        ...
+        
+    <?xml version="1.0" encoding="utf-8"?>
+    <!--certificates说明的src=“system"表示信任系统的CA证书，src=“user"表示信任用户导入的CA证书，只在debug模式下生效-->
+    <network-security-config>
+        <debug-overrides>
+            <trust-anchors>
+                <certificates
+                    overridePins="true"
+                    src="system" />
+                <certificates
+                    overridePins="true"
+                    src="user" />
+            </trust-anchors>
+        </debug-overrides>
+    </network-security-config>
+    
+# APP 中常见的 MAC/sign 算法
+* 按顺序拼接 key value
+* 拼接 salt
+* 摘要
+
+搜索“sign 算法逆向” 逆向，可以找到部分博文。
+
+以抖音为例：
+
+    抖音核心的步骤是：
+    在查询串插入一个固定的键rstr
+    对查询串进行按键排序并取值，对空格和+进行转义为a
+    然后取MD5；如果时间轴&1为1，那么取多一次MD5
+    将MD5结果分别和5******6、1******4进行2次错位排序算法
+    将4的结果再进行一次错位排序，得到36位字符
+    将字符分别取18位给到as和cp字段，追加到查询串最后

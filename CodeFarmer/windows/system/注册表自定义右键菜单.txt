@@ -1,0 +1,30 @@
+# 手动添加
+
+    HKEY_CLASSES_ROOT\Directory\Background\shell
+    添加项 xx_function （项即键）
+    
+    在 xx_function 下新建字符串值
+        Icon 图标
+        MUIVerb显示名，如果没有则是项名
+    
+    单个命令，新建 command 项，修改默认值
+    多个命令，
+        新建字符串值 SubCommands，填上各条命令，以 “;” 分隔
+        
+        每一条命令添加于
+        HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell
+        格式一致
+        
+# dos 命令
+主要是 reg 的 add 和 delete 命令
+
+见 xx_function_add.bat
+
+# reg 导入
+[Regedit file format](https://stackoverflow.com/questions/334207/regedit-file-format)
+
+[How to add, modify, or delete registry subkeys and values by using a .reg file](https://support.microsoft.com/en-us/help/310516/how-to-add-modify-or-delete-registry-subkeys-and-values-by-using-a-reg)
+
+xx_function_add.reg
+
+xx_function_delete.reg

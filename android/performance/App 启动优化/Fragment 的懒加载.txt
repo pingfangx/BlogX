@@ -1,0 +1,95 @@
+# setOffscreenPageLimit
+首先，我们知道，就算设成 0，也会被赋为 1  
+这样做是为了滑动的时候能够展示，否则会没有 view
+    
+    public void setOffscreenPageLimit(int limit) {
+        if (limit < DEFAULT_OFFSCREEN_PAGES) {
+            Log.w(TAG, "Requested offscreen page limit " + limit + " too small; defaulting to " +
+                    DEFAULT_OFFSCREEN_PAGES);
+            limit = DEFAULT_OFFSCREEN_PAGES;
+        }
+        if (limit != mOffscreenPageLimit) {
+            mOffscreenPageLimit = limit;
+            populate();
+        }
+    }
+
+就算通过反射设为 0，还是会加载，逻辑在 com.android.internal.widget.ViewPager#populate(int)
+
+    
+            float extraWidthRight = curItem.widthFactor;
+            itemIndex = curIndex + 1;
+            if (extraWidthRight < 2.f) {
+                ii = itemIndex < mItems.size() ? mItems.get(itemIndex) : null;
+                final float rightWidthNeeded = clientWidth <= 0 ? 0 :
+                        (float) getPaddingRight() / (float) clientWidth + 2.f;
+                for (int pos = mCurItem + 1; pos < N; pos++) {
+                    // extraWidthRight 为 1 ，rightWidthNeeded 为 2，条件不满足
+                    if (extraWidthRight >= rightWidthNeeded && pos > endPos) {
+                        if (ii == null) {
+                            break;
+                        }
+                        if (pos == ii.position && !ii.scrolling) {
+                            mItems.remove(itemIndex);
+                            mAdapter.destroyItem(this, pos, ii.object);
+                            if (DEBUG) {
+                                Log.i(TAG, "populate() - destroyItem() with pos: " + pos
+                                        + " view: " + ((View) ii.object));
+                            }
+                            ii = itemIndex < mItems.size() ? mItems.get(itemIndex) : null;
+                        }
+                    } else if (ii != null && pos == ii.position) {
+                        extraWidthRight += ii.widthFactor;
+                        itemIndex++;
+                        ii = itemIndex < mItems.size() ? mItems.get(itemIndex) : null;
+                    } else {
+                        //新建
+                        ii = addNewItem(pos, itemIndex);
+                        itemIndex++;
+                        extraWidthRight += ii.widthFactor;
+                        ii = itemIndex < mItems.size() ? mItems.get(itemIndex) : null;
+                    }
+                }
+            }
+
+# 懒加载思路
+## 1 把联网等初始化数据的操作放在首次展示时
+此方法的加载是加载数据，我们需要的是布局也懒加载
+
+[xmagicj/LazyFragment](https://github.com/xmagicj/LazyFragment)  
+
+## 2 套一个 ViewGroup
+首次加载时只展示 ViewGroup，实际加载时再加载真实的 View ，同时 add 进 ViewGroup  
+
+此方法的缺点是多一个 ViewGroup
+
+[TellH/FragmentLazyLoading](https://github.com/TellH/FragmentLazyLoading)  
+
+[LuckyJayce/ViewPagerIndicator](https://github.com/LuckyJayce/ViewPagerIndicator/blob/master/library/src/main/java/com/shizhefei/fragment/LazyFragment.java)  
+
+## 3 移除 ViewGroup 再添加
+强迫症表示怎么可以多一个没有用的 ViewGroup 呢，影响渲染。
+于是想在实际添加时先将其移除
+
+但是移除后会报错
+
+    android.support.v4.app.FragmentManagerImpl#moveFragmentToExpectedState
+    
+        if (f.mView != null) {
+            // Move the view if it is out of order
+            Fragment underFragment = findFragmentUnder(f);
+            if (underFragment != null) {
+                final View underView = underFragment.mView;
+                // make sure this fragment is in the right order.
+                final ViewGroup container = f.mContainer;
+                int underIndex = container.indexOfChild(underView);
+                //因为被移除了，所以 viewIndex 为 -1，在后面 removeViewAt 出错
+                int viewIndex = container.indexOfChild(f.mView);
+                if (viewIndex < underIndex) {
+                    container.removeViewAt(viewIndex);
+                    container.addView(f.mView, underIndex);
+                }
+            }
+
+也就是说，我们修改了 view，但是仍持有 f.mView  
+于是通过反射将其修改，测试成功，不知道是否会有别的问题。

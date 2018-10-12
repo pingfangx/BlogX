@@ -1,0 +1,173 @@
+MD5消息摘要算法（英语：MD5 Message-Digest Algorithm）
+
+[漫画：什么是MD5算法？](https://mp.weixin.qq.com/s/k-ToL356asWtS_PN30Z17w?)
+
+# 处理原文，补齐位数
+使用 64 位记录长度
+要求原文长度 % 512 =448，如果不足，第一位填充 1 ，其余位填充 0
+
+# 初始值
+MD5 哈希为 128位，每 32 位为一组分为 4 组。  
+ABCD
+    private final int A=0x67452301;
+    private final int B=0xefcdab89;
+    private final int C=0x98badcfe;
+    private final int D=0x10325476;
+
+## 循环加工
+
+    新A = 原d
+
+    新B = b+((a+F(b,c,d)+Mj+Ki)<<<s)
+
+    新C = 原b
+
+    新D = 原c
+    
+    F 表示不同的方法
+    Mj 表示 512 位分成 16 块，不同的块
+    Ki 表示一个常量
+    
+    F(X, Y, Z) =(X&Y) | ((~X) & Z)
+
+    G(X, Y, Z) =(X&Z) | (Y & (~Z))
+
+    H(X, Y, Z) =X^Y^Z
+
+    I(X, Y, Z)=Y^(X|(~Z))
+    
+    第一轮：
+
+    FF(a,b,c,d,M0,7,0xd76aa478）     s[0]=7,   K[0] = 0xd76aa478
+
+    FF(a,b,c,d,M1,12,0xe8c7b756）   s[1]=12,  K[1] = 0xe8c7b756 
+
+    FF(a,b,c,d,M2,17,0x242070db)
+
+    FF(a,b,c,d,M3,22,0xc1bdceee)
+
+    FF(a,b,c,d,M4,7,0xf57c0faf)
+
+    FF(a,b,c,d,M5,12,0x4787c62a)
+
+    FF(a,b,c,d,M6,17,0xa8304613）
+
+    FF(a,b,c,d,M7,22,0xfd469501）
+
+    FF(a,b,c,d,M8,7,0x698098d8）
+
+    FF(a,b,c,d,M9,12,0x8b44f7af)
+
+    FF(a,b,c,d,M10,17,0xffff5bb1）
+
+    FF(a,b,c,d,M11,22,0x895cd7be)
+
+    FF(a,b,c,d,M12,7,0x6b901122）
+
+    FF(a,b,c,d,M13,12,0xfd987193）
+
+    FF(a,b,c,d,M14,17, 0xa679438e)
+
+    FF(a,b,c,d,M15,22,0x49b40821）
+
+    第二轮：
+
+    GG(a,b,c,d,M1,5,0xf61e2562）
+
+    GG(a,b,c,d,M6,9,0xc040b340）
+
+    GG(a,b,c,d,M11,14,0x265e5a51）
+
+    GG(a,b,c,d,M0,20,0xe9b6c7aa)
+
+    GG(a,b,c,d,M5,5,0xd62f105d)
+
+    GG(a,b,c,d,M10,9,0x02441453）
+
+    GG(a,b,c,d,M15,14,0xd8a1e681）
+
+    GG(a,b,c,d,M4,20,0xe7d3fbc8）
+
+    GG(a,b,c,d,M9,5,0x21e1cde6）
+
+    GG(a,b,c,d,M14,9,0xc33707d6）
+
+    GG(a,b,c,d,M3,14,0xf4d50d87）
+
+    GG(a,b,c,d,M8,20,0x455a14ed)
+
+    GG(a,b,c,d,M13,5,0xa9e3e905）
+
+    GG(a,b,c,d,M2,9,0xfcefa3f8）
+
+    GG(a,b,c,d,M7,14,0x676f02d9）
+
+    GG(a,b,c,d,M12,20,0x8d2a4c8a)
+
+    第三轮：
+
+    HH(a,b,c,d,M5,4,0xfffa3942）
+
+    HH(a,b,c,d,M8,11,0x8771f681）
+
+    HH(a,b,c,d,M11,16,0x6d9d6122）
+
+    HH(a,b,c,d,M14,23,0xfde5380c)
+
+    HH(a,b,c,d,M1,4,0xa4beea44）
+
+    HH(a,b,c,d,M4,11,0x4bdecfa9）
+
+    HH(a,b,c,d,M7,16,0xf6bb4b60）
+
+    HH(a,b,c,d,M10,23,0xbebfbc70）
+
+    HH(a,b,c,d,M13,4,0x289b7ec6）
+
+    HH(a,b,c,d,M0,11,0xeaa127fa)
+
+    HH(a,b,c,d,M3,16,0xd4ef3085）
+
+    HH(a,b,c,d,M6,23,0x04881d05）
+
+    HH(a,b,c,d,M9,4,0xd9d4d039）
+
+    HH(a,b,c,d,M12,11,0xe6db99e5）
+
+    HH(a,b,c,d,M15,16,0x1fa27cf8）
+
+    HH(a,b,c,d,M2,23,0xc4ac5665）
+
+    第四轮：
+
+    Ⅱ（a,b,c,d,M0,6,0xf4292244）
+
+    Ⅱ（a,b,c,d,M7,10,0x432aff97）
+
+    Ⅱ（a,b,c,d,M14,15,0xab9423a7）
+
+    Ⅱ（a,b,c,d,M5,21,0xfc93a039）
+
+    Ⅱ（a,b,c,d,M12,6,0x655b59c3）
+
+    Ⅱ（a,b,c,d,M3,10,0x8f0ccc92）
+
+    Ⅱ（a,b,c,d,M10,15,0xffeff47d)
+
+    Ⅱ（a,b,c,d,M1,21,0x85845dd1）
+
+    Ⅱ（a,b,c,d,M8,6,0x6fa87e4f)
+
+    Ⅱ（a,b,c,d,M15,10,0xfe2ce6e0)
+
+    Ⅱ（a,b,c,d,M6,15,0xa3014314）
+
+    Ⅱ（a,b,c,d,M13,21,0x4e0811a1）
+
+    Ⅱ（a,b,c,d,M4,6,0xf7537e82）
+
+    Ⅱ（a,b,c,d,M11,10,0xbd3af235）
+
+    Ⅱ（a,b,c,d,M2,15,0x2ad7d2bb)
+
+    Ⅱ（a,b,c,d,M9,21,0xeb86d391）

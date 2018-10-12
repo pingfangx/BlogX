@@ -1,0 +1,17 @@
+
+[一篇胎死腹中的Android文章——Dex文件结构解析](https://blog.csdn.net/sbsujjbcy/article/details/52869361)
+
+[Android逆向之旅---解析编译之后的Dex文件格式](https://blog.csdn.net/jiangwei0910410003/article/details/50668549)
+
+[android如何修改dex文件添加非法指令（学习笔记）](https://blog.csdn.net/u012439662/article/details/39859623)
+
+## dex2jar
+[iBotPeaches/Apktool](https://github.com/iBotPeaches/Apktool)
+
+[pxb1988/dex2jar](https://github.com/pxb1988/dex2jar)
+
+[JesusFreke/smali](https://github.com/JesusFreke/smali)
+
+[java-decompiler/jd-gui](https://github.com/java-decompiler/jd-gui)
+
+[ClassyShark](https://github.com/google/android-classyshark)

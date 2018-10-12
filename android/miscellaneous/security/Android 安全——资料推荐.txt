@@ -1,0 +1,45 @@
+# 论坛及博主
+## 看雪论坛
+致力于PC、移动、智能设备安全研究及逆向工程的开发者社区。
+
+[论坛地址](https://bbs.pediy.com/)
+
+微信公众号“看雪学院”，除了论坛中的一些文章分享外，还会举办 CTF。
+> CTF（Capture The Flag）中文一般译作夺旗赛，在网络安全领域中指的是网络安全技术人员之间进行技术竞技的一种比赛形式。
+
+
+## 吾爱破解
+致力于软件安全与病毒分析的前沿
+
+[论坛地址](https://www.52pojie.cn/)
+
+微信公众号“吾爱破解论坛”，
+
+## 尼古拉斯_赵四
+《Android应用安全防护和逆向分析》作者
+
+[官方网站](http://www.520monkey.com/)
+
+[csdn 个人主页](https://blog.csdn.net/jiangwei0910410003)
+
+微信公众号“编码美丽”，还有小密圈，会分享一些逆向实践。  
+之前做微信、QQ聊天记录及抖音数据分析都有阅读他的文章。
+
+
+在查看文章时看到
+
+[一篇胎死腹中的Android文章——Dex文件结构解析](https://blog.csdn.net/sbsujjbcy/article/details/52869361)
+
+觉得很不错，于是查看了 csdn 与 github
+
+[区长的 csdn](https://blog.csdn.net/sbsujjbcy/article/list/1?t=1)
+
+[lizhangqu/CoreLink](https://github.com/lizhangqu/CoreLink)
+
+
+# 一些文章
+[Android "挂逼" 修炼之行---支付宝蚂蚁森林能量自动收取插件开发原理解析](https://mp.weixin.qq.com/s/_P1pOF7Of4O-_zoekfbJ9Q?tdsourcetag=s_pctim_aiomsg)  
+根据日志辅助逆向，开发时应该删除日志。
+
+[Reduce the APK size](https://developer.android.com/topic/performance/reduce-apk-size)  
+官方介绍 apk 结构

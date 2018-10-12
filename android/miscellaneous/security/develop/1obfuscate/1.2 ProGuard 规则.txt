@@ -1,0 +1,252 @@
+[ProGuard Manual Reference card](https://www.guardsquare.com/en/products/proguard/manual/refcard)
+
+手册中很详细了，要读懂默认的规则，了解以下选项
+# -keep
+    -keep [,modifier,...] class_specification
+    
+> Specifies classes and class members (fields and methods) to be preserved as entry points to your code. For example, in order to keep an application, you can specify the main class along with its main method. In order to process a library, you should specify all publicly accessible elements.
+
+Keep|From being removed or renamed|From being renamed
+-|-|-
+Classes and class members|-keep|-keepnames
+Class members only|-keepclassmembers|-keepclassmembernames
+Classes and class members, if class members present|-keepclasseswithmembers|-keepclasseswithmembernames
+
+
+## -keep
+类和类成员
+指定要保留为代码入口点的类和类成员（字段和方法）。
+例如，为了保留应用程序，您可以指定主类及其主方法。 要处理库，您应指定所有可公开访问的元素。
+
+## -keepclassmembers
+仅成员
+指定要保留的类成员（如果还保留了它们的类）。 
+例如，您可能希望保留实现 Serializable 接口的所有类序列化字段和类方法。
+
+## -keepclasseswithmembers
+类和类成员，如果成员存在
+指定要保留的类和类成员，条件是存在所有指定的类成员。例如，您可能希望保留所有具有main方法的应用程序，而不必显式列出它们。
+
+# Class specifications
+[Class specifications](https://www.guardsquare.com/en/products/proguard/manual/usage#classspecification)
+
+    ?   匹配类名中的任何单个字符，但不匹配包分隔符
+    *   匹配类名的任何部分，但不匹配包分隔符。
+    **  匹配类名的任何部分，可能包含任意数量的包分隔符。
+    <n> 在同一选项中匹配第n个匹配的通配符。
+    
+    For additional flexibility, class names can actually be comma-separated lists of class names, with optional ! negators, just like file name filters. This notation doesn't look very Java-like, so it should be used with moderation.
+    
+    extends和implements规范通常用于限制带有通配符的类。它们目前是等价的。
+    @ 可用于将类和类成员限制为使用指定注释类型注释的类。注释类型与类名一样被指定。
+    除了方法参数列表不包含参数名称（就像javadoc和javap等其他工具一样）之外，字段和方法的指定方式与Java类似。规范还可以包含以下全能通配符：
+    
+    <init>      匹配任何构造函数
+    <fields>    匹配任何字段
+    <methods>   匹配任何方法
+    *           匹配任何字段或方法
+    
+    
+# dont
+## -dontnote [class_filter]
+不要打印有关配置中潜在错误或遗漏的说明。
+
+## -dontwarn [class_filter]
+不要警告未解决的引用。
+
+
+   
+    # 实测
+    minifyEnabled 设为 ture 后，Entry Point 不可达的类被删除，添加引用后才会被包括并混淆。
+
+    # 保留类名
+    # -keep class **ProGuardTest
+
+    # 保留类和成员
+    #-keep class **ProGuardTest{*;}
+
+    # 未找到成员，仍保留类
+    #-keep class **ProGuardTest{
+    #    *** no();
+    #}
+
+    # 保留 keep() 方法及其类
+    #-keep class * {
+    #    *** keep();
+    #}
+
+    # 仅保留 keep() 方法，不保留类
+    #-keepclassmembers class *{
+    #    *** keep();
+    #}
+
+
+
+    # 找到成员，保留成员及类
+    #-keepclasseswithmembers class *{
+    #    *** keep();
+    #}
+
+    # 未找到成员，不保留类
+    #-keepclasseswithmembers class *{
+    #    *** no();
+    #}
+
+
+
+
+
+# proguard-android.txt-3.1.4
+build/intermediates/proguard-files/proguard-android.txt-3.1.4
+
+全文如下
+
+    # This is a configuration file for ProGuard.
+    # http://proguard.sourceforge.net/index.html#manual/usage.html
+    # 文档地址
+    #
+    # Starting with version 2.2 of the Android plugin for Gradle, this file is distributed together with
+    # the plugin and unpacked at build-time. The files in $ANDROID_HOME are no longer maintained and
+    # will be ignored by new version of the Android plugin for Gradle.
+    #
+    # 从 Android 插件 2.2 开始，该文件与插件一起分发，并在构建时解包。
+    # $ANDROID_HOME 的文件不再维护，新插件将忽略它。
+
+    # Optimization is turned off by default. Dex does not like code run
+    # through the ProGuard optimize steps (and performs some
+    # of these optimizations on its own).
+    #
+    # 优化默认关闭。Dex 不喜欢代码运行 ProGuard 的优化步骤（并自行执行其中一些优化）。
+
+    # Note that if you want to enable optimization, you cannot just
+    # include optimization flags in your own project configuration file;
+    # instead you will need to point to the
+    # "proguard-android-optimize.txt" file instead of this one from your
+    # project.properties file.
+    #
+    # 请注意，如果要启用优化，则不能仅在自己的项目配置文件中包含优化标志;
+    # 相反，你需要从 project.properties 文件中指向“proguard-android-optimize.txt”文件而不是这个文件。
+
+    # 不优化
+    -dontoptimize
+
+    # 混淆时不使用大小写混合
+    -dontusemixedcaseclassnames
+
+    # 不忽略非公有的库类
+    -dontskipnonpubliclibraryclasses
+
+    # 在处理过程中写出更多信息
+    -verbose
+
+    # Preserve some attributes that may be required for reflection.
+    # 保留反射可能需要的一些属性。
+    -keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
+
+
+    -keep public class com.google.vending.licensing.ILicensingService
+    -keep public class com.android.vending.licensing.ILicensingService
+    -keep public class com.google.android.vending.licensing.ILicensingService
+    -dontnote com.android.vending.licensing.ILicensingService
+    -dontnote com.google.vending.licensing.ILicensingService
+    -dontnote com.google.android.vending.licensing.ILicensingService
+
+    # For native methods, see http://proguard.sourceforge.net/manual/examples.html#native
+    # 原生方法
+    -keepclasseswithmembernames class * {
+        native <methods>;
+    }
+
+    # Keep setters in Views so that animations can still work.
+    # Why？动画原理。
+    -keepclassmembers public class * extends android.view.View {
+        void set*(***);
+        *** get*();
+    }
+
+    # We want to keep methods in Activity that could be used in the XML attribute onClick.
+    # 保存 Activity 的参数为 View 的方法，以使 xml 中的 onClick 属性生效。
+    -keepclassmembers class * extends android.app.Activity {
+        public void *(android.view.View);
+    }
+
+    # For enumeration classes, see http://proguard.sourceforge.net/manual/examples.html#enumerations
+    # 枚举
+    -keepclassmembers enum * {
+        public static **[] values();
+        public static ** valueOf(java.lang.String);
+    }
+
+    -keepclassmembers class * implements android.os.Parcelable {
+        public static final ** CREATOR;
+    }
+
+    -keepclassmembers class **.R$* {
+        public static <fields>;
+    }
+
+    # Preserve annotated Javascript interface methods.
+    # 保留注解的 Javascript 接口方法。
+    -keepclassmembers class * {
+        @android.webkit.JavascriptInterface <methods>;
+    }
+
+    # The support libraries contains references to newer platform versions.
+    # Don't warn about those in case this app is linking against an older
+    # platform version. We know about them, and they are safe.
+    # 支持库包含对较新平台版本的引用。
+    # 如果此应用程序与较旧的平台版本链接，请不要警告这些。 我们了解他们，他们是安全的。
+    -dontnote android.support.**
+    -dontwarn android.support.**
+
+    # This class is deprecated, but remains for backward compatibility.
+    # 不推荐使用此类，但仍保留向后兼容性。
+    -dontwarn android.util.FloatMath
+
+    # Understand the @Keep support annotation.
+    # 支持 @Keep 注解。
+    -keep class android.support.annotation.Keep
+
+    -keep @android.support.annotation.Keep class * {*;}
+
+    -keepclasseswithmembers class * {
+        @android.support.annotation.Keep <methods>;
+    }
+
+    -keepclasseswithmembers class * {
+        @android.support.annotation.Keep <fields>;
+    }
+
+    -keepclasseswithmembers class * {
+        @android.support.annotation.Keep <init>(...);
+    }
+
+# proguard-android-optimize.txt-3.1.4
+build/intermediates/proguard-files/proguard-android-optimize.txt-3.1.4
+
+优化多了以下内容
+
+    # Optimizations: If you don't want to optimize, use the proguard-android.txt configuration file
+    # instead of this one, which turns off the optimization flags.
+    # 优化：如果您不想进行优化，请使用 proguard-android.txt 配置文件
+    # Adding optimization introduces certain risks, since for example not all optimizations performed by
+    # ProGuard works on all versions of Dalvik.  The following flags turn off various optimizations
+    # known to have issues, but the list may not be complete or up to date. (The "arithmetic"
+    # optimization can be used if you are only targeting Android 2.0 or later.)  Make sure you test
+    # thoroughly if you go this route.
+
+    # 添加优化会带来某些风险，例如，并非所有 ProGuard 执行的优化都适用于所有版本的Dalvik。
+    # 以下标志会关闭已知存在问题的各种优化，但列表可能不完整或不是最新的。
+    # 如果您只针对 Android 2.0 或更高版本，则可以使用“arithmetic”优化。）
+    # 如果你走这条路，一定要彻底测试。
+
+    # 指定要在更细粒度级别启用和禁用的优化。仅在优化时适用。
+    # 后面的 optimization_filter 指定优化内容
+    -optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*
+
+    # 指定优化要执行的次数。
+    -optimizationpasses 5
+    # 在优化时允许修改类和类成员的访问修饰符。
+    -allowaccessmodification
+    
+ 

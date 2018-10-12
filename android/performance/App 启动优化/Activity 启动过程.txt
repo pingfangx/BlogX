@@ -1,0 +1,4 @@
+
+[Android 性能优化—— 启动优化提升60%](https://mp.weixin.qq.com/s?__biz=MzAxMTI4MTkwNQ==&mid=2650826203&idx=1&sn=4c83f119ae3a7e818a65357cb78e5df5&chksm=80b7b145b7c038538ef46e7b16d41b6dc5d622b6a3c72ce67ce9735c49709f011d334e1366f9&mpshare=1&scene=23&srcid=0906SJGGqrBCrVwzeMR9H1t0#rd)
+
+这里面提到一些，还有图，以后有时间可以看一下。

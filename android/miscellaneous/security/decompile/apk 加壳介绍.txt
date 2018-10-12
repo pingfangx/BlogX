@@ -1,0 +1,19 @@
+[Android中的Apk的加固(加壳)原理解析和实现](http://www.520monkey.com/archives/553)
+
+介绍了 dex 的格式，可以将 apk 及大小拼到 dex 的末尾  
+然后修复 dex  
+最后运行时自定义 Application 进行处理。
+
+[Apk脱壳圣战之—脱掉“爱加密”家的壳](http://www.520monkey.com/archives/806)
+
+把 apk 加密放到 assets 中  
+用 so 进行解密，so 进行了修改  
+反调试  
+
+[Apk脱壳圣战之—脱掉“360加固”的壳](http://www.520monkey.com/archives/812)
+
+根据错报信息修改 apk tool 源码  
+不识别属性报错
+
+[Apk脱壳圣战之—如何脱掉“梆梆加固”的保护壳](http://www.520monkey.com/archives/955)
+

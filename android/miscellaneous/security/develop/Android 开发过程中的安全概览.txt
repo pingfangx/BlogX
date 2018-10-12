@@ -1,0 +1,15 @@
+在官方给出的
+[安全要点](https://developer.android.com/training/articles/security-tips?hl=zh-cn)
+
+* 存储数据
+* 使用权限
+* 使用网络
+* 使用 WebView
+* 使用进程间通信
+
+等，整理与项目相关的，将具体讨论
+
+* 混淆
+* 网络
+* 存储
+* webview

@@ -1,0 +1,28 @@
+Q:
+* LayoutManager 是如何作用的
+* 一般会重写哪些方法
+
+# LayoutManager 是如何作用的
+    5 = {StackTraceElement@5544} "android.support.v7.widget.RecyclerView$Adapter.createViewHolder(RecyclerView.java:6794)"
+    6 = {StackTraceElement@5545} "android.support.v7.widget.RecyclerView$Recycler.tryGetViewHolderForPositionByDeadline(RecyclerView.java:5975)"
+    7 = {StackTraceElement@5546} "android.support.v7.widget.RecyclerView$Recycler.getViewForPosition(RecyclerView.java:5858)"
+    8 = {StackTraceElement@5547} "android.support.v7.widget.RecyclerView$Recycler.getViewForPosition(RecyclerView.java:5854)"
+    9 = {StackTraceElement@5548} "android.support.v7.widget.LinearLayoutManager$LayoutState.next(LinearLayoutManager.java:2230)"
+    10 = {StackTraceElement@5549} "android.support.v7.widget.LinearLayoutManager.layoutChunk(LinearLayoutManager.java:1557)"
+    11 = {StackTraceElement@5550} "android.support.v7.widget.LinearLayoutManager.fill(LinearLayoutManager.java:1517)"
+    12 = {StackTraceElement@5551} "android.support.v7.widget.LinearLayoutManager.onLayoutChildren(LinearLayoutManager.java:612)"
+    13 = {StackTraceElement@5552} "android.support.v7.widget.RecyclerView.dispatchLayoutStep2(RecyclerView.java:3924)"
+    14 = {StackTraceElement@5553} "android.support.v7.widget.RecyclerView.dispatchLayout(RecyclerView.java:3641)"
+    15 = {StackTraceElement@5554} "android.support.v7.widget.RecyclerView.onLayout(RecyclerView.java:4194)"
+    
+可以看到，由 LinearLayoutManager 填充 view，通过 getViewForPosition 找到一个 view，  
+add 就行了。
+
+# GridLayoutManager 是如何作用的
+    3 = {StackTraceElement@5789} "android.support.v7.widget.GridLayoutManager.getSpanSize(GridLayoutManager.java:489)"
+    4 = {StackTraceElement@5790} "android.support.v7.widget.GridLayoutManager.layoutChunk(GridLayoutManager.java:547)"
+    5 = {StackTraceElement@5791} "android.support.v7.widget.LinearLayoutManager.fill(LinearLayoutManager.java:1517)"
+    
+在  LinearLayoutManager.fill 过程中，根据剩余的竖直空间，依次填充  
+而 GridLayoutManager#layoutChunk 中，就每次填充一行
+使用 remainingSpan 和 mSpanCount判断，mSpanSizeLookup 用来查询每个 item 占几个 span

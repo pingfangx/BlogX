@@ -1,0 +1,233 @@
+# 1 有两个方法
+
+一是 adb shell am start -S -W intent  
+[调用 Activity Manager (am)](https://developer.android.com/studio/command-line/adb?hl=zh-cn#am)
+
+
+    adb shell am start -S -W
+
+    Stopping: ...
+    Starting: Intent {...}
+    Status: ok
+    Activity: ...
+    ThisTime: 2704
+    TotalTime: 2704
+    WaitTime: 2753
+    Complete
+二是查看 log 
+去除过滤器，使用 Displayed 或 launch 过滤  
+结果是一致的
+
+    09-25 10:58:31.829 1764-1800/system_process I/ActivityManager: Displayed ...: +2s704ms
+    09-25 10:58:36.254 1764-1800/system_process I/ActivityManager: Displayed ...: +1s490ms
+    09-25 10:58:31.831 6086-6361/com.miui.powerkeeper D/PowerKeeper.Event: notifyActivityLaunchTime: ... totalTime: 2704
+    09-25 10:58:36.254 6086-6361/com.miui.powerkeeper D/PowerKeeper.Event: notifyActivityLaunchTime: .. totalTime: 1490
+    
+    原文表述为“Event log中 TAG=am_activity_launch_time 中的两个值分表表示 ThisTime、TotalTime，跟通过 “adb shell am start -W ” 得到的值是一致的。”
+    这里可能是 MIUI 进行了修改。
+
+这两种方法、三个输出值是一致的，原因是它们在相同的方法中输出或赋值  
+见下方的 com.android.server.am.ActivityRecord#reportFullyDrawnLocked
+    
+# 2 理解各时间的意义
+根据文章所述
+
+[Android 中如何计算 App 的启动时间？](https://www.androidperformance.com/2015/12/31/How-to-calculation-android-app-lunch-time/)    
+
+
+* WaitTime 就是总的耗时，包括前一个应用 Activity pause 的时间和新应用启动的时间；
+* ThisTime 表示一连串启动 Activity 的最后一个 Activity 的启动耗时；
+* TotalTime 表示新应用启动的耗时，包括新进程的启动和 Activity 的启动，但不包括前一个应用 Activity pause 的耗时。  
+> 也就是说，开发者一般只要关心 TotalTime 即可，这个时间才是自己应用真正启动的耗时。
+
+> 我们来解释下代码里curTime、displayStartTime、mLaunchStartTime三个时间变量.
+
+* curTime 表示该函数调用的时间点.
+* displayStartTime表示一连串启动Activity中的最后一个Activity的启动时间点.
+* mLaunchStartTime表示一连串启动Activity中第一个Activity的启动时间点.
+
+
+> “adb shell am start -W ”的实现在 frameworks\base\cmds\am\src\com\android\commands\am\Am.java 文件中。其实就是跨Binder调用ActivityManagerService.startActivityAndWait() 接口（后面将ActivityManagerService简称为AMS），这个接口返回的结果包含上面打印的ThisTime、TotalTime时间.
+
+# 3 查看代码执行流程
+以下是 am 命令执行的过程
+
+    com.android.commands.am.Am#main
+    com.android.internal.os.BaseCommand#run
+    com.android.commands.am.Am#onRun
+    com.android.commands.am.Am#runAmCmd
+    ...
+    com.android.server.am.ActivityManagerService#startActivityAndWait
+
+    @Override
+    public final WaitResult startActivityAndWait(IApplicationThread caller, String callingPackage,
+            Intent intent, String resolvedType, IBinder resultTo, String resultWho, int requestCode,
+            int startFlags, ProfilerInfo profilerInfo, Bundle bOptions, int userId) {
+        enforceNotIsolatedCaller("startActivityAndWait");
+        userId = mUserController.handleIncomingUser(Binder.getCallingPid(), Binder.getCallingUid(),
+                userId, false, ALLOW_FULL_ONLY, "startActivityAndWait", null);
+        WaitResult res = new WaitResult();
+        // TODO: Switch to user app stacks here.
+        mActivityStarter.startActivityMayWait(caller, -1, callingPackage, intent, resolvedType,
+                null, null, resultTo, resultWho, requestCode, startFlags, profilerInfo, res, null,
+                bOptions, false, userId, null, null, "startActivityAndWait");
+        return res;
+    }
+    com.android.server.am.ActivityStarter#startActivityMayWait
+                    ...
+                    //不知道是不是
+                    mSupervisor.mWaitingActivityLaunched.add(outResult);
+
+可以看到对 WaitResult 进行了赋值，然后返回，接下来看 reportLaunchTimeLocked 的调用过程  
+选择进程 system_process 然后下断，
+    有点复杂，实在看不下去了。
+    
+    2 = {StackTraceElement@14236} "com.android.server.am.ActivityRecord.reportLaunchTimeLocked(ActivityRecord.java:2033)"
+    3 = {StackTraceElement@14237} "com.android.server.am.ActivityRecord.onWindowsDrawn(ActivityRecord.java:2081)"
+    4 = {StackTraceElement@14238} "com.android.server.wm.AppWindowContainerController$H.handleMessage(AppWindowContainerController.java:82)"
+    
+    接下来断点 com.android.server.wm.AppWindowContainerController#reportWindowsDrawn
+    定位到
+    28 = {StackTraceElement@14469} "com.android.server.wm.WindowSurfacePlacer.lambda$new$0(WindowSurfacePlacer.java:118)"
+    29 = {StackTraceElement@14470} "com.android.server.wm.-$$Lambda$WindowSurfacePlacer$4Hbamt-LFcbu8AoZBoOZN_LveKQ.run(Unknown Source:2)"
+    
+    这里是 post 了mPerformSurfacePlacement，断点 com.android.server.wm.WindowSurfacePlacer#requestTraversal
+    
+    2 = {StackTraceElement@14408} "com.android.server.wm.WindowSurfacePlacer.requestTraversal(WindowSurfacePlacer.java:802)"
+    3 = {StackTraceElement@14409} "com.android.server.wm.WindowManagerService.executeAppTransition(WindowManagerService.java:2716)"
+    4 = {StackTraceElement@14410} "com.android.server.am.ActivityStackSupervisor.reportResumedActivityLocked(ActivityStackSupervisor.java:3655)"
+    5 = {StackTraceElement@14411} "com.android.server.am.ActivityRecord.completeResumeLocked(ActivityRecord.java:1866)"
+    6 = {StackTraceElement@14412} "com.android.server.am.ActivityStack.minimalResumeActivityLocked(ActivityStack.java:1256)"
+    7 = {StackTraceElement@14413} "com.android.server.am.ActivityStackSupervisor.realStartActivityLocked(ActivityStackSupervisor.java:1602)"
+    8 = {StackTraceElement@14414} "com.android.server.am.ActivityStackSupervisor.startSpecificActivityLocked(ActivityStackSupervisor.java:1704)"
+    9 = {StackTraceElement@14415} "com.android.server.am.ActivityStack.resumeTopActivityInnerLocked(ActivityStack.java:2764)"
+    10 = {StackTraceElement@14416} "com.android.server.am.ActivityStack.resumeTopActivityUncheckedLocked(ActivityStack.java:2302)"
+    11 = {StackTraceElement@14417} "com.android.server.am.ActivityStackSupervisor.resumeFocusedStackTopActivityLocked(ActivityStackSupervisor.java:2229)"
+    12 = {StackTraceElement@14418} "com.android.server.am.ActivityStack.completePauseLocked(ActivityStack.java:1606)"
+    13 = {StackTraceElement@14419} "com.android.server.am.ActivityStack.activityPausedLocked(ActivityStack.java:1530)"
+    14 = {StackTraceElement@14420} "com.android.server.am.ActivityManagerService.activityPaused(ActivityManagerService.java:8161)"
+    15 = {StackTraceElement@14421} "android.app.IActivityManager$Stub.onTransact(IActivityManager.java:224)"
+    16 = {StackTraceElement@14422} "com.android.server.am.ActivityManagerService.onTransact(ActivityManagerService.java:3291)"
+    17 = {StackTraceElement@14423} "android.os.Binder.execTransact(Binder.java:731)"
+    
+    或者是
+    2 = {StackTraceElement@14488} "com.android.server.wm.WindowSurfacePlacer.requestTraversal(WindowSurfacePlacer.java:802)"
+    3 = {StackTraceElement@14489} "com.android.server.wm.WindowManagerService.finishDrawingWindow(WindowManagerService.java:2301)"
+    4 = {StackTraceElement@14490} "com.android.server.wm.Session.finishDrawing(Session.java:281)"
+    5 = {StackTraceElement@14491} "android.view.ViewRootImpl.reportDrawFinished(ViewRootImpl.java:3085)"
+    6 = {StackTraceElement@14492} "android.view.ViewRootImpl.pendingDrawFinished(ViewRootImpl.java:3074)"
+    7 = {StackTraceElement@14493} "android.view.ViewRootImpl.performDraw(ViewRootImpl.java:3165)"
+    8 = {StackTraceElement@14494} "android.view.ViewRootImpl.performTraversals(ViewRootImpl.java:2484)"
+    9 = {StackTraceElement@14495} "android.view.ViewRootImpl.doTraversal(ViewRootImpl.java:1460)"
+    10 = {StackTraceElement@14496} "android.view.ViewRootImpl$TraversalRunnable.run(ViewRootImpl.java:7183)"
+    11 = {StackTraceElement@14497} "android.view.Choreographer$CallbackRecord.run(Choreographer.java:949)"
+    12 = {StackTraceElement@14498} "android.view.Choreographer.doCallbacks(Choreographer.java:761)"
+    13 = {StackTraceElement@14499} "android.view.Choreographer.doFrame(Choreographer.java:696)"
+    14 = {StackTraceElement@14500} "android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:935)"
+    ...
+    
+有点乱，最后也没理清，根据原文述
+> 最后再说下系统根据什么来判断应用启动结束。我们知道应用启动包括进程启动、走 Activity生命周期 onCreate/onResume 等。在第一次 onResume 时添加窗口到WMS中，然后measure/layout/draw，窗口绘制完成后通知 WMS，WMS 在合适的时机控制界面开始显示(夹杂了界面切换动画逻辑)。记住是窗口界面显示出来后，WMS 才调用reportLaunchTimeLocked() 通知 AMS Activity 启动完成。
+
+也就是说，是在 onResume 之后才调用的，我们在 onResume 断点。
+
+
+如[官方文档](https://developer.android.google.cn/topic/performance/vitals/launch-time#dx)
+所述，也可以主动调用 reportFullyDrawn()
+
+    android.app.Activity#reportFullyDrawn
+    com.android.server.am.ActivityManagerService#reportActivityFullyDrawn
+    com.android.server.am.ActivityRecord#reportFullyDrawnLocked
+    long displayStartTime;  // when we started launching this activity
+    public void reportFullyDrawnLocked() {
+        // curTime 的赋值
+        final long curTime = SystemClock.uptimeMillis();
+        if (displayStartTime != 0) {
+            reportLaunchTimeLocked(curTime);
+        }
+        ...
+    }
+    private void reportLaunchTimeLocked(final long curTime) {
+        final ActivityStack stack = getStack();
+        if (stack == null) {
+            return;
+        }
+        final long thisTime = curTime - displayStartTime;
+        final long totalTime = stack.mLaunchStartTime != 0
+                ? (curTime - stack.mLaunchStartTime) : thisTime;
+        if (SHOW_ACTIVITY_START_TIME) {
+            Trace.asyncTraceEnd(TRACE_TAG_ACTIVITY_MANAGER, "launching: " + packageName, 0);
+            // ①输出 event log
+            EventLog.writeEvent(AM_ACTIVITY_LAUNCH_TIME,
+                    userId, System.identityHashCode(this), shortComponentName,
+                    thisTime, totalTime);
+            StringBuilder sb = service.mStringBuilder;
+            sb.setLength(0);
+            sb.append("Displayed ");
+            sb.append(shortComponentName);
+            sb.append(": ");
+            TimeUtils.formatDuration(thisTime, sb);
+            if (thisTime != totalTime) {
+                sb.append(" (total ");
+                TimeUtils.formatDuration(totalTime, sb);
+                sb.append(")");
+            }
+            // ②输出 log，其 TAG 即为 com.android.server.am.ActivityManagerDebugConfig#TAG_AM
+            // 值为 ActivityManager
+            Log.i(TAG, sb.toString());
+        }
+        // ③调用方法设置返回值
+        mStackSupervisor.reportActivityLaunchedLocked(false, this, thisTime, totalTime);
+        if (totalTime > 0) {
+            //service.mUsageStatsService.noteLaunchTime(realActivity, (int)totalTime);
+        }
+        displayStartTime = 0;
+        stack.mLaunchStartTime = 0;
+    }
+    
+    com.android.server.am.ActivityStack#setLaunchTime
+    //可以看到 mLaunchStartTime 只赋值一次
+    void setLaunchTime(ActivityRecord r) {
+        if (r.displayStartTime == 0) {
+            r.fullyDrawnStartTime = r.displayStartTime = SystemClock.uptimeMillis();
+            if (mLaunchStartTime == 0) {
+                startLaunchTraces(r.packageName);
+                mLaunchStartTime = mFullyDrawnStartTime = r.displayStartTime;
+            }
+        } else if (mLaunchStartTime == 0) {
+            startLaunchTraces(r.packageName);
+            mLaunchStartTime = mFullyDrawnStartTime = SystemClock.uptimeMillis();
+        }
+    }
+    
+    //③ 此方法对 WaitResult 进行了设置，然后会返回
+    com.android.server.am.ActivityStackSupervisor#reportActivityLaunchedLocked
+    void reportActivityLaunchedLocked(boolean timeout, ActivityRecord r,
+            long thisTime, long totalTime) {
+        boolean changed = false;
+        for (int i = mWaitingActivityLaunched.size() - 1; i >= 0; i--) {
+            WaitResult w = mWaitingActivityLaunched.remove(i);
+            if (w.who == null) {
+                changed = true;
+                w.timeout = timeout;
+                if (r != null) {
+                    w.who = new ComponentName(r.info.packageName, r.info.name);
+                }
+                w.thisTime = thisTime;
+                w.totalTime = totalTime;
+                // Do not modify w.result.
+            }
+        }
+        if (changed) {
+            mService.notifyAll();
+        }
+    }    
+    
+# 总结
+经过上面的学习，我们知道了，可以使用两程方法查看 app 启动时间  
+我们一般关心 TotalTime  
+TotalTime 的计时在窗口界面显示出来后，也就是在 onResume 之后
+
+比较接近的起始时间为可记录于
+android.support.multidex.MultiDexApplication#attachBaseContext
+android.app.Activity#onWindowFocusChanged

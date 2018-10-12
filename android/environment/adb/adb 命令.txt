@@ -26,3 +26,5 @@
           press (Default: trackball)
           roll <dx> <dy> (Default: trackball)
           tmode <tmode>
+
+[调用 Activity Manager (am)](https://developer.android.com/studio/command-line/adb?hl=zh-cn#am)
