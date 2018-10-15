@@ -22,7 +22,7 @@ echo 新建文件 %target_file%
 copy %source_file% %target_file%
 
 rem 打开文件
-%target_file%
+start "" %target_file%
 
 goto exit
 

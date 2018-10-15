@@ -1,0 +1,38 @@
+# 下载并刷入 twrp
+[TWRP for gemini](https://dl.twrp.me/gemini/)
+
+音量键下+开机键 进入 fastboot  
+    
+    fastboot flash recovery recovery.img
+    fastboot boot recovery.img
+    
+# 备份 data
+要在摘要生成完之后，震动并显示完成，耗时 2721s，45 分钟
+
+# 清除数据
+直接使用 twrp 的清除选项。  
+
+原本清除数据后，不需要再刷机，重启就可以正常开机了。（因为是这次升级的原因，不需要刷）
+
+但此次清除数据还是不能开机，于是下载线刷包，想刷入 System.img
+
+后来想是不是清除的不够干净，于是重启到 Mi Recovery 3.0 界面。
+
+等待线刷包下载过程中，手机居然重启了，我没有按到任何键呀。然后居然重启好了。
+
+不知道不能开机可能是某个 root 软件与系统冲突，还是 System 损坏了？
+
+
+# root
+开机，开启 root 后
+
+为什么要 root 不知道这个步骤是不是必须的。
+
+# 刷入 twrp  
+关机  
+音量键下+开机键 进入 fastboot  
+恢复数据
+耗时 3086s,50 分钟.
+
+# 重启
+花了好几分钟

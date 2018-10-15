@@ -1,0 +1,12 @@
+有很多教程，这一个最终解决了我的问题。
+空白处是
+HKEY_CLASSES_ROOT\Directory\Background\shell
+添加一个项，如xxFunctions，然后添加值
+Icon
+MUIVerb显示名，如果没有则是项名
+SubCommands，填上命令
+
+如果是一个命令，直接在xxFunctions项内添加command项，修改“默认值即可”
+
+添加的命令，要全部注册，在
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell
