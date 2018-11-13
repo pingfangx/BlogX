@@ -1,0 +1,30 @@
+在了解了 PHP chr 与  python chr 之后，
+
+在进行 base64 的时候，php 直接进行了编码。  
+但是 Python 需要先将 str 转为 bytes，于是用 encode  
+但是默认使用的编码 str.encode('utf-8')，根据 utf-8 规则，大于 127 的时候，就被重新编码变为 2 个字节。
+
+传入的字节不一样了，base64 的结果也就不一样。
+
+解决方法，python 中使用时，不使用 str 来接收结果，而使用 bytesarray
+如下
+
+
+    def test(self):
+        a = [
+            126,
+            127,
+            128,
+        ]
+        b = ''
+        for i in a:
+            b += chr(i)
+        print(bytearray(b.encode()))
+        # bytearray(b'~\x7f\xc2\x80')
+
+        length = len(a)
+        c = bytearray(length)
+        for i in range(length):
+            c[i] = a[i]
+        print(c)
+        # bytearray(b'~\x7f\x80')

@@ -1,0 +1,70 @@
+点击
+
+    android.view.View#onTouchEvent
+                switch (action) {
+                    case MotionEvent.ACTION_UP:
+                        ...
+                        mPrivateFlags3 &= ~PFLAG3_FINGER_DOWN;
+                        if ((viewFlags & TOOLTIP) == TOOLTIP) {
+                            handleTooltipUp();
+                        }
+                        if (!clickable) {
+                            removeTapCallback();
+                            removeLongPressCallback();
+                            mInContextButtonPress = false;
+                            mHasPerformedLongPress = false;
+                            mIgnoreNextUpEvent = false;
+                            break;
+                        }
+                        boolean prepressed = (mPrivateFlags & PFLAG_PREPRESSED) != 0;
+                        if ((mPrivateFlags & PFLAG_PRESSED) != 0 || prepressed) {
+                            // take focus if we don't have it already and we should in
+                            // touch mode.
+                            boolean focusTaken = false;
+                            if (isFocusable() && isFocusableInTouchMode() && !isFocused()) {
+                                focusTaken = requestFocus();
+                            }
+
+                            if (prepressed) {
+                                // The button is being released before we actually
+                                // showed it as pressed.  Make it show the pressed
+                                // state now (before scheduling the click) to ensure
+                                // the user sees it.
+                                setPressed(true, x, y);
+                            }
+
+                            if (!mHasPerformedLongPress && !mIgnoreNextUpEvent) {
+                                // This is a tap, so remove the longpress check
+                                removeLongPressCallback();
+
+                                // Only perform take click actions if we were in the pressed state
+                                if (!focusTaken) {
+                                    // Use a Runnable and post this rather than calling
+                                    // performClick directly. This lets other visual state
+                                    // of the view update before click actions start.
+                                    if (mPerformClick == null) {
+                                        mPerformClick = new PerformClick();
+                                    }
+                                    if (!post(mPerformClick)) {
+                                        performClick();
+                                    }
+                                }
+                            }
+# 为什么按钮默认会是 clickable
+com.android.internal.R.attr.buttonStyle
+        attrs.xml
+        <!-- Normal Button style. -->
+        <attr name="buttonStyle" format="reference" />
+        
+        themes.xml
+        <item name="buttonStyle">@style/Widget.Button</item>
+        
+        styles.xml
+        <style name="Widget.Button">
+            <item name="background">@drawable/btn_default</item>
+            <item name="focusable">true</item>
+            <item name="clickable">true</item>
+            <item name="textAppearance">?attr/textAppearanceSmallInverse</item>
+            <item name="textColor">@color/primary_text_light</item>
+            <item name="gravity">center_vertical|center_horizontal</item>
+        </style>

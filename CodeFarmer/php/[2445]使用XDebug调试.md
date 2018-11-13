@@ -1,3 +1,9 @@
+
+# wamp 3.1.4
+下载的 php 已经自带 xdebug ，只需要在 php.ini 中启用即可。  
+PhpStorm 还是一样，添加配置，调试是否可用，可以直接 validate
+
+
 参考  
 http://blog.sina.com.cn/s/blog_6fb374610101a0fe.html
 http://www.cnphp6.com/archives/64729

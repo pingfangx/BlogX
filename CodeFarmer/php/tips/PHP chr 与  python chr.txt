@@ -1,0 +1,17 @@
+# PHP
+## chr
+Return a specific character  
+The ascii code.
+
+## ord
+Return ASCII value of character
+
+# Python
+## chr
+Return the string representing a character whose Unicode code point is the integer i. 
+## ord
+Given a string representing one Unicode character, return an integer representing the Unicode code point of that character.
+## ascii
+As repr(), return a string containing a printable representation of an object, but escape the non-ASCII characters in the string returned by repr() using \x, \u or \U escapes. This generates a string similar to that returned by repr() in Python 2.
+
+可以看到一个是 ascii，一个是 unicode

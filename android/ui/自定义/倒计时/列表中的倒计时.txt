@@ -1,0 +1,37 @@
+Q:
+* 复用时的倒计时
+* 如何轻便地实现
+
+# 如何监听
+首先我们知道，会涉及 addView 和 removeView
+
+    android.view.ViewGroup#dispatchViewRemoved
+    android.view.ViewGroup.OnHierarchyChangeListener#onChildViewRemoved
+
+而针对 RecyclerView，又有
+
+    android.support.v7.widget.RecyclerView.Recycler#dispatchViewRecycled
+        void dispatchViewRecycled(ViewHolder holder) {
+            if (mRecyclerListener != null) {
+                mRecyclerListener.onViewRecycled(holder);
+            }
+            if (mAdapter != null) {
+                mAdapter.onViewRecycled(holder);
+            }
+            if (mState != null) {
+                mViewInfoStore.removeViewHolder(holder);
+            }
+            if (DEBUG) Log.d(TAG, "dispatchViewRecycled: " + holder);
+        }
+    
+    因些有 3 个方法可以监听
+    Adapter
+        参数为 ViewHolder
+        android.support.v7.widget.RecyclerView.Adapter#onViewAttachedToWindow
+        android.support.v7.widget.RecyclerView.Adapter#onViewDetachedFromWindow
+    android.support.v7.widget.RecyclerView.OnChildAttachStateChangeListener
+        参数为 View
+        onChildViewAttachedToWindow
+        onChildViewDetachedFromWindow
+    android.support.v7.widget.RecyclerView.RecyclerListener
+        onViewRecycled

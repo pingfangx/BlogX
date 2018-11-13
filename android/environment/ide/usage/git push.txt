@@ -1,0 +1,14 @@
+# push 的一些命令
+    git push [<repository> [<refspec>…​]]
+    git push [远程名] [本地分支]:[远程分支] 
+
+    refspec 格式为 [+]<src>:<dst>
+
+    git push origin +dev:dev2
+    将 dev 分支推送，服务器新建了 dev2 分支
+    
+    git push origin master:dev2
+    将本地 master 分支的内容，推送至 dev2 分支
+    
+    git push origin :dev2
+    推送空到 dev2 ，即删除 dev2 分支

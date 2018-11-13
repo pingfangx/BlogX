@@ -1,0 +1,26 @@
+想看命令，在 Event log 工具窗口中一直找不到，
+其实是在 Version Control 工具窗口的“控制台”选项卡。
+
+# Ctrl + T（更新项目）
+    git -c core.quotepath=false -c log.showSignature=false fetch origin --progress --prune
+    
+    -c <name>=<value>
+    传递配置参数
+    
+    core.quotepath=false 不转义异常字符，如命令行下中文会被转义（见另一篇文章）
+    
+    log.showSignature=false 不显示签名
+    
+    fetch origin --progress --prune
+    origin 是 <repository> 参数，指的是 config 中定义的 origin
+    --progress 进度
+    --prune 修剪
+# Ctrl + Shift + K （push）
+    git -c core.quotepath=false -c log.showSignature=false push --progress --porcelain origin refs/heads/develop_v7.2.0:develop_v7.2.0
+    
+    --progress 进度
+    --porcelain 产生机器可读输出
+    
+    origin refs/heads/develop_v7.2.0:develop_v7.2.0
+    对应 <repository> [<refspec>…​]
+    refspec 为 [+]<src>:<dst>，推送 src 更新目录的 dst

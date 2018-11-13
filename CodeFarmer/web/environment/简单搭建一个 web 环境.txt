@@ -1,0 +1,23 @@
+# wamp
+[wamp](https://sourceforge.net/projects/wampserver/)  
+下载完就包括 Apache PHP MySQL
+
+设置 mysql 密码
+
+
+# discuz
+[DiscuzX](https://gitee.com/ComsenzDiscuz/DiscuzX)  
+直接下载源码  
+删除 www 目录（可以不删除，查看添加 Virtual Host）
+复制 upload，打开 localhost 安装即可。
+
+删除 install 目录
+
+# ThinkPHP
+[top-think/think](https://github.com/top-think/think)  
+[top-think/framework](https://github.com/top-think/framework)  
+
+仅克隆深度 1 ，单分支，注意区分分支  
+think 命名为 tp5，framework 命名为 thinkphp
+
+克隆完成后，访问 tp5/public 即可

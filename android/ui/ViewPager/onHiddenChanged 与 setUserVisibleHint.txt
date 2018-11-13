@@ -1,3 +1,8 @@
+# 总结
+FragmentManager 调用 transaction.show  
+show 会调用 onHiddenChanged
+
+ViewPager 的 PagerAdapter#instantiateItem 手动调用 setUserVisibleHint
 # onHiddenChanged
     android.support.v4.app.FragmentManagerImpl#moveFragmentToExpectedState
         ...

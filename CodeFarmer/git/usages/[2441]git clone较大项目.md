@@ -1,3 +1,7 @@
+# 最终结果
+    git clone <repository> --depth 1 --branch <branch name> --single-branch
+
+
 下载omegat的时候，文件非常多，而且github还不稳定，后来终于下好了,400多M。
 ```
 Receiving objects: 100% (101728/101728), 437.93 MiB | 984.00 KiB/s, done.

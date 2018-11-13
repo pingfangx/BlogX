@@ -1,0 +1,77 @@
+TimeDelta 用来表示一个时间差  
+CountDownTextView 根据时间差用来展示时间  
+CountDownManager 用来倒计时并分发时间。
+
+# 流程介绍
+    CountDownManager#addOnTickListener 添加监听
+    启动后开始倒计时，分发每一个时间
+    监听器在 onTick 中收到时间并处理
+    更新商品状态，根据状态生成时间差
+    CountDownTextView#updateTimeDelta 更新展示
+
+# CountDownTextView
+    <!--商城-倒计时-->
+    <declare-styleable name="CountDownTextView">
+        <!--天的字体颜色-->
+        <attr name="day_text_color" format="color" />
+        <!--时间字体颜色-->
+        <attr name="time_text_color" format="color" />
+        <!--时间背景颜色-->
+        <attr name="time_background_color" format="color" />
+        <!--时间分隔符颜色-->
+        <attr name="time_separator_color" format="color" />
+        <!--时间 span 的圆角半径-->
+        <attr name="time_span_corner_radius" format="dimension" />
+        <!--时间 span 的竖直 padding-->
+        <attr name="time_span_padding_vertical" format="dimension" />
+        <!--时间 span 的水平 padding-->
+        <attr name="time_span_padding_horizontal" format="dimension" />
+        <!--时间 span 的水平 margin-->
+        <attr name="time_span_margin_horizontal" format="dimension" />
+    </declare-styleable>
+    
+# CountDownManager
+    getInstance()
+    
+    addOnTickListener
+    removeOnTickListener
+    
+    onPause
+    onResume
+    onDestroy
+    setUserVisibleHint（可以调用 onVisibilityChanged）
+    onHiddenChanged（可以调用 onVisibilityChanged）
+    onVisibilityChanged
+    
+    CountDownManager.OnTickListener
+        onTick
+
+# CountDownCommodityUtils
+    isShowCountDownStatus
+    updateActivityStatus
+    CountDownCommodityUtils.ICountDownCommodity
+    
+    
+## 在 ViewHolder 中使用
+在 adapter 中设置 countDownTag，生成 ViewHolder 时传给 ViewHolder  
+在 bindTo 时判断添加、移除  
+同时在 adapter 的 onViewAttachedToWindow 中添加，onViewDetachedFromWindow 中移除
+
+## 在 Activity 中使用
+    onResume 添加，继续
+    onPause 暂停
+    onDestroy 销毁
+    
+## 在 Fragment 中使用
+    如果 Fragment 使用的 CountDownTag，要保证 tag 已经初始化。
+    onResume 继续
+    onPause 暂停
+    onDestroy 销毁
+    setUserVisibleHint
+    onParentVisibilityChanged
+        父类需要分发 setUserVisibleHint、onHiddenChanged、onParentVisibilityChanged
+    onViewCreated
+        adapter.notifyDataSetChanged()
+        在 tab 切换时销毁，就被移除，没有暂存
+        在切回的时候，虽然调用 onResume 但是没有暂存，无法继续
+        同时已经持有 mRootView 不会再更新 RecyclerView，所以需要通知变化，然后会重新执行 adapter 的相关方法

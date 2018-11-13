@@ -1,0 +1,143 @@
+有以下相关方法
+    
+    Fragment 有以下相关生命周期方法
+    onPause
+    onResume
+    onDestroy
+    setUserVisibleHint
+    不考虑 onHiddenChanged
+    
+    Adapter 的这两个方法是在 addView 和 removeView 时调用的。
+    onViewAttachedToWindow
+    onViewDetachedFromWindow
+    
+    View
+    onVisibilityChanged
+    
+
+
+
+onPause 暂停，保留监听  
+onResume 时再继续，继续监听  
+onDestroy 时销毁，下一次重新创建，重新监听。  
+
+但是，如果是左右切换引起的，虽然会走 onDestroy，但是 Fragment 仍被持有  
+重新添加时，仍持有 mRootView，因此 View 不会变化，也就不会调用 adapter 的方法。
+
+因此在 onViewCreated 中，如果已经初始化，则调用 adapter.notifyDataSetChanged()  
+让其重新布局，以执行 adapter 的相关方法。
+
+# 总结
+如果需要 ViewHolder 滑出时暂停，滑入时继续
+
+    onViewAttachedToWindow
+    onViewDetachedFromWindow
+    
+如果需要 Fragment 暂停时暂停，恢得时继续
+
+    onPause
+    onResume
+    
+如果需要 Fragment 销毁时停止
+
+    onDestroy
+    
+如果需要切换其他 Fragment 时暂停，切回时继续
+
+    setUserVisibleHint
+    再配合
+    onViewCreated
+
+如果是嵌套的 Fragment ，父 Fragment 应该传给子 Fragment
+
+# 最后看相关代码
+    
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        CountDownManager.getInstance().onPause(getCountDownTag());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        /*
+        如果在其他 Fragment 转到其他 Activity 并返回
+        分发 onResume，当前 isHidden() 为 false，getUserVisibleHint() 为 true
+        所以需要再判断 mParentVisible
+         */
+        if (mParentVisible && getUserVisibleHint()) {
+            //如果可见再添加
+            CountDownManager.getInstance().onResume(getCountDownTag());
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        CountDownManager.getInstance().onDestroy(getCountDownTag());
+    }
+    
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (mInitHelper != null) {
+            mInitHelper.checkAndInit();
+            if (mInitHelper.isInitialized()) {
+                RefreshController<Object> refreshController = getRefreshController();
+                if (refreshController != null) {
+                    RecyclerView.Adapter adapter = refreshController.getAdapter();
+                    if (adapter != null) {
+                        List<Object> data = refreshController.getData();
+                        if (data != null && data.size() > 0) {
+                            //如果是切换引起的，view 已经存在，需要让其重新布局，以调用 adapter 的相关方法
+                            DebugUtils.d("调用 notifyDataSetChanged");
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (mInitHelper != null) {
+            mInitHelper.setUserVisibleHint(isVisibleToUser);
+            if (mInitHelper.isInitialized()) {
+                //因为需要 tag，所以初始化以后再获取
+                CountDownManager.getInstance().setUserVisibleHint(isVisibleToUser, getCountDownTag());
+            }
+        }
+    }
+
+    @Override
+    public void onParentVisibilityChanged(boolean visible) {
+        mParentVisible = visible;
+        if (mInitHelper != null) {
+            if (mInitHelper.isInitialized()) {
+                CountDownManager.getInstance().onVisibilityChanged(visible, getCountDownTag());
+            }
+        }
+    }
+
+    
+    Adapter 的相关方法
+    @Override
+    public void onViewAttachedToWindow(@NonNull BaseRecyclerViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        if (holder instanceof BaseCountDownCommodityViewHolder) {
+            //虽然在 BindTo 方法中添加了，但不是都会走 BindTo，如滑出再滑进，执行的 android.support.v7.widget.RecyclerView.Recycler.getScrapOrHiddenOrCachedHolderForPosition()
+            ((BaseCountDownCommodityViewHolder) holder).onViewAttachedToWindow();
+        }
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull BaseRecyclerViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        if (holder instanceof BaseCountDownCommodityViewHolder) {
+            ((BaseCountDownCommodityViewHolder) holder).onViewDetachedFromWindow();
+        }
+    }

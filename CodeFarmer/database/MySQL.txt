@@ -17,7 +17,15 @@ mysql -uroot
 
 # 使用
 ## 设置密码
+[MySQL设置和修改登陆密码方法总结](https://blog.csdn.net/u014236259/article/details/74276866)
 
+    1、登陆MySQL终端，直接运行如下命令
+    mysql>set password =password(‘123456‘);
+    mysql>flush privileges;
+    
+    3、在shell命令行里修改MySQL用户密码
+    [root@bogon]# mysqladmin -u root password “666666”;
+    
 ## mysql
     -p, --password[=name]
     Password to use when connecting to server. If password is

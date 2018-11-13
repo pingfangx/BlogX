@@ -6,15 +6,12 @@ echo 请选择
 
 
 rem 新建子功能，只需修改这 3 个
-set sub_cmd_name=XX.NewMdFile
-set sub_cmd_show_name=新建 md 文件
-set sub_cmd_cmd=D:\workspace\BlogX\CodeFarmer\windows\bat\create_md_file.bat
+set sub_cmd_name=XX.LoginVpn
+set sub_cmd_show_name=登录 vpn
+set sub_cmd_cmd=D:\workspace\BlogX\CodeFarmer\windows\bat\shortcut\cmd_login_vpn.bat
 
 set sub_cmd_path=HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\%sub_cmd_name%
 
-set main_cmd_name=xx_function
-set main_cmd_show_name=XX 功能
-set main_cmd_path=HKCR\Directory\Background\shell\%main_cmd_name%
 
 set /p input=
 if %input%==1 (
@@ -42,17 +39,6 @@ set cmd=reg add %sub_cmd_path%\command /ve /d "\"%sub_cmd_cmd%\" \"%%v\"" /f
 echo %cmd%
 %cmd%
 
-
-rem 添加一个主操作
-set cmd=reg add %main_cmd_path% /v MUIVerb /d "%main_cmd_show_name%" /f
-echo %cmd%
-%cmd%
-
-rem 关联子操作
-set cmd=reg add %main_cmd_path% /v SubCommands /d "%sub_cmd_name%" /f
-echo %cmd%
-%cmd%
-
 goto exit
 
 :uninstall
@@ -64,11 +50,6 @@ set cmd=reg delete %sub_cmd_path%
 echo %cmd%
 %cmd%
 
-
-rem 删除主操作
-set cmd=reg delete %main_cmd_path%
-echo %cmd%
-%cmd%
 
 goto exit
 

@@ -1,0 +1,80 @@
+# 处理过程
+## 异常堆栈
+    java.lang.IllegalStateException: Fragment no longer exists for key f0: index 0
+        at android.support.v4.app.FragmentManagerImpl.getFragment(FragmentManager.java:907)
+        at android.support.v4.app.FragmentStatePagerAdapter.restoreState(FragmentStatePagerAdapter.java:216)
+        at android.support.v4.view.ViewPager.onRestoreInstanceState(ViewPager.java:1455)
+        at android.view.View.dispatchRestoreInstanceState(View.java:17664)
+        at android.view.ViewGroup.dispatchRestoreInstanceState(ViewGroup.java:3725)
+        at android.view.ViewGroup.dispatchRestoreInstanceState(ViewGroup.java:3731)
+        at android.view.ViewGroup.dispatchRestoreInstanceState(ViewGroup.java:3731)
+        at android.view.ViewGroup.dispatchRestoreInstanceState(ViewGroup.java:3731)
+        at android.view.View.restoreHierarchyState(View.java:17642)
+        at android.support.v4.app.Fragment.restoreViewState(Fragment.java:415)
+        at android.support.v4.app.FragmentManagerImpl.moveToState(FragmentManager.java:1454)
+        at android.support.v4.app.FragmentManagerImpl.moveFragmentToExpectedState(FragmentManager.java:1759)
+        at android.support.v4.app.BackStackRecord.executeOps(BackStackRecord.java:792)
+        at android.support.v4.app.FragmentManagerImpl.executeOps(FragmentManager.java:2596)
+        at android.support.v4.app.FragmentManagerImpl.executeOpsTogether(FragmentManager.java:2383)
+        at android.support.v4.app.FragmentManagerImpl.removeRedundantOperationsAndExecute(FragmentManager.java:2338)
+        at android.support.v4.app.FragmentManagerImpl.execSingleAction(FragmentManager.java:2215)
+        at android.support.v4.app.BackStackRecord.commitNowAllowingStateLoss(BackStackRecord.java:649)
+        at android.support.v4.app.FragmentPagerAdapter.finishUpdate(FragmentPagerAdapter.java:145)
+        at android.support.v4.view.ViewPager.populate(ViewPager.java:1238)
+        at android.support.v4.view.ViewPager.setCurrentItemInternal(ViewPager.java:663)
+        at android.support.v4.view.ViewPager.setCurrentItemInternal(ViewPager.java:625)
+        at android.support.v4.view.ViewPager.setCurrentItem(ViewPager.java:606)
+
+由 setCurrentItem 最后在 FragmentManagerImpl 中
+    
+                case Fragment.CREATED:
+                        ...
+                        if (f.mView != null) {
+                            f.restoreViewState(f.mSavedFragmentState);
+                        }
+
+    final void restoreViewState(Bundle savedInstanceState) {
+        if (mSavedViewState != null) {
+            mInnerView.restoreHierarchyState(mSavedViewState);
+            mSavedViewState = null;
+        }
+        ...
+    }
+    View 传到了 ViewPager
+    ViewPager 调用了内部的 android.support.v4.app.FragmentStatePagerAdapter#restoreState
+
+## 基本原因
+FragmentStatePagerAdapter 会保存状态并恢复  
+恢复时因为 Fragment 被修改，找不到对应的 Fragment 而出错。
+
+具体场景
+* ViewPager 中有 3 个 Frament，其中第 1 个也有 ViewPager
+* 第 1 个 Fragment 使用 FragmentStatePagerAdapter，同时加载数据
+* 切换到第 3 个 Fragment，第 1 个 destroy，其 adapter saveState
+* 第 1 个加载数据完成，更新了它持有的 Fragment
+* 从第 3 个 Fragment 切加第 1 个，adapter restoreState，Fragment 找不到，报错。
+
+### 方案一
+网上的方法是 android.support.v4.app.FragmentStatePagerAdapter#saveState  
+让其返回 null，则在 restoreState 就不会处理。
+
+## 深究原因
+那项目中为什么会发生呢，输出日志发现  
+在 saveState 之后，更改了 Fragment，所以出现了问题。  
+具体发生于 Fragment 被 Destroy ，于是 saveState，然后后台的网络加载才完成，
+加载完成后处理数据，更新 Fragment，造成 saveState 保存的数据无效。
+
+### 方案二
+在 Destroy 后，就不应该更新 Fragment  
+于是在联网请求后，如果 Fragment 已经 destroy，则丢弃数据，不继续处理（或是持有数据，在恢复时恢复）  
+* 如何判断 Fragment 被 destroy?  
+了解生命周期，使用 isDetached()
+* 如何在下一次进入时重新请求被丢充的数据？  
+项目中的 FragmentInitHelper 记录是否已初始化
+
+
+结论
+* 加载完数据后更新 Fragment
+* 因此如果使用 FragmentStatePagerAdapter
+* saveState 之后就不能更改 Fragment，否则 restoreState 会找不到 Fragment 而报错
+* 因此在更新 Fragment 前使用 !isDetached() 判断
