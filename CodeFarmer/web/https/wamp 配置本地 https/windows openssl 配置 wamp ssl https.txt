@@ -1,0 +1,67 @@
+安装 openssl  
+[Win32 OpenSSL](http://slproweb.com/products/Win32OpenSSL.html)  
+部分文章要生成很多文件，甚至手动导入证书等，而有的只生成 3 个文件。  
+该部分知识点没有完全掌握，需要再学习（已学习）。
+
+# 部分参考博文
+[自签名https证书，本地浏览器测试](https://www.jianshu.com/p/7a72851676f1)
+
+[wamp配置https服务](https://blog.csdn.net/xjymcc/article/details/54380241)  
+这一篇的证书签署与下一篇不一样，该篇用 CA 证书签署服务器证书是正确的。
+> 注意Common Name为服务器域名，如果在本机，为本机IP。  
+一开始以为是因为这个，后来发现这个好像并不是必要的，即使不一致，也可以用浏览器访问。  
+但是 xdebug 却无法调试，所以还是要一致。
+Specified URL is not reachable,caused by:
+'java.security.cert.CertificateException:No name matching localhost.pingfangx.com found'
+
+
+[搭建本地wamp https SSL 测试环境](https://liangsandian.com/a/local-ssl-env.html)  
+这里面提到切换到 conf 目录就可以使用 apache 的配置（openssl.cnf）  
+在其他相关教程中，用 -config 配置，和这个是一样的原理。
+该博文中的相关注意都很重要，很适合我的实际情形。
+> 找到apache的conf目录， 在该目录下运行cmd（按住Ctrl右键 文件夹空白处），在此处运行cmd
+
+    openssl genrsa 1024>server.key
+    openssl req -new -key server.key > server.csr
+    > 需要用户输入国家代码之类的信息，可以随便输入。 除了 Common Name 只能输入域名或IP，而且Common Name 必须和 httpd.conf 中 server name 必须一致， 否则 apache 不能启动
+    openssl req -x509 -days 365 -key server.key -in server.csr > server.crt
+
+[openssl、x509、crt、cer、key、csr、ssl、tls 这些都是什么鬼?](https://www.cnblogs.com/yjmyzz/p/openssl-tutorial.html)
+
+[openssl manpages](https://www.openssl.org/docs/man1.1.0/apps/openssl.html)
+
+[OpenSSL命令详解（一）——标准命令](https://blog.csdn.net/scuyxi/article/details/54884976)
+
+# 最后总结如下
+## 1 生成证书
+### 生成服务器端私钥
+-out server.key 是配置参数，> server.key 则 MS-DOS 的输出  
+按理说结果一样，可是 -out 却提示多余的参数。
+
+`openssl genrsa 1024 > server.key`
+
+### 生成证书签署申请
+> CSR 是Certificate Signing Request的缩写，即证书签名请求，这不是证书，可以简单理解成公钥，生成证书时要把这个提交给权威的证书颁发机构。
+`openssl req -new -key server.key > server.csr`
+
+### 签发证书
+`openssl req -x509 -days 365 -key server.key -in server.csr > server.crt`
+
+可以看到只生成了 3 个文件，但感觉是不正确的，该服务器自己为自己签署了证书。
+
+## 2 配置 wamp
+### httpd.conf
+    LoadModule socache_shmcb_module modules/mod_socache_shmcb.so
+    Include conf/extra/httpd-ssl.conf 
+    LoadModule ssl_module modules/mod_ssl.so
+### httpd-ssl.conf
+
+
+# 部分问题
+## Can't load ./.rnd into RNG
+这是因为在 openssl.conf 有配置
+
+    HOME			= .
+    RANDFILE		= $ENV::HOME/.rnd
+    
+因此在目录下新建 .rnd 文件，内容写 01 （不知道是否必须。）即可。

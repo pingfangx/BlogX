@@ -1,0 +1,13 @@
+因为是服务，所以查看日志可以在
+
+运行 eventvwr 启动事件查看器 > Windows 日志 > 应用程序
+
+另外，也可以在 apache 的 bin 目录运行
+
+    httpd -t
+    -t                 : run syntax check for config files
+    
+    出现
+    Syntax OK
+    
+    表示正常，否则会输出相应错误。

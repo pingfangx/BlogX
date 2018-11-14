@@ -1,0 +1,75 @@
+[自签名https证书，本地浏览器测试](https://www.jianshu.com/p/7a72851676f1)
+
+很久以前就配置过，一直没有成功。  
+这一次尝试也是几经周折。  
+过程基本为
+
+* 配置后 apache 启动失败
+* 升级 wamp，还是失败
+* 查看日志，修改相关错误，启动成功
+* https 无法访问，请求遭到拒绝 您未获授权，无法查看此网页。
+* 以为是证书问题，各种重新配置证书
+
+
+
+# 启动失败
+## 查询查看日志的方法
+> 运行 eventvwr 启动事件查看器 > Windows 日志 > 应用程序
+
+> \xb2\xd9\xd7\xf7\xcf\xb5\xcd\xb3\xce\xde\xb7\xa8\xd4\xcb\xd0\xd0 The Apache service named\xa1\xa3     .
+
+
+## 日志乱码
+
+> print(b''.decode('gbk'))
+
+结果
+
+> 操作系统无法运行 The Apache service named。.
+
+一开始搜索没有找到，后来根据
+
+The operating system cannot run 结果搜到了别的结果。
+
+最后搜索完整的
+
+The operating system cannot run The Apache service named
+
+[Cannot load modules/mod_ssl.so into server: The operating system cannot run The Apache service named](http://php-problems.blogspot.com/2016/05/cannot-load-modulesmodsslso-into-server.html)
+
+里面提到
+
+> Then check the VC compatibility , I had this error when I tried to run Apache 2.4.20  VC14 ( C++ Redistributable Visual Studio), with php 5.6 which compiled using VC11, which is not compatible, So to solve this issue there are two methods:  
+>The first is upgrade PHP by downloading the  PHP version compiled with VC14, Or to downgrade Apache server and download the VC11 version.
+
+然后我才想起来，这台电脑上的的 wamp 已经是很久以前安装的了。
+之前在另一电脑上装了最新版，这台电脑还是旧的呢。
+
+于是几经周折升级完成。
+
+解决相关的问题
+
+* Using a PATH on Wampserver or PHP version is detrimental to the proper functioning of wampserver  
+删除相关环境变量
+
+* SSLSessionCache: 'shmcb' session cache not supported (known names: ). Maybe you need to load the appropriate socache module (mod_socache_shmcb?).     
+httpd.conf 中启用
+
+* Cannot access directory 'C:/Apache24/logs/' for error log  
+extra/httpd-ssl.conf 中的路径需要正确配置，升级后可以定义常量了。
+
+* could not bind to address [::]:443  
+最关键的问题，也是让我误入歧途很久的问题。  
+netstat -ano | findstr 443 查看占用  
+tasklist | findstr  
+发现是 vmware-hostd.exe，但是呢，apache 的叫 httpd.exe  
+后面都带个 d.exe 我还以为是 apache 自己在其他地方配置了，所以自己占用了  
+我直接将 httpd-ssl.conf 中的 Listen 443 注掉  
+apache 是可以正常启动了，但是打不开 https://localhost  
+
+* 请求遭到拒绝 您未获授权，无法查看此网页。  
+一开始以为是权限问题，证书问题，于是各种折腾证书。  
+实现上，后来想想，443 被 vmware 占用了，可能是它不接收访问 localhost 对应文件目录，所以才没有权限。
+
+[XAMPP 和 VMWare 的冲突……](http://kaikai.info/xampp-vmware-conflict/)  
+位于首选项 > 共享虚拟机 > 端口，禁用共享后修改即可。

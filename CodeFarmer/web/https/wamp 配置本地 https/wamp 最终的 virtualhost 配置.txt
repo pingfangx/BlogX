@@ -1,0 +1,78 @@
+定义
+
+    Define PINGFANGX_ROOT D:\workspace\PHPX\www.pingfangx.com\wwwroot
+# httpd-vhosts.conf
+    <VirtualHost *:80>
+        DocumentRoot "${SRVROOT}/www"
+        ServerName localhost
+        ErrorLog "${SRVROOT}/logs/error.log"
+        TransferLog "${SRVROOT}/logs/access.log"
+    </VirtualHost>
+
+    <VirtualHost *:80>
+        DocumentRoot "${PINGFANGX_ROOT}"
+        ServerName localhost.pingfangx.com
+        ErrorLog "${SRVROOT}/logs/error.log"
+        TransferLog "${SRVROOT}/logs/access.log"
+        <Directory  "${PINGFANGX_ROOT}">
+            Options +Indexes +Includes +FollowSymLinks +MultiViews
+            AllowOverride All
+            Require local
+        </Directory>
+    </VirtualHost>
+
+# httpd-ssl.conf
+
+    <VirtualHost _default_:443>
+        DocumentRoot "${SRVROOT}/www"
+        ServerName localhost
+        ServerAdmin admin@example.com
+        ErrorLog "${SRVROOT}/logs/error.log"
+        TransferLog "${SRVROOT}/logs/access.log"
+        SSLEngine on
+        SSLCertificateFile "${SRVROOT}/conf/server.crt"
+        SSLCertificateKeyFile "${SRVROOT}/conf/server.key"
+        <FilesMatch "\.(cgi|shtml|phtml|php)$">
+            SSLOptions +StdEnvVars
+        </FilesMatch>
+        <Directory "${SRVROOT}/www">
+            SSLOptions +StdEnvVars
+        </Directory>
+        BrowserMatch "MSIE [2-5]" \
+                 nokeepalive ssl-unclean-shutdown \
+                 downgrade-1.0 force-response-1.0
+
+        CustomLog "${SRVROOT}/logs/ssl_request.log" \
+                  "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+    </VirtualHost>                                  
+
+    <VirtualHost _default_:443>
+        DocumentRoot "${PINGFANGX_ROOT}"
+        ServerName localhost.pingfangx.com
+        ServerAdmin admin@example.com
+        ErrorLog "${SRVROOT}/logs/error.log"
+        TransferLog "${SRVROOT}/logs/access.log"
+        SSLEngine on
+        SSLCertificateFile "${SRVROOT}/conf/server.crt"
+        SSLCertificateKeyFile "${SRVROOT}/conf/server.key"
+        <FilesMatch "\.(cgi|shtml|phtml|php)$">
+            SSLOptions +StdEnvVars
+        </FilesMatch>
+        <Directory "${PINGFANGX_ROOT}">
+            SSLOptions +StdEnvVars
+            AllowOverride All
+            Require local
+        </Directory>
+        BrowserMatch "MSIE [2-5]" \
+                 nokeepalive ssl-unclean-shutdown \
+                 downgrade-1.0 force-response-1.0
+
+        CustomLog "${SRVROOT}/logs/ssl_request.log" \
+                  "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+    </VirtualHost>                                  
+
+                              
+# hosts
+    127.0.0.1 localhost
+    127.0.0.1 localhost.pingfangx.com
+    ::1 localhost

@@ -1,0 +1,20 @@
+# [非对称加密](https://zh.wikipedia.org/wiki/%E5%85%AC%E5%BC%80%E5%AF%86%E9%92%A5%E5%8A%A0%E5%AF%86)
+
+我们知道，可以将公钥公开，别人用公钥加密，只可以用私钥解密。
+
+# [https](https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%AE%89%E5%85%A8%E5%8D%8F%E8%AE%AE)
+> 被访问的网站提供了一个有效的证书，意即，它是由一个被信任的证书颁发机构签发的（大部分浏览器会对无效的证书发出警告）；
+
+[图解HTTPS](http://www.cnblogs.com/zhuqil/archive/2012/07/23/2604572.html)
+
+    客户端请求 https 连接
+    服务端返回证书（含公钥）
+    客户商生成对称密钥，用公钥加密，传送给服务端
+    服务端用自己的私钥解密，得到对称密钥
+    此时双方都有对称密钥，进行数据传输。
+    
+    
+# 配置证书
+# [CA](https://en.wikipedia.org/wiki/Certificate_authority)
+通过 https 原理，我们知道，服务器需要配置一个私钥，一个证书。  
+该证书应该由 CA 签发。

@@ -1,0 +1,39 @@
+# 默认软件的配置
+[change-default-text-editor-in-wampserver](https://www.wideitzone.com/2018/03/change-default-text-editor-in-wampserver.html)
+
+有 3 个文件可能是配置  
+wampmanager.tpl  
+wampmanager.ini  
+wampmanager.conf  
+
+修改 wampmanager.conf 即可。
+
+
+# httpd.conf
+主配置文件是 httpd.conf  
+* 通过 LoadModule 启动用关模块  
+* 通过 Include 包启额外的配置
+
+[Define Directive](http://httpd.apache.org/docs/2.4/mod/core.html#define)
+
+    定义参数
+    Define parameter-name [parameter-value]
+    使用
+    ${parameter-name}
+    
+
+# vhost
+新版本可以通过 VirtualHost Management 来方便的设置了。
+
+    # Virtual hosts
+    Include conf/extra/httpd-vhosts.conf
+
+# SSL
+包含 httpd-ssl 后需要作相关修改，也可以不包启，直接在 httpd-vhosts.conf 中修改  
+都是配置，在哪个文件都是一样的
+
+    LoadModule socache_shmcb_module modules/mod_socache_shmcb.so
+    LoadModule ssl_module modules/mod_ssl.so
+    
+    # Secure (SSL/TLS) connections
+    Include conf/extra/httpd-ssl.conf

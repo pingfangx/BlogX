@@ -1,0 +1,2 @@
+netstat -ano | findstr 443
+tasklist |findstr 4880
