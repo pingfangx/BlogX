@@ -29,7 +29,7 @@
     }
 
 # 3 带参数执行任务
-    gradle :app:clean -Dorg.gradle.debug=true --no-daemon
+    gradle :app:clean -Dorg.gradle.debug=true --no-daemon --rerun-tasks
 
     命令执行后会显示
     To honour the JVM settings for this build a new JVM will be forked. Please consider using the daemon: https://docs.gradle.org/4.7/userguide/gradle_daemon.html.

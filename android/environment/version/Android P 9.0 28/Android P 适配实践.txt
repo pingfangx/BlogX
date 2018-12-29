@@ -1,3 +1,5 @@
+[Android 9 Pie](https://developer.android.google.cn/about/versions/pie/)
+
 # 对使用非 SDK 接口的限制
 使用 veridex 检查
 
@@ -17,3 +19,7 @@
 播放视频、直播、VR 看车
 只有横屏时才全屏，左边没有操作按钮，可以不处理。
 
+# CLEARTEXT communication to host not permitted by network
+前面不是 = （布局文件中的空间声明），后面不是 s 的 http
+
+    (?<!=)"http(?!s)

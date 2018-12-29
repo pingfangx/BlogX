@@ -1,3 +1,10 @@
+# 实际项目笔记
+* 切到分支 pingfangx/plugin
+* Build > Build artifacts 生成插件 jar 包  
+根据配置会生成到 classes/artifacts/2502
+* gradle installDist 生成安装分发包  
+生成到 build/install/OmegaT
+
 在开发文档中没有介绍怎么打包生成可执行文件。
 
 # 编译替换

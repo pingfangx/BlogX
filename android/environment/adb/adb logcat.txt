@@ -1,2 +1,3 @@
 [logcat 命令行工具](https://developer.android.com/studio/command-line/logcat)
 
+adb logcat -d *:E >D:/adb/log.txt

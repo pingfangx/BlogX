@@ -1,5 +1,7 @@
 [md]
 
+最后使用的还是 WinHTTrack
+
 想抓取 https://git-scm.com/book/zh/v2/  
 使用以前自己珍藏的 Teleport Pro ，居然不可以抓 https 的。  
 搜了一圏，

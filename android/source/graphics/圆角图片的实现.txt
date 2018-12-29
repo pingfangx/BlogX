@@ -1,13 +1,18 @@
 # 0x01 设置 shader 绘制圆角矩形
 [glide-transformations](https://github.com/wasabeef/glide-transformations)
 
-
+## 步骤
 * 设置 shader 
 * 绘制一个圆角矩形
 * 绘制源 bitmap
 
----
+## 原理
+绘制一个圆角矩形，绘制的时候使用 paint  
+这个 paint 提供颜色，它的颜色从 shader 中取  
+shader 是一个 BitmapShader，因此会从图片中取出相应的颜色  
+因为本身是绘制一个圆角矩形，所以只取了圆角矩形部分的颜色
 
+## 代码
     private fun createRoundBitmap(imageView: ImageView, bitmap: Bitmap, cornerRadius: Int): Bitmap {
         mPaint.reset()
         mPaint.isAntiAlias = true
@@ -33,13 +38,16 @@ Q:
 见另一篇文章
 
 # 0x02 圆角矩形配合 xfermode
-
+## 步骤
 * 绘制一个圆角矩形
 * 设置 xfermode 
 * 绘制源 bitmap
 
----
-
+## 原理
+先绘制圆角矩形
+后绘制图片
+要取的是图片与圆角相交的部分，保留圆角，所以是 SRC_IN
+## 代码
     private fun createRoundBitmap(imageView: ImageView, bitmap: Bitmap, cornerRadius: Int): Bitmap {
         mPaint.reset()
         mPaint.isAntiAlias = true

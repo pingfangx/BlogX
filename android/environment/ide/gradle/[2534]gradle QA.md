@@ -91,7 +91,7 @@ gradlew 是使用 gradle-wrapper.properties 中指定下载路径、指定版本
 上面的构建插件的版本可能限制该 buildToolsVersion
 
 ## minSdkVersion
-最小
+最小 sdk，会限制部分 api 使用
 
 ## targetSdkVersion
 目标

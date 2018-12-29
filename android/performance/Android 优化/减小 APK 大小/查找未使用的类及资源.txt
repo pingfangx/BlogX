@@ -19,9 +19,10 @@ Unused declaration
 
 ## UCDetector
 ## ProGuard
-启用 shrink ，但看输出的 usage.txt
+启用 shrink ，然后查看输出的 usage.txt
 
 Gradle Task 位于 :app > Tasks > other > transformClassedAndResourcesWithProguardFor...
 
-输出位于 app/build/outputs/mapping
+输出位于 app/build/outputs/mapping/usage.txt
 
+阅读 usage.txt 见另一篇

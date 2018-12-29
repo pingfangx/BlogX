@@ -5,6 +5,8 @@ resConfigs 去除引用的第三方包
 
 R:
 
+[Reduce the APK size](https://developer.android.google.cn/topic/performance/reduce-apk-size)
+
 [美团技术团队-Android App包瘦身优化实践](https://tech.meituan.com/android_shrink_overall_solution.html)
 
 [android APK体积大小优化](https://blog.csdn.net/cchp1234/article/details/77750428)

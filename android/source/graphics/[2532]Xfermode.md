@@ -5,7 +5,7 @@ Q:
 * 相关 mode 的命名
 * 各模式的官方 demo 与错误示范
 * 如何计算
-
+* 谁是 SRC 谁是 DST
 源码
 [BitmapDemo](https://github.com/pingfangx/AndroidX/tree/master/demo/BitmapDemo)
 
@@ -139,6 +139,20 @@ DARKEN、LIGHTEN 等显示不正常
 
     [Sa + (1 - Sa) * Da,(2 * Dc ≤ Da ? 2 * Sc * Dc : Sa * Da - 2 * (Da - Dc) * (Sa - Sc))\n + (Sc * (1 - Da) + Dc * (1 - Sa))]
             
+
+## 谁是 SRC 谁是 DST
+根据[官方文档](https://developer.android.google.cn/reference/android/graphics/PorterDuff.Mode)中的源码
+
+     Paint paint = new Paint();
+     canvas.drawBitmap(destinationImage, 0, 0, paint);
+
+     PorterDuff.Mode mode = // choose a mode
+     paint.setXfermode(new PorterDuffXfermode(mode));
+
+     canvas.drawBitmap(sourceImage, 0, 0, paint);            
+
+我们知道，先绘制的为 DST ，后绘制的为 SRC  
+即将源文件 SRC 绘制到目标 DST 上，根据不同 mode 来处理叠加效果。
 
 # 参考文献
 [PorterDuff.Mode](https://developer.android.google.cn/reference/android/graphics/PorterDuff.Mode)  
