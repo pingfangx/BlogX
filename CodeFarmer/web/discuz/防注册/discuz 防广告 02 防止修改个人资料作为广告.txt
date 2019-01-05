@@ -6,9 +6,10 @@
 [DZX2修改数据库字段为注册必填能有效防止注册机](http://www.discuz.net/thread-2368534-1-1.html)
 
 ## 后台>>工具 >> 运行记录>> 系统记录>>后台访问
+查看访问记录正常
 
 ## 后台 工具 校验文件
-仅创建者可查看
+仅创建者可查看，查看文件正常。
 
 ## 删除 Powered by Discuz！
 [【浅见】Discuz网站有效阻止发贴机灌水机的方法](https://www.discuzlab.com/thread-80-1-1.html)
@@ -32,3 +33,5 @@ http://localhost.pingfangx.com/home.php?mod=spacecp&ac=profile&op=info
         }
 		C::t('common_member_profile')->update($_G['uid'], $setarr);
 	}
+    
+## 用户修改资料需要审核

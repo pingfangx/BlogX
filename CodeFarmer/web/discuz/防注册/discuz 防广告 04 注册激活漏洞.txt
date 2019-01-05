@@ -1,0 +1,42 @@
+
+# 为什么审核用户中看不到？
+    /admin.php?action=moderate&operation=members
+    /source/admincp/admincp_moderate.php
+    /source/admincp/moderate/moderate_member.php
+        $count = C::t('common_member_validate')->fetch_all_status_by_count();
+        
+    所以位于表 common_member_validate 中，查看表，发现没有记录。
+    
+    查看 members 表，发现 group_id 为 10（未认证为 8）
+    也就是说过了认证？明明没有审核，怎么过的认证？
+    
+# 操作日志
+搜索 common_member_validate 发现在 data/log/*_cplog.php 有操作日志  
+另外还有异常日志等。  
+根据 moderate ，确定没有被盗号。
+
+# 待认证记录怎么被删除了
+    通过上面的分析我们知道，因为 common_member_validate 中没有记录，所以待审核用户中看不到。  
+    通过访问日志我们知道，走的应该是正常的流程，理应在 common_member_validate 中记录，可能是某处被删除了
+    搜索 common_member_validate.*delete 找到
+    /source/include/misc/misc_emailcheck.php
+    
+        if($_G['setting']['regverify'] == 1 && $member['groupid'] == 8) {
+            $membergroup = C::t('common_usergroup')->fetch_by_credits($member['credits']);
+            $setarr['groupid'] = $membergroup['groupid'];
+        }
+        updatecreditbyaction('realemail', $uid);
+        C::t('common_member')->update($uid, $setarr);
+        C::t('common_member_validate')->delete($uid);
+        
+经过上面的分析，我们知道了，discuz 会把需要认证的会员（邮箱认证和待审核）都暂存到 common_member_validate  
+原本是待审核的用户，结果邮箱认证以后，就从表中删除了。也是醉了。
+
+    这个 bug 修复于名为 “邮箱验证漏洞修复”的提交中，
+    b2dddfc SNIPER722 <tom8201@hotmail.com> on 2017/1/18 at 1:12
+    但是只加了判断
+    if($_G['setting']['regverify'] == 1 && $member['groupid'] == 8) {
+        ...
+    }
+    实际上后面还是从 common_member_validate 表中删除了。
+    删除语句应该也加上判断才行。

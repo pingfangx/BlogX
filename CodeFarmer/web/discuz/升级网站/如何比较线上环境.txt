@@ -1,0 +1,19 @@
+# 准备本地文件
+新建一个文件夹，git clone "D:\workspace\GitX\www.pingfangx.com\.git" --recursive
+
+在主仓库子模块没有文件，检出的才有？
+    
+    切到线上分支
+    git checkout online
+    更新子模块，主要是 think 目录
+    git submodule update
+    查看工作空间是否干净
+    git status
+    如果不干净，reset
+    git reset --hard
+    查看是否有添加的、忽略的文件
+    git clean -dfxn
+    
+## 将 config 切到 online，然后整体复制
+# 下载线上文件
+打包，下载，删除包

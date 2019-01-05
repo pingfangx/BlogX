@@ -1,0 +1,4 @@
+[Discuz 在 PHP7.2环境下的警告信息如何删除](https://blog.nf12.com/thread-4-1-1.html)
+
+> 把这段删除，或者注释掉。
+> 修改php.ini中的错误报告（error_reporting）等级

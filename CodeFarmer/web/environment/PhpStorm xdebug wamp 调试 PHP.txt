@@ -1,0 +1,12 @@
+之前很顺序，这一次却遇到了问题。
+
+> Waiting for incoming connection with ide key
+
+后来发现是 host 不匹配。  
+在 validate 页面检查时需要仔细查看。
+
+host 和 port  
+之前的 host 就是 localhost ，所以直接就可以调试了。  
+这一次本地是 localhost.pingfangx.com，所以需要在 php.ini 中配置
+
+    xdebug.remote_host="localhost.pingfangx.com"
