@@ -19,3 +19,5 @@
     
     将 -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
     添加到 studio64.exe.vmoptions 即可。
+    
+    suspend=n 不暂停

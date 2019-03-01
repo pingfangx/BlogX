@@ -64,29 +64,41 @@ jar:file:/D:/xx/software/JetBrains/AndroidStudio/lib/platform-impl.jar!/com/inte
 ## 替换图片的过程
 ### AndroidStudio
     可以看到，只是把图片替换为了带宽高
-    URL url = ResourceUtil.getResource(tipLoader, "/tips/", path);
-    if (url != null) {
-        String newImgTag = "<img src=\"" + path + "\" ";
+    
+    
+    String path = img.substring(srcIndex + 5, endIndex);
+    if (!path.endsWith("_dark") && !path.endsWith("@2x")) {
+        boolean hidpi = JBUI.isPixHiDPI((Component)comp);
+        path = path + (hidpi ? "@2x" : "") + (dark ? "_dark" : "") + ".png";
+        URL url = ResourceUtil.getResource(tipLoader, "/tips/", path);
+        if (url != null) {
+            String newImgTag = "<img src=\"" + path + "\" ";
 
-        try {
-            BufferedImage image = ImageIO.read(url.openStream());
-            int w = image.getWidth();
-            int h = image.getHeight();
-            if (hidpi) {
-                w /= 2;
-                h /= 2;
+            try {
+                BufferedImage image = ImageIO.read(url.openStream());
+                int w = image.getWidth();
+                int h = image.getHeight();
+                if (hidpi) {
+                    w /= 2;
+                    h /= 2;
+                }
+
+                w = (int)JBUI.scale((float)w);
+                h = (int)JBUI.scale((float)h);
+                newImgTag = newImgTag + "width=\"" + w + "\" height=\"" + h + "\"";
+            } catch (Exception var18) {
+                newImgTag = newImgTag + "width=\"400\" height=\"200\"";
             }
 
-            w = (int)JBUI.scale((float)w);
-            h = (int)JBUI.scale((float)h);
-            newImgTag = newImgTag + "width=\"" + w + "\" height=\"" + h + "\"";
-        } catch (Exception var18) {
-            newImgTag = newImgTag + "width=\"400\" height=\"200\"";
+            newImgTag = newImgTag + "/>";
+            text.replace(index, end + 1, newImgTag);
         }
-
-        newImgTag = newImgTag + "/>";
-        text.replace(index, end + 1, newImgTag);
     }
+    
+    
+    // path 为 images/code_completion.png
+    // url 为 jar:file:/E:/file/download/chrome/android-studio/lib/resources_zh_CN_AndroidStudio_3.2.1_r1.jar!/tips_zh_CN/images/code_completion.png
+    // newImgTag 为 <img src="images/code_completion.png" width="519" height="224"/>
 ### idea
 
         URL url = ResourceUtil.getResource(tipLoader, "/tips/", path);
@@ -120,7 +132,7 @@ jar:file:/D:/xx/software/JetBrains/AndroidStudio/lib/platform-impl.jar!/com/inte
       }
       
     idea 拼上的是 url，区别于 AndroidStudio 只拼上 path
-    <img src="file:/D:/workspace/github/intellij-community/out/production/platform-resources-en/tips/images/goto_class.png" width="449" height="111">
+    newImgTag 为 <img src="file:/D:/workspace/github/intellij-community/out/production/platform-resources-en/tips/images/goto_class.png" width="449" height="111">
     
     
 # AndroidStudio 的问题是什么时候修改
@@ -134,3 +146,79 @@ Commits on Nov 3, 2017
 
 而 2018.1.6 是 181.5540
 按理说应该是合并的呀，但实际的 platform-impl.jar 并未更新。
+
+
+# 3.3 的 AndroidStudio
+
+    //images/image_completion.png
+    String path = img.substring(srcIndex + 5, endIndex);
+    //jar:file:/E:/file/download/chrome/android-studio/lib/resources_en.jar!/tips/images/image_completion.png
+    URL url = ResourceUtil.getResource(tipLoader, "/tips/", path);
+    if (url != null) {
+        //jar:file:/E:/file/download/chrome/android-studio/lib/resources_en.jar!/tips/images/image_completion.png
+        path = url.toExternalForm();
+    }
+
+    int extPoint = path.lastIndexOf(46);
+    String pathWithoutExtension = extPoint != -1 ? path.substring(0, extPoint) : path;
+    String fileExtension = extPoint != -1 ? path.substring(extPoint) : "";
+    if (!pathWithoutExtension.endsWith("_dark") && !pathWithoutExtension.endsWith("@2x")) {
+        boolean hidpi = JBUI.isPixHiDPI(component);
+        path = pathWithoutExtension + (hidpi ? "@2x" : "") + (dark ? "_dark" : "") + fileExtension;
+        if (url != null) {
+            //<img src="jar:file:/E:/file/download/chrome/android-studio/lib/resources_en.jar!/tips/images/image_completion.png" 
+            String newImgTag = "<img src=\"" + url + "\" ";
+
+            try {
+                boolean fallbackUpscale = false;
+
+                Trinity trinity;
+                URL actualURL;
+                try {
+                    actualURL = new URL(path);
+                    trinity = read(actualURL);
+                } catch (IOException var23) {
+                    LOG.warn("Cannot find icon with path [" + path + "]");
+                    fallbackUpscale = hidpi;
+                    actualURL = url;
+                    trinity = read(url);
+                }
+
+                if (Registry.is("ide.javafx.tips")) {
+                    newImgTag = "<img src=\"data:image/" + (String)trinity.first + ";base64," + Base64.getEncoder().encodeToString((byte[])trinity.third) + "\" ";
+                } else {
+                    //<img src="jar:file:/E:/file/download/chrome/android-studio/lib/resources_en.jar!/tips/images/image_completion.png" 
+                    newImgTag = "<img src=\"" + actualURL.toExternalForm() + "\" ";
+                }
+
+                BufferedImage image = (BufferedImage)trinity.second;
+                int w = image.getWidth();
+                int h = image.getHeight();
+                if (hidpi) {
+                    float k = 2.0F;
+                    if (UIUtil.isJreHiDPI(component)) {
+                        k = JBUI.sysScale(component);
+                    }
+
+                    w = (int)((float)w / k);
+                    h = (int)((float)h / k);
+                }
+
+                int userScale = RoundingMode.ROUND_FLOOR_BIAS.round((double)JBUI.scale(1.0F));
+                w = userScale * w;
+                h = userScale * h;
+                if (fallbackUpscale) {
+                    w *= 2;
+                    h *= 2;
+                }
+
+                newImgTag = newImgTag + "width=\"" + w + "\" height=\"" + h + "\"";
+            } catch (Exception var24) {
+                newImgTag = newImgTag + "width=\"400\" height=\"200\"";
+            }
+
+            //<img src="jar:file:/E:/file/download/chrome/android-studio/lib/resources_en.jar!/tips/images/image_completion.png" width="446" height="50">
+            newImgTag = newImgTag + ">";
+            text.replace(index, end + 1, newImgTag);
+        }
+    }

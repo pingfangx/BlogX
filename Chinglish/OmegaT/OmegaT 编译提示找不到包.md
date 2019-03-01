@@ -1,0 +1,1 @@
+Gradle 刷新即可，总是想不起来，每次 rebuild 、 invalidate caches 之后才想起来。

@@ -1,3 +1,5 @@
+https://stackoverflow.com/questions/1983839/determine-which-jar-file-a-class-is-from
+
 [Java-查看JVM从哪个JAR包中加载指定类](https://blog.csdn.net/yangshangwei/article/details/74531939)
 
     public static String where(final Class cls) {
