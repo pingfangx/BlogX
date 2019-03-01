@@ -48,3 +48,8 @@
       }
       
       可以看到，在写入内容时，写入了 UTF-8
+      
+      改版之后，不再创建文件了，改用
+      
+            Process process = Runtime.getRuntime().exec(cmd);
+            (new CapturingProcessHandler(process, (Charset)null, cmd)).runProcess().checkSuccess(LOG);

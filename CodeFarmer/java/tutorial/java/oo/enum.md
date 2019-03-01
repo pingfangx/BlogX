@@ -1,0 +1,1 @@
+> 所有 枚举隐式继承 java.lang.Enum。因为一个类只能继承一个父类(参见 Declaring Classes)，所以 Java 语言不支持多重继承状态(参见 Multiple Inheritance of State, Implementation, and Type)因此，枚举不能继承任何其他内容。
