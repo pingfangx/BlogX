@@ -40,3 +40,7 @@ https://stackoverflow.com/questions/1983839/determine-which-jar-file-a-class-is-
     但下面的可以正常调用
     TipUIUtil.class.getClassLoader().getResource(TipUIUtil.class.getName().replace('.', '/').concat(".class"))
     
+# 最后确定
+    Class clazz=TipUIUtil.class;
+    clazz.getClassLoader().getResource(clazz.getName().replace('.', '/').concat(".class"));
+    
