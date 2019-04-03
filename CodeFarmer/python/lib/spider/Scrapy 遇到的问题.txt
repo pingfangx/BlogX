@@ -1,0 +1,33 @@
+# 添加 ITEM_PIPELINES 不成功
+异常未输出
+
+    scrapy.middleware.MiddlewareManager#from_settings
+    
+            try:
+                mwcls = load_object(clspath)
+                if crawler and hasattr(mwcls, 'from_crawler'):
+                    mw = mwcls.from_crawler(crawler)
+                elif hasattr(mwcls, 'from_settings'):
+                    mw = mwcls.from_settings(settings)
+                else:
+                    mw = mwcls()
+                middlewares.append(mw)
+                enabled.append(clspath)
+            except NotConfigured as e:
+                if e.args:
+                    clsname = clspath.split('.')[-1]
+                    logger.warning("Disabled %(clsname)s: %(eargs)s",
+                                   {'clsname': clsname, 'eargs': e.args[0]},
+                                   extra={'crawler': crawler})
+                                   
+                                   
+    MediaPipeline.from_crawler
+    scrapy.pipelines.files.FilesPipeline#from_settings
+        store_uri = settings['FILES_STORE']
+        return cls(store_uri, settings=settings)
+    scrapy.pipelines.files.FilesPipeline#__init__
+    def __init__(self, store_uri, download_func=None, settings=None):
+        if not store_uri:
+            raise NotConfigured
+            
+    文档已经说了要配置的……
