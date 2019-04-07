@@ -1,0 +1,22 @@
+手机上的定时签到，少数情况还是会漏签。  
+想在服务器上实现定时签到作为辅助，最终选型
+
+Python 定时任务 -> 请求 PHP 服务器 -> 签到完成发送邮件通知
+
+
+# PHP 端
+参考 [MoeNetwork/Tieba-Cloud-Sign](https://github.com/MoeNetwork/Tieba-Cloud-Sign)  
+虽然没有直接使用，也借鉴了一些东西。  
+* ThinkPHP
+* 校验权限、校验参数、根据请求方式分发
+* [PHPMailer](https://github.com/PHPMailer/PHPMailer) 发送邮件
+
+没有直接使用 php 定时任务的实现方式。
+
+# Python 端
+* [APScheduler](agronholm/apscheduler) 定时任务 cron
+
+最后形成了 app 6:35 定时签到  
+云主机设置了 6,20 调用签到（注意设置时间）  
+本地运行一份 7,21 调用签到  
+定时查收邮件和检查日志。
