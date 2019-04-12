@@ -4,7 +4,7 @@
 在上一篇中备份微信的聊天记录比较复杂，还好有前人指路。  
 这一次备份手机的QQ聊天记录，
 
-adb pull /data/data/com.tencent.mobileqq/databases/252114284.db D:/adb
+adb pull /data/data/com.tencent.mobileqq/databases/<qqunmber>.db D:/adb
 
 能查到的资料不多，不知为啥。  
 知道是按位异或，但是要注意一点。  
