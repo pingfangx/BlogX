@@ -6,6 +6,9 @@
 ## 翻译下列属性
 全部去掉
 
+
+## 
+org.omegat.filters2.html2.HTMLFilter2#privateProcessEntry
 ## 不翻译含下列属性键值对（逗号分隔）的标签内容
 class=codeblock
 
