@@ -1,3 +1,33 @@
 [logcat 命令行工具](https://developer.android.com/studio/command-line/logcat)
 
 adb logcat -d *:E >D:/adb/log.txt
+
+
+
+# 在命令行查看
+## [CMD窗口正确显示UTF-8字符](https://www.bbsmax.com/A/kvJ3EN3Ddg/)
+[代码页-维基百科](https://zh.wikipedia.org/zh-cn/%E4%BB%A3%E7%A0%81%E9%A1%B5)
+
+    查看
+    chcp
+    切换
+    chcp 65001
+    切回
+    chcp 936
+
+## [CMD窗口正确显示UTF-8字符](https://www.bbsmax.com/A/kvJ3EN3Ddg/)
+修改完字符还是乱码，需要在命令行标题栏上点击右键，选择"属性"->"字体"，将字体修改
+
+# findstr
+使用 | findstr 过滤，但是会出现
+
+    FINDSTR: Write error
+    
+使用 | find 卡住，可能是没使用对
+
+# adb logcat OkHttp:D *:S
+可以正常过滤，但是我们的 tag 是 CheckCodeUtils.logRequestOrResponse(L:231)  
+
+
+发现确实不太好解决啊，估计只有用 python 写脚本方便了。
+
