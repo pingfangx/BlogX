@@ -30,6 +30,29 @@
         breakpositions.removeAll(dontbreakpositions);
         ...
     }
+    
+    getBreaks
+        ...
+        
+        while (bbm.find()) {
+            int bbe = bbm.end();
+            if (abm == null) {
+                res.add(new BreakPosition(bbe, rule));
+            } else {
+                int abs = abm.start();
+                while (abs < bbe) {
+                    boolean found = abm.find();
+                    if (!found) {
+                        return res;
+                    }
+                    abs = abm.start();
+                }
+                if (abs == bbe) {
+                    res.add(new BreakPosition(bbe, rule));
+                }
+            }
+        }
+        ...
 
     断点看到被以下规则分割
     Break Before: [\.\?\!]+After: \s
