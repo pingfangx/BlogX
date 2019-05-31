@@ -91,3 +91,25 @@
             TagNode
         Text
             TextNode
+            
+            
+# pre 标签含有 class 忽略无效
+再次下断
+
+    processEntry:606, AbstractFilter (org.omegat.filters2)
+    privateProcessEntry:204, HTMLFilter2 (org.omegat.filters2.html2)
+    endup:616, FilterVisitor (org.omegat.filters2.html2)
+    visitEndTag:321, FilterVisitor (org.omegat.filters2.html2)
+    accept:760, TagNode (org.htmlparser.nodes)
+    accept:461, CompositeTag (org.htmlparser.tags)
+    accept:461, CompositeTag (org.htmlparser.tags)
+    accept:461, CompositeTag (org.htmlparser.tags)
+    accept:461, CompositeTag (org.htmlparser.tags)
+    visitAllNodesWith:661, Parser (org.htmlparser)
+    
+    看到时一开始的 pre 已经忽略了但是 /pre 又继续处理。
+    和之前的 code 标签一样，
+    <pre></pre> 被解析为 一个 Tag 一个 Text 加一个 End
+    于是手动添加 pre 标签的解析。
+    
+    成功。
