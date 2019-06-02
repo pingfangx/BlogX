@@ -1,0 +1,109 @@
+#PLL http://www.rubik.com.cn/fridrich3.htm
+# 第1组 简版CFOP里面的七个PLL公式
+## 1-1) (R U' R) U (R U R U') (R' U' R2)
+往右移 旋转3个棱块
+
+## 1-2) (R2' U)(R U R' U') (R' U')(R' U R')
+往左移 旋转3个棱块
+
+## 1-3) M2 U M2 U2 M2 U M2
+对称地 交换4个棱块
+
+## 1-4) (M2 U M2 U) (M上 U2) (M2 U2) (M上 U2)
+相邻地 交换4个棱块
+
+## 1-5) x' R2 D2 (R' U' R) D2 (R' U R') x
+顺时针 交换3个角块
+黄色朝自己 R2 D2
+
+## 1-6) x'(R U'R) D2 (R' U R) D2 R2 x
+逆时针 交换3个角块
+R U'R
+
+## 1-7) (R2 U R' U') y (R U R' U')2 (R U R') y' (R U' R2)
+左右交换 4个角块
+R2 U R' U'交换
+y (R U R' U')2 (R U R')
+y‘ 再接回去
+
+# 第2组 8个关键的PLL公式
+## 2-1) (R U R' U') (R' F R2 U' R' U')  (R U R' F')
+躺T字
+(R U R' U')
+R' F下去
+R2 U' R' U' 接下来U’一下
+(R U R' F') 再送回去
+
+2-2) (R U R'F') (R U R'U')(R'F R2 U'R'U')
+斜插
+R U R'F'
+R U R'U'送出去 接回来
+
+
+## 2-3) z(U' R D')(R2 U R' U') (R2 U) D R'
+斜插
+z(U' R D')
+R2 U R' U'
+
+## 2-4) F(R U'R' U')
+(R U R' F')
+(R U R' U')(R' F R F')
+F起
+R U'R' 一退一回
+Y'
+R U R' F' 一进一回
+R U R' U' 一送一回
+R' F R F' 一下一回
+
+
+## 2-5) U' (R'U R U') R2' b' x 
+(R' U R) y' 
+(R U R' U' R2)
+右侧的一对角块一对棱块上下交换
+
+## 2-6) (R' U R' d') (R' F') 
+(R2 U' R' U) (R' F R F)
+(R' U R' d') (R' F') R2 前而形成4个白色
+
+## 2-7) (R U'U')(R' U2)  (R B' R' U') (R U R B)  R2' U
+(R U'U')(R' U2)变换后白色朝前
+R B'下沉
+R' U' R U 变换
+R B 再复原回去
+
+## 2-8) (R' U2)(R U'U')  (R' F R U R' U')   (R' F' R2 U')
+(R' U2)(R U'U')交换后白色朝后
+R' F抬起左边
+R U R' U'变换
+R' F'再复原回去
+
+# 第3组 最后6个较难的PLL公式 
+## 3-1)U' L U' R U2 L' U R'   L U' R U2 L' U R '
+
+## 3-2)L' U R' U2 L U' R
+L' U R' U2 L U' R
+
+## 3-3) (R2' u') (R U' R) U 
+(R' u R2') y (R U'R')
+R2' u'转动
+(R U' R) U 
+R' u R2
+
+## 3-4) (R U R') y'(R2' u') (R U' R' U) (R' u R2)
+(R U R') y'移到左边
+R2 u'
+R U' R' U左移再回
+R‘拼上u回再R2
+
+
+
+##　3-5) (R2' u R') (U R' U') (R u' R2') y' (R' U R)
+R2' u移到前面
+R') (U R' U'移动
+R u' R2'恢复
+
+
+
+## 3-6) (R' d' F)(R2' u R') U (R U' R) u' R2
+R' d' F)(R2'u将2个白色翻起
+R') U (R U' R)变换
