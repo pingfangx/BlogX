@@ -4,3 +4,5 @@
 * The Java Virtual Machine Specification
 * Thinking in Java
 * Effective java
+* 深入理解Java虚拟机
+* Java并发编程的艺术
