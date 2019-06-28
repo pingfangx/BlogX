@@ -1,5 +1,8 @@
 [md]
 
+    git clone --dissociate --reference "<repository_path>" <repository>
+
+
 克隆时想要引用本地仓库，但本地仓库又经过修改，不能直接复制。  
 想起 git clone 时的一些参数，于是进行查看。
 

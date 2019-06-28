@@ -1,0 +1,86 @@
+@startuml
+
+'分隔符
+== 创建 Observable ==
+'进入和发出消息
+[-> Observable: Observable.create()
+
+'注释
+note left of Observable
+    示例为
+    public static <T> Observable<T>
+    create(ObservableOnSubscribe<T> source)
+end note
+
+create ObservableOnSubscribe
+Observable -> ObservableOnSubscribe :new ，重写 subscribe(ObservableEmitter)
+
+'创建参与者
+create ObservableCreate
+Observable -> ObservableCreate : new ObservableCreate<T>(ObservableOnSubscribe<T>)
+note right #0FF: 创建可观察结象 Observable
+
+== 创建 Observer 并订阅到 Observable==
+
+create Consumer
+Observable -> Consumer:new，重写 accept
+
+'给自己发消息
+Observable -> Observable : subscribe(Consumer<? super T> onNext)
+note left:单个参数为 onNext
+
+Observable -> Observable : subscribe(Consumer onNext, \nConsumer onError, \nAction onComplete, \nConsumer onSubscribe)
+
+create LambdaObserver
+Observable -> LambdaObserver : new
+note right #0FF: 创建观察者 Observer
+
+'声明参与者
+participant Observer
+LambdaObserver <--> Observer
+note right
+    该箭头表示 LambdaObserver 是 Observer 的子类
+    相关方法作用于 Observer
+end note
+Observable -> Observable : Observable.subscribe(Observer<? super T>)
+note left #0FF
+订阅
+关键方法，创建的各种 Observable 的不同实现
+都是在 subscribeActual 中完成的
+end note
+
+Observable -> ObservableCreate : subscribeActual(Observer<? super T> observer)
+create CreateEmitter
+ObservableCreate -> CreateEmitter : new CreateEmitter<T>(observer)
+
+ObservableCreate -> Observer : onSubscribe(Disposable)
+note right: 调用观察者的方法 onSubscribe(parent)
+
+ObservableCreate -> ObservableOnSubscribe : subscribe(ObservableEmitter)
+note left: 此时可调用 Emitter 的相关方法
+
+== 接下来可发射数据项或通知==
+ObservableOnSubscribe --> CreateEmitter
+
+'生命线的激活
+activate CreateEmitter
+CreateEmitter --> Observer : onNext(T value)
+Observer  -> LambdaObserver
+LambdaObserver -> Consumer : accept(T t)
+'延迟
+... ...
+CreateEmitter --> Observer : onError(Throwable error)
+'生命线的撤销
+destroy CreateEmitter
+
+
+... ...
+'空间
+|||
+CreateEmitter --> Observer : onNext(T value)
+note right: onError 和 onComplete 只会出现其中之一
+activate CreateEmitter
+... ...
+CreateEmitter --> Observer : onComplete()
+destroy CreateEmitter
+@enduml

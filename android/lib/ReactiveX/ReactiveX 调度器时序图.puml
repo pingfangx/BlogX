@@ -1,0 +1,144 @@
+@startuml
+
+
+== 创建 Observable ==
+[-> Observable: 各种方式创建
+Observable --> ObservableSource
+
+== 创建 Scheduler 并 subscribeOn==
+Observable -> Schedulers : Schedulers.io()
+Schedulers -> "Schedulers.IOTask" as IOTask:call()
+IOTask -> IoScheduler:单例 new
+
+'IoScheduler 内部初始化
+IoScheduler -> IoScheduler : static init
+create RxThreadFactory
+IoScheduler -> RxThreadFactory:new RxThreadFactory(WORKER_THREAD_NAME_PREFIX, priority)
+IoScheduler -> Scheduler
+
+IoScheduler -> IoScheduler : start()
+
+IoScheduler -> Observable
+
+Observable -> Observable:subscribeOn(Scheduler)
+
+create ObservableSubscribeOn
+Observable -> ObservableSubscribeOn : new ObservableSubscribeOn<T>(this, scheduler)
+note right #0FF
+public ObservableSubscribeOn(ObservableSource<T> source, Scheduler scheduler) {
+    super(source);
+    this.scheduler = scheduler;
+}
+创建了 ObservableSubscribeOn，持有 source
+在执行 subscribeActual 时创建 SubscribeTask ，其实现 Runnable
+然后调用 Schedule 的 scheduleDirect 方法，该方法会创建 Scheduler.Worker，由 worker 将 SubscribeTask 加入线程池
+后续执行 SubscribeTask 时直接调用 source.subscribe() 方法
+由于创建  executor 时使用了 threadFactory 参数
+所以关键就是各 Scheduler 提供的 ThreadFactory
+
+不同的 Scheduler 提从不同的 ThreadFactory
+ThreadFactory 创建不同的线程
+SubscribeTask 在不同的线程执行
+
+通俗一点说明
+包装了 Observable，重写订阅方法
+创建一个 Runnable 交由调度器调度，
+一般调度器会创建 worker 由 worker 实现调度
+一此 worker 会将 Runnable 加入线程池，创建线程池使用的 ThreadFactory 可以创建不同的线程就实现了线程切换
+end note
+
+== observeOn ==
+
+|||
+Observable -> AndroidSchedulers : AndroidSchedulers.mainThread()
+AndroidSchedulers -> HandlerScheduler: new HandlerScheduler(new Handler(Looper.getMainLooper()), false)
+
+Observable -> Observable:observeOn(Scheduler)
+Observable -> Observable:observeOn(Scheduler scheduler, boolean delayError, int bufferSize)
+create ObservableObserveOn
+Observable -> ObservableObserveOn:new ObservableObserveOn<T>(this, scheduler, delayError, bufferSize)
+note right #0FF:ObservableObserveOn
+
+== 创建 Observer 并订阅到 Observable==
+
+create Observer
+Observable -> Observer : new
+
+Observable -> Observable : subscribe()
+
+Observable -> ObservableObserveOn : subscribeActual(Observer)
+create ObserveOnObserver
+ObservableObserveOn -> ObserveOnObserver : new
+ObserveOnObserver -> ObservableObserveOn :return ObserveOnObserver
+
+
+'转到 ObservableSubscribeOn
+ObservableObserveOn ->ObservableSubscribeOn : source.subscribe(Observer)
+ObservableSubscribeOn -> ObservableSubscribeOn : subscribeActual()
+
+create "ObservableSubscribeOn$SubscribeOnObserver" as SubscribeOnObserver
+ObservableSubscribeOn -> SubscribeOnObserver : parent = new SubscribeOnObserver<T>(observer)
+ObservableSubscribeOn -> ObserveOnObserver : observer.onSubscribe(parent)
+ObserveOnObserver -> ObservableSubscribeOn : return parent
+
+create "ObservableSubscribeOn$SubscribeTask" as SubscribeTask
+ObservableSubscribeOn -> SubscribeTask : new SubscribeTask(parent)
+ObservableSubscribeOn -> Scheduler:scheduler.scheduleDirect(Runnable)
+
+Scheduler -> Scheduler : scheduleDirect(Runnable run, long delay, TimeUnit unit)
+Scheduler -> IoScheduler : createWorker()
+
+'创建 worker 过程
+participant "IoScheduler$EventLoopWorker" as EventLoopWorker
+IoScheduler -> "AtomicReference<CachedWorkerPool>" as ACachedWorkerPool
+ACachedWorkerPool -> CachedWorkerPool
+CachedWorkerPool -> IoScheduler:return CachedWorkerPool
+
+IoScheduler -> EventLoopWorker : new EventLoopWorker(CachedWorkerPool pool)
+EventLoopWorker -> CachedWorkerPool:threadWorker = pool.get()
+CachedWorkerPool -> ThreadWorker
+ThreadWorker -> NewThreadWorker
+NewThreadWorker -> EventLoopWorker : return ThreadWorker
+EventLoopWorker -> IoScheduler : return EventLoopWorker
+
+IoScheduler -> Scheduler :return worker
+
+create DisposeTask
+Scheduler -> DisposeTask : new
+Scheduler -> EventLoopWorker : schedule(Runnable run, long delay, TimeUnit unit)
+
+EventLoopWorker -> NewThreadWorker : scheduleActual
+NewThreadWorker -> ExecutorService: submit 或 schedule
+
+
+ExecutorService --> DisposeTask : run
+DisposeTask -> SubscribeTask:run
+
+SubscribeTask -> ObservableSubscribeOn: 获取 source 直接调用
+SubscribeTask -> ObservableSource:source.subscribe(parent)
+
+== Observer 的处理==
+ObservableSource -> Observable : 具体 Observable 不同的实现
+Observable --> ObserveOnObserver : onNext
+note right #0FF
+当调用 observeOn 时，创建了一个 ObservableObserveOn
+当调用 subscribeActual 时，包装 Observer 为 ObserveOnObserver
+后续调用 onNext 时，进行调度，runnable 为 this，call 方法执行
+Scheduler 的用途与前面的 subscribeOn 的分析不太一样，当其用于 ObservableSubscribeOn 时，会在 subscribeActual 中调用 Scheduler.scheduleDirect
+然后由 Scheduler 创建 worker，再调用 worker.schedule
+而当用于 ObservableObserveOn 时，没有 Scheduler.scheduleDirect 方法的调用，而是在 onNext 时，直接调用 worker.schedule
+
+如果 worker 执行 schedule 时创建线程池，则关键在于 Scheduler 提供的 ThreadFactory
+在 HandlerScheduler 的实现中，创建的 worker 为 HandlerWorker，其 schedule 实现使用 Handler
+
+通俗一点说明
+包装了 Observable 包装为 ObservableObserveOn
+在订阅时，将订阅者包装为，使得订阅者在收到 onNext 不直接处理，可是使用 Scheduler 创建的 worker 调度
+线程切换就依赖于 worker 调度的实现
+
+HandlerScheduler 的调度使用 Handler
+end note
+ObserveOnObserver -> ObserveOnObserver: queue.offer(t);\nschedule();
+
+ObserveOnObserver -> ObserveOnObserver :worker.schedule(this);\nrun();
+@enduml
