@@ -1,0 +1,36 @@
+因为空间吃紧，需要使用占用空间尽量小的数据类型。
+
+[Data Types](https://dev.mysql.com/doc/refman/8.0/en/data-types.html)
+
+# Numeric Types
+## M 表示什么
+不同类型有不同的含义，int 用来表示展示宽度。
+> M indicates the maximum display width for integer types. 
+
+
+整理的部分类型
+类型|最小值|最大值|无符号最大值|备注
+-|-|-|-|-
+数字|
+TINYINT|-128|127|255|
+SMALLINT|-32768|32767|65535
+MEDIUMINT|-8388608|8388607|16777215
+INT|-2147483648|2147483647|4294967295
+BIGINT|-9223372036854775808|9223372036854775807|18446744073709551615
+时间|
+DATE|1000-01-01|9999-12-31
+DATETIME|1000-01-01 00:00:00.000000|9999-12-31 23:59:59.999999
+TIMESTAMP|1970-01-01 00:00:01.000000|2038-01-19 03:14:07.999999
+TIME|-838:59:59.000000|838:59:59.000000
+字符串|
+CHAR|0|255|-|定长
+VARCHAR|0|65535|-|变长
+TEXT|
+
+Discuz 数据库类型
+名称|类型|备注
+-|-|-
+pid|int
+tid|mediumint
+author|varchar|15
+authorid|mediumint
