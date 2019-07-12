@@ -1,0 +1,25 @@
+# 遗留问题
+在继承 ImageView 时，需要接管 draw(Canvas canvas)  
+自己创建 bitmap 然后绘制到 canvas  
+当明想，能不能让 ImageView 自己绘制，然后再使用绘制好的 bitmap 处理呢。  
+一开始认为不行，因为获取不到 Canvas 绘制时使用的 paint，
+没有 paint 就不能设置 setXfermode  
+后来看到一个实现
+
+    com.aliyun.quview.RoundSquareView
+    
+    @Override
+    public void draw(Canvas canvas) {
+        Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas2 = new Canvas(bitmap);
+        super.draw(canvas2);
+        drawLiftUp(canvas2);
+        drawRightUp(canvas2);
+        drawLiftDown(canvas2);
+        drawRightDown(canvas2);
+        canvas.drawBitmap(bitmap, 0, 0, paint2);
+        bitmap.recycle();
+    }
+
+    可以看到，还是调用 super.draw() 来绘制图片了，但是使用自己的 canvas
+    canvas 绘制在 bitmap 上，处理 bitmap 最后调用 canvas.drawBitmap
