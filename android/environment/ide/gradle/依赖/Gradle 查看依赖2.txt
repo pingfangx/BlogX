@@ -1,0 +1,30 @@
+原本的 Gradle 文档地址找不到了。好像是有一个   
+Building Android Apps - Gradle Tutorials and Guides
+
+现在没有了。
+[Inspecting Dependencies](https://docs.gradle.org/current/userguide/inspecting_dependencies.html)
+
+# Gradle tasks
+在 Gradle 工具窗口中  
+<project>:app 中找到名为  
+<project>:app [dependencies] 的任务，执行即可。  
+
+可以看到执行的任务是`:app:dependencies`
+
+那么手动执行`gradlew :app:dependencies` 也是可以的
+
+该任务会列出所有运行配置的依赖，有时我们可能只要查看某个配置的依赖
+
+# 指定运行配置
+    gradlew :app:dependencies --configuration <configuration_name>CompileClasspath
+    
+    如
+    gradlew :app:dependencies --configuration releaseCompileClasspath
+
+    实际项目中的配置名为 a_testDebug
+    gradlew :app:dependencies --configuration a_testDebugCompileClasspath
+    
+# 指定依赖
+    gradlew :app:dependencyInsight --dependency om.squareup.retrofit2:retrofit --configuration a_testDebugCompileClasspath
+    
+注意此时是 dependencyInsight 
