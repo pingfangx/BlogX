@@ -1,5 +1,6 @@
 升级后编译花费较长时间，且 CPU 占满，还会失败。
 
+使用 org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=1g 配置
 
 同时有部分错误
 
