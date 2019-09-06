@@ -23,3 +23,12 @@ rfc 中限制宽度，宽度到了就换行。
 写了 Python 脚本，同时记录修改前、后的文件，方便比较。
 
     process_line_break_for_translation.py
+    
+    
+# 后来发现
+[Internet-Draft Archive Tool](https://tools.ietf.org/id/)
+
+中的是标准的 html 格式，甚至 xml 也应该是可以的。  
+之前只是点了 txt、pdf 和 html 就是没试一下 draft
+
+后业又再发现，早期的类似 rfc5246 还是只有 txt 和 pdf 两种格式
