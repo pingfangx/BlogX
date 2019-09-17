@@ -8,4 +8,7 @@
 
 同时 openssl 也提供了方法由私钥生成公钥
 
-    openssl rsa -in <private key in> -pubout <public key out>
+    openssl rsa -in <private key in> -pubout -out <public key out>
+    
+    
+[Generating Public and Private Keys with openssl.exe](http://lunar.lyris.com/help/lm_help/12.0/Content/generating_public_and_private_keys.html)
