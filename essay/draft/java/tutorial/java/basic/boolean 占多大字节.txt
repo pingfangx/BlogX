@@ -1,5 +1,0 @@
-TODO 查看是否与机器相关
-int 在 32 与 64 位电脑是否不同
-> This data type represents one bit of information, but its "size" isn't something that's precisely defined.
-
-https://stackoverflow.com/questions/1907318
