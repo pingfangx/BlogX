@@ -32,4 +32,5 @@ TODO
 可能需要查看规范
 > This data type represents one bit of information, but its "size" isn't something that's precisely defined.
 * 如何确定一个变量的基本类型
-* 未赋初值的字段，在编译时也并没有为其赋值，是计算时直接作为空吗
+* 未赋初值的字段，查看编译文件也并没有为其赋值，还是说反编译没有展示  
+> 已声明但未初始化的字段将由编译器设置为合理的默认值。
