@@ -4,3 +4,7 @@
 -|-|-
 数字下划线|7|1_234_567L
 case String|7|case "A":
+@Repeatable|8|涉及重复注解、容器注解等
+类型注解|8|new @Interned MyObject();
+@FunctionalInterface|8|
+
