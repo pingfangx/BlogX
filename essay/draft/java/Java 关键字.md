@@ -16,7 +16,7 @@ do|控制流||
 double|类型||
 else|控制流||
 enum|类||5.0
-extends|类|类继承和接口继承|
+extends|类|类继承和接口继承，泛型上界|
 final|修饰符|类、成员|
 finally|异常||
 float|类型||
