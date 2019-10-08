@@ -4,6 +4,8 @@
 -|-|-
 数字下划线|7|1_234_567L
 case String|7|case "A":
+try-with-resources|7
+捕获多种类型的异常|7|catch (IOException|SQLException ex){}
 @Repeatable|8|涉及重复注解、容器注解等
 类型注解|8|new @Interned MyObject();
 @FunctionalInterface|8|
