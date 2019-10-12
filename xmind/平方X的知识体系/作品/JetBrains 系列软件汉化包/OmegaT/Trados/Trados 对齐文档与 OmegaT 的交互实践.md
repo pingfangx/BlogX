@@ -16,3 +16,6 @@ xml:lang 替换为 lang
 
 ## 标签
 trados 使用 level2 的 tmx，标签处理是类似 bpt ept 的标签包围
+
+## \xa0
+应该替换为空格

@@ -49,3 +49,12 @@
     Error:(20, 9) java: 未报告的异常错误java.io.FileNotFoundException; 必须对其进行捕获或声明以便抛出
     
     以后如果发现再进行对比。
+    
+    
+# 官方译文
+    在 1.6 的 java api 中文版中
+    api/java/util/package-summary.html
+    译为了 未经检查的异常
+    
+    api/java/lang/reflect/package-summary.html
+    译为了 经过检查的异常
