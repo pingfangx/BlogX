@@ -22,6 +22,10 @@
 所以这里的检查型或许可以理解为，开发者应该 **检查** 异常，以进行恢复。  
 而非检查型异常（错误和运行时异常），应用程序通常无法预测或恢复
 
+## 在 Android doc Error.html 中
+> That is, Error and its subclasses are regarded as unchecked exceptions for the purposes of compile-time checking of exceptions.
+
+这里意思更清楚，所谓的 unchecked 是指用于编译时异常检查目的时，不需要检查。
 
 # 未经检查的警告
 这里还有一个  unchecked warning

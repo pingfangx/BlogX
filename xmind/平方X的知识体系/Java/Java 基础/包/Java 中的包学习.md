@@ -7,11 +7,11 @@ java 中的非 lang 包
 
 lang 中的除了常用类以外的类
 
-* 常用类，应该查看所有方法，了解有哪些方法可以使用
+* 常用类，应该查看所有方法的 Summary，了解有哪些方法可以使用
 
 lang/package-summary.html 中提到的各类
 
-* 重点类，应该查看部分方法的实现，了解实现原理
+* 重点类，应该查看所有方法的完整文档，查看部分方法的实现，了解实现原理
 
   集合
 
@@ -26,25 +26,28 @@ java.security|不常用包||1|
 java.sql|不常用包||1|
 java.text|不常用包||1|
 java.util|不常用包||1|
-|常用包|||
+|常用包||-|
 java.lang|常用包||1|
 java.lang.annotation|常用包||1|
 java.lang.ref|常用包||1|
 java.lang.reflect|常用包||1|
-|常用类|||
-Object|常用类|||
-Class|常用类|||
-Throwable|常用类|||
-Byte|常用类，包装类|||
-Short|常用类|||
-Integer|常用类|||
-Long|常用类|||
-Float|常用类|||
-Double|常用类|||
-Boolean|常用类|||
-Character|常用类|||
-Void|常用类|||
-Math|常用类，数学|||
+|常用类||-|
+Object|常用类||1|
+Class|常用类||1|
+Throwable|常用类、异常||1|
+Exception|常用类||1|
+Error|常用类||1|
+Byte|常用类，包装类||1|
+Short|常用类||1|
+Integer|常用类||1|
+Long|常用类||1|
+Float|常用类||1|
+Double|常用类||1|
+Boolean|常用类||1|
+Character|常用类||1|
+Void|常用类||1|
+Number|常用类，数学||1|
+Math|常用类||1|
 String|常用类，字符串|||
 StringBuilder|常用类|||
 StringBuffer|常用类|||
@@ -52,7 +55,12 @@ CharSequence|常用类|||
 ClassLoader|常用类|||
 Process|常用类|||
 ProcessBuilder|常用类|||
-Runtime|常用类|||
-SecurityManager|常用类|||
-System|常用类|||
-|重点类|||
+Thread|常用类|||
+Runnable|常用类||1|
+Runtime|常用类||1|
+SecurityManager|常用类||-|弃
+System|常用类||1|
+|重点类||-|
+String|重点类|||
+Thread|重点类|||
+Runnable|重点类|||
