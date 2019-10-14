@@ -67,7 +67,9 @@
     修改了目录结构
     
 # 最终使用文件
-选取中文的 java-api-1.6-cn.zip、java-api-1.6-html_zh_CN-改.zip 和
-英文的 java-api-1.6-en.zip、j2se6-改.zip 分别组合
+选取中文的 java-api-1.6-cn.zip（cn）、java-api-1.6-html_zh_CN-改（cn改）.zip 和
+英文的 java-api-1.6-en（en）.zip、j2se6-改（en改）.zip 分别组合
 
-得到 4 个结果文件，java-api-1.6-cn.zip 配合 j2se6-改.zip 对齐最多。
+得到 4 个结果文件，cn 配合 en改 对齐最多。
+
+但是 cn 中有部分内容（如 StringBuilder）未正确翻译，需要使用 cn改

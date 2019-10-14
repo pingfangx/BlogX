@@ -19,6 +19,10 @@
     为什么会是 0xD83D 0xDE02 呢？
     因为使用的 UTF-16
     
+在 String api 中有介绍
+
+> A String represents a string in the UTF-16 format in which supplementary characters are represented by surrogate pairs (see the section Unicode Character Representations in the Character class for more information).
+    
 [Which encoding does Java uses UTF-8 or UTF-16? - Stack Overflow](https://stackoverflow.com/questions/39955169/which-encoding-does-java-uses-utf-8-or-utf-16)
 
 [UTF-16 - 维基百科](https://zh.wikipedia.org/wiki/UTF-16)
