@@ -1,2 +1,4 @@
 # ignore the ignore dir
 ignore/
+# pdf books
+*.pdf
