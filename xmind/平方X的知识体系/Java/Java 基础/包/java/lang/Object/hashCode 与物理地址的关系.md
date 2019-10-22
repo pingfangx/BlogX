@@ -5,3 +5,5 @@
 
 # Java Tutorial
 > hashCode() 返回的值是对象的哈希码，它是十六进制的对象的内存地址。
+
+# Thinking in Java 也多次提到是对象的内存地址

@@ -48,4 +48,6 @@
         }
     }
 
+# Thinking in Java 中也有介绍
+> However, final fields are actually safe from change. The runtime system accepts any attempts at change without complaint, but nothing actually happens.  
 

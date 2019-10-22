@@ -9,6 +9,7 @@
 ## 泛型协变 List<? extends T>
 > 带 extends 限定（上界）的通配符类型使得类型是协变的（covariant）
 
+
 # 逆变 contravariance
 用宽类型覆盖窄类型
 
