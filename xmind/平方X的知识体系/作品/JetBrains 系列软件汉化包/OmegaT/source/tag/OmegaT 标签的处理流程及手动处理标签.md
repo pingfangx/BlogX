@@ -78,3 +78,24 @@
     
 # 处理
 所以只是转为小写，没有特殊的处理规则，直接用 Python 脚本处理
+
+# 片段之间是如何缩短与还原的
+都要执行缩短与还原，只是解析时缩短后的内容 由 processEntry 处理，out 外理还原内容是 NullBufferedWriter
+
+而翻译输出时, processEntry 返回翻译，out 将还原内容输出。
+
+## 如何判断需要还原
+    不需要判断，在调用 processEntry 时，如果是解析，会自动添加到解析的条目
+    如果是翻译，会返回结果
+    org.omegat.filters2.AbstractFilter#processEntry(java.lang.String, java.lang.String)
+    protected final String processEntry(String entry, String comment) {
+        if (entryParseCallback != null) {
+            entryParseCallback.addEntry(null, entry, null, false, comment, null, this, null);
+            return entry;
+        } else {
+            String translation = entryTranslateCallback.getTranslation(null, entry, null);
+            return translation != null ? translation : entry;
+        }
+    }
+    所以，只需要缩短标签，传递给 processEntry
+    然后还原即可
