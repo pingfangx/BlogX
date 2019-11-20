@@ -1,0 +1,1 @@
+打开应用进 AMS 创建了 ActivityThread，并调用了 android.app.ActivityThread#main

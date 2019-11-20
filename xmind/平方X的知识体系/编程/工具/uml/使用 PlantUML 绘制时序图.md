@@ -6,17 +6,32 @@
 
 ## 给自己发消息
 
+## 修改箭头颜色
+Bob -[#red]> Alice : hello
+Alice -[#0000FF]->Bob : ok
+
 ## 对消息序列编号
-
+    autonumber
+    autonumber 15
+    
 ## 给消息添加注释
-
+    note left
+    end note
 ## 分隔符
 
 ## 生命线的激活与撤销
 
 ## 创建参与者
+    participant 
 
 ## 进入和发出消息
+
+## Return
+
+## 组合消息
+    alt
+    else
+    end
 
 # 绘制时注意
 

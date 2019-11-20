@@ -6,7 +6,7 @@
 
 ## 后台 Activity 的启动
 
-## 获以设备信息
+## 获取设备信息
 相关信息包括 IMEI、IMSI、序列号等，项目中获取 IMSI 的方法需要 try catch
 
 https://developer.android.com/about/versions/10/privacy/changes#non-resettable-device-ids
